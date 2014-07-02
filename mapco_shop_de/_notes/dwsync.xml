@@ -21,7 +21,6 @@
 <file name="21540.php" server="www.mapco.de/public_html/" local="129983990027810832" remote="129962403000000000" Dst="1" />
 <file name="amazon_feed3.xml" server="www.mapco.de/public_html/" local="130171643221260029" remote="129961944000000000" Dst="2" />
 <file name="amazon_feed.xml" server="www.mapco.de/public_html/" local="130171643223340148" remote="129961944000000000" Dst="2" />
-<file name="amazon_prices.csv" server="www.mapco.de/public_html/" local="130171643240901153" remote="129965400000000000" Dst="2" />
 <file name="backend_amazon_accounts.php" server="www.mapco.de/public_html/" local="130471150457086724" remote="130471150200000000" Dst="2" />
 <file name="backend_amazon_categories.php" server="www.mapco.de/public_html/" local="130475559367029223" remote="130475559000000000" Dst="2" />
 <file name="backend_amazon_index.php" server="www.mapco.de/public_html/" local="130396221074155904" remote="130396185000000000" Dst="2" />
@@ -44,7 +43,6 @@
 <file name="backend_shop_returns.php" server="www.mapco.de/public_html/" local="130344226960000000" remote="130344226960000000" Dst="1" />
 <file name="shop_searchbycar.php" server="www.mapco.de/public_html/" local="130348761870000000" remote="130348761870000000" Dst="1" />
 <file name="backend_cms_file_editor.php" server="www.mapco.de/public_html/" local="130344181630000000" remote="130344181630000000" Dst="1" />
-<file name="backend_cms_files.php" server="www.mapco.de/public_html/" local="129962403160000000" remote="129962403160000000" Dst="1" />
 <file name="backend_cms_imageprofiles.php" server="www.mapco.de/public_html/" local="130044465290000000" remote="130044465290000000" Dst="1" />
 <file name="backend_cms_label_editor.php" server="www.mapco.de/public_html/" local="130344182970000000" remote="130344182970000000" Dst="1" />
 <file name="backend_cms_labels.php" server="www.mapco.de/public_html/" local="130344183220000000" remote="130344183220000000" Dst="1" />
@@ -98,13 +96,11 @@
 <file name="company_staff.php" server="www.mapco.de/public_html/" local="130344229990000000" remote="130344229990000000" Dst="1" />
 <file name="company_stuff.php" server="www.mapco.de/public_html/" local="130344230180000000" remote="130344230180000000" Dst="1" />
 <file name="contact.php" server="www.mapco.de/public_html/" local="130344234910000000" remote="130344234910000000" Dst="1" />
-<file name="csvmanager.csv" server="www.mapco.de/public_html/" local="129860654460000000" remote="129860654460000000" Dst="1" />
 <file name="cup_rules.php" server="www.mapco.de/public_html/" local="130281136650000000" remote="130281136650000000" Dst="1" />
 <file name="customer_test.php" server="www.mapco.de/public_html/" local="130281136940000000" remote="130281136940000000" Dst="1" />
 <file name="download.php" server="www.mapco.de/public_html/" local="130344236310000000" remote="130344236310000000" Dst="1" />
 <file name="ebay_images.php" server="www.mapco.de/public_html/" local="130344236730000000" remote="130344236730000000" Dst="1" />
 <file name="ebay_images_upload.php" server="www.mapco.de/public_html/" local="129948120000000000" remote="129948120000000000" Dst="2" />
-<file name="ebay_tmp.jpg" server="www.mapco.de/public_html/" local="130344236900000000" remote="129702371710000000" Dst="1" />
 <file name="ebaytest.php" server="www.mapco.de/public_html/" local="129520236850000000" remote="129520236850000000" Dst="1" />
 <file name="google57312c0badfcdd7b.html" server="www.mapco.de/public_html/" local="129859503070000000" remote="129859503070000000" Dst="1" />
 <file name="google7cf1608a09ddf9e2.html" server="www.mapco.de/public_html/" local="129581223640000000" remote="129581223640000000" Dst="1" />
@@ -119,7 +115,6 @@
 <file name="logout.php" server="www.mapco.de/public_html/" local="129358468300000000" remote="129358468300000000" Dst="1" />
 <file name="mapco_cup.php" server="www.mapco.de/public_html/" local="130344263350000000" remote="130344263350000000" Dst="1" />
 <file name="mapco_tv.php" server="www.mapco.de/public_html/" local="130344263570000000" remote="130344263570000000" Dst="1" />
-<file name="mysql" server="www.mapco.de/public_html/" local="129288261600000000" remote="129288261600000000" Dst="1" />
 <file name="newsletter_archive.php" server="www.mapco.de/public_html/" local="130281148150000000" remote="130281148150000000" Dst="1" />
 <file name="newsletter_subscription.php" server="www.mapco.de/public_html/" local="130344263890000000" remote="130344263890000000" Dst="1" />
 <file name="newsletter_web.php" server="www.mapco.de/public_html/" local="130344264020000000" remote="130344264020000000" Dst="1" />
@@ -130,8 +125,6 @@
 <file name="press_reports.php" server="www.mapco.de/public_html/" local="130344275950000000" remote="130344275950000000" Dst="1" />
 <file name="products.php" server="www.mapco.de/public_html/" local="130344276360000000" remote="130344276360000000" Dst="1" />
 <file name="quality.php" server="www.mapco.de/public_html/" local="130281150630000000" remote="130281150630000000" Dst="1" />
-<file name="recherche.csv" server="www.mapco.de/public_html/" local="129950359370000000" remote="129950359370000000" Dst="1" />
-<file name="recherche2.csv" server="www.mapco.de/public_html/" local="129950374980000000" remote="129950374980000000" Dst="1" />
 <file name="register.php" server="www.mapco.de/public_html/" local="130281150600000000" remote="130281151170000000" Dst="1" />
 <file name="response_test.htm" server="www.mapco.de/public_html/" local="130144699800000000" remote="130144736350000000" Dst="1" />
 <file name="response_test.php" server="www.mapco.de/public_html/" local="129314352080000000" remote="129314352080000000" Dst="1" />
@@ -155,12 +148,8 @@
 <file name="shopitem.php" server="www.mapco.de/public_html/" local="130344307970000000" remote="130344307970000000" Dst="1" />
 <file name="sitemap.php" server="www.mapco.de/public_html/" local="130344308220000000" remote="130344308220000000" Dst="1" />
 <file name="survey.php" server="www.mapco.de/public_html/" local="129930436210000000" remote="129930436210000000" Dst="1" />
-<file name="temp.jpg" server="www.mapco.de/public_html/" local="130020383215752964" remote="129542076000000000" Dst="1" />
-<file name="test.dat" server="www.mapco.de/public_html/" local="129860533020000000" remote="129860533020000000" Dst="1" />
 <file name="test.htm" server="www.mapco.de/public_html/" local="130295962120000000" remote="130295962120000000" Dst="1" />
 <file name="temp.tmp" server="www.mapco.de/public_html/" local="130349463340000000" remote="130349463340000000" Dst="1" />
-<file name="test123.dat" server="www.mapco.de/public_html/" local="129860621710000000" remote="129860621710000000" Dst="1" />
-<file name="test.pdf" server="www.mapco.de/public_html/" local="129968333560000000" remote="129968333560000000" Dst="1" />
 <file name="test79.php" server="www.mapco.de/public_html/" local="129960829860000000" remote="129960829860000000" Dst="1" />
 <file name="test80.php" server="www.mapco.de/public_html/" local="130344460200000000" remote="130344460200000000" Dst="1" />
 <file name="test_actions.php" server="www.mapco.de/public_html/" local="130344465960000000" remote="130344465960000000" Dst="1" />
@@ -171,7 +160,6 @@
 <file name="user_index.php" server="www.mapco.de/public_html/" local="130294356600000000" remote="130294356660000000" Dst="1" />
 <file name="user_topitems.php" server="www.mapco.de/public_html/" local="130344163903515176" remote="130344164040000000" Dst="1" />
 <file name=".htaccess" server="www.mapco.de/public_html/" local="130446267000000000" remote="130446267000000000" Dst="2" />
-<file name="hallowelt.html" server="www.mapco.de/public_html/" local="130022985166566026" remote="130022985000000000" Dst="1" />
 <file name="backend_shop_gart.php" server="www.mapco.de/public_html/" local="130344220480000000" remote="130344220480000000" Dst="1" />
 <file name="PayPalIPNHandler.php" server="www.mapco.de/public_html/" local="130081794149395518" remote="130081794000000000" Dst="1" />
 <file name="backend_administration_index.php" server="www.mapco.de/public_html/" local="130144248000000000" remote="130144248000000000" Dst="2" />
@@ -202,7 +190,6 @@
 <file name="csv_test.php" server="www.mapco.de/public_html/" local="130084476312933189" remote="130084476000000000" Dst="1" />
 <file name="Lagerbestandsabgleich.php" server="www.mapco.de/public_html/" local="130344263040000000" remote="130344263040000000" Dst="1" />
 <file name="ipn_single_execute.php" server="www.mapco.de/public_html/" local="130344262880000000" remote="130344262880000000" Dst="1" />
-<file name="op_listenabgleich_22032013.csv" server="www.mapco.de/public_html/" local="130084465800000000" remote="130084465800000000" Dst="1" />
 <file name="backend_ebay_oplistenabgleich.php" server="www.mapco.de/public_html/" local="130344210190000000" remote="130344210190000000" Dst="1" />
 <file name="backend_crm_orders.php" server="www.mapco.de/public_html/" local="130468798200000000" remote="130468798200000000" Dst="2" />
 <file name="import_orders.php" server="www.mapco.de/public_html/" local="130344258320000000" remote="130344258320000000" Dst="1" />
@@ -233,16 +220,13 @@
 <file name="repair_shop_orders.php" server="www.mapco.de/public_html/" local="130344280840000000" remote="130344280840000000" Dst="1" />
 <file name="backend_crm_orders_repair.php" server="www.mapco.de/public_html/" local="130344206850000000" remote="130344206850000000" Dst="1" />
 <file name="remail_orders.php" server="www.mapco.de/public_html/" local="130344276750000000" remote="130344276750000000" Dst="1" />
-<file name="amazonuk_fitments.csv" server="www.mapco.de/public_html/" local="130171643255491987" remote="130102493400000000" Dst="2" />
 <file name="AmazonUpdateJob.php" server="www.mapco.de/public_html/" local="130171643258802177" remote="130144739400000000" Dst="2" />
 <file name="AmazonUpdatePricesJob.php" server="www.mapco.de/public_html/" local="130171643270382839" remote="130144744800000000" Dst="2" />
-<file name="amazon_uk_asins.csv" server="www.mapco.de/public_html/" local="130064362650000000" remote="130064362650000000" Dst="1" />
 <file name="AmazonUpdateQuantitiesJob.php" server="www.mapco.de/public_html/" local="130171643279453358" remote="130144747200000000" Dst="2" />
 <file name="backend_admin_customs.php" server="www.mapco.de/public_html/" local="130344167230000000" remote="130344167230000000" Dst="1" />
 <file name="backend_admin_idims_test.php" server="www.mapco.de/public_html/" local="130126687800000000" remote="130126723970000000" Dst="1" />
 <file name="backend_admin_ebay_update.php" server="www.mapco.de/public_html/" local="130344171340000000" remote="130344171340000000" Dst="1" />
 <file name="backend_administration_shops.php" server="www.mapco.de/public_html/" local="130344175280000000" remote="130344175200000000" Dst="1" />
-<file name="backend_administration_vapp_export" server="www.mapco.de/public_html/" local="130344345580000000" remote="130344345000000000" Dst="1" />
 <file name="backend_administration_vapp_export.php" server="www.mapco.de/public_html/" local="130344175590000000" remote="130344175590000000" Dst="1" />
 <file name="backend_admin_zipcodes.php" server="www.mapco.de/public_html/" local="130344172080000000" remote="130344172080000000" Dst="1" />
 <file name="backend_dhl_calculator.php" server="www.mapco.de/public_html/" local="130344208370000000" remote="130344208370000000" Dst="1" />
@@ -255,19 +239,11 @@
 <file name="backend_shop_tecdoc_update.php" server="www.mapco.de/public_html/" local="130344227670000000" remote="130344227670000000" Dst="1" />
 <file name="contact2.php" server="www.mapco.de/public_html/" local="130344235230000000" remote="130344235230000000" Dst="1" />
 <file name="contact_map.php" server="www.mapco.de/public_html/" local="130344235700000000" remote="130344235700000000" Dst="1" />
-<file name="fitments.csv" server="www.mapco.de/public_html/" local="130102655700000000" remote="130102655700000000" Dst="1" />
-<file name="ihr-autopartner.csv" server="www.mapco.de/public_html/" local="130057553080000000" remote="130057553080000000" Dst="1" />
 <file name="impressum.html" server="www.mapco.de/public_html/" local="130144699800000000" remote="130144736350000000" Dst="1" />
-<file name="mapco-eu.csv" server="www.mapco.de/public_html/" local="130057546840000000" remote="130057546840000000" Dst="1" />
-<file name="mapco_images_ori.zip" server="www.mapco.de/public_html/" local="130308080860000000" remote="130308080860000000" Dst="1" />
-<file name="mapco_images.zip.Z7afND" server="www.mapco.de/public_html/" local="130172011709176332" remote="130087473000000000" Dst="2" />
-<file name="mapco_images.zip.i1Y0Ri" server="www.mapco.de/public_html/" local="130172012610297874" remote="130106470800000000" Dst="2" />
-<file name="mapco_images.zip.oXZkPp" server="www.mapco.de/public_html/" local="130172012736425088" remote="130080550800000000" Dst="2" />
 <file name="shop_cart2.php" server="www.mapco.de/public_html/" local="130344343090000000" remote="130344306600000000" Dst="2" />
 <file name="shop_cart_alt.php" server="www.mapco.de/public_html/" local="130177675200000000" remote="130177675200000000" Dst="2" />
 <file name="shop_cart_test.php" server="www.mapco.de/public_html/" local="130344445960000000" remote="130344445960000000" Dst="1" />
 <file name="TD_tree.php" server="www.mapco.de/public_html/" local="130344312500000000" remote="130344312500000000" Dst="1" />
-<file name="temp.bmp" server="www.mapco.de/public_html/" local="130068646850000000" remote="130068646850000000" Dst="1" />
 <file name="test81.php" server="www.mapco.de/public_html/" local="130344460350000000" remote="130344460350000000" Dst="1" />
 <file name="test82.php" server="www.mapco.de/public_html/" local="130344460530000000" remote="130344460530000000" Dst="1" />
 <file name="test83.php" server="www.mapco.de/public_html/" local="130344460660000000" remote="130344460660000000" Dst="1" />
@@ -278,10 +254,6 @@
 <file name="test98.php" server="www.mapco.de/public_html/" local="130344464600000000" remote="130344464600000000" Dst="1" />
 <file name="test97.php" server="www.mapco.de/public_html/" local="130344464370000000" remote="130344464370000000" Dst="1" />
 <file name="test_mail.php" server="www.mapco.de/public_html/" local="130177416000000000" remote="130177452190000000" Dst="1" />
-<file name="mapco_images.zip.3zbdpJ" server="www.mapco.de/public_html/" local="130172031866109243" remote="130104742800000000" Dst="2" />
-<file name="mapco_images.zip" server="www.mapco.de/public_html/" local="130229156400000000" remote="130229156400000000" Dst="2" />
-<file name="mapco_images.zip.4uXnd7" server="www.mapco.de/public_html/" local="130234637369032259" remote="130051800000000000" Dst="2" />
-<file name="mapco_images.zip.o858VF" server="www.mapco.de/public_html/" local="130172038635036404" remote="130102150200000000" Dst="2" />
 <file name="shop_carfleet_user_input.php" server="www.mapco.de/public_html/" local="130185182346836992" remote="130185183600000000" Dst="2" />
 <file name="backend_shop_statistics.php" server="www.mapco.de/public_html/" local="130372964220149502" remote="130377258000000000" Dst="1" />
 <file name="backend_admin_dpd.php" server="www.mapco.de/public_html/" local="130344170750000000" remote="130344134400000000" Dst="2" />
@@ -297,10 +269,8 @@
 <file name="carfleet_userinput_statistics.php" server="www.mapco.de/public_html/" local="130344228930000000" remote="130344228930000000" Dst="1" />
 <file name="htaccess.bak" server="www.mapco.de/public_html/" local="130298389490000000" remote="130298389490000000" Dst="1" />
 <file name="index_alt.php" server="www.mapco.de/public_html/" local="130344258940000000" remote="130344258940000000" Dst="1" />
-<file name="mapco_images.zip.AF757t" server="www.mapco.de/public_html/" local="130092647400000000" remote="130092647400000000" Dst="2" />
 <file name="sendFINmail.php" server="www.mapco.de/public_html/" local="130344282530000000" remote="130344282530000000" Dst="1" />
 <file name="shop_cart_alt04092013.php" server="www.mapco.de/public_html/" local="130226974800000000" remote="130226974800000000" Dst="2" />
-<file name="shop_orders.csv" server="www.mapco.de/public_html/" local="130348493680000000" remote="130348493680000000" Dst="1" />
 <file name="shop_searchbycar_alt.php" server="www.mapco.de/public_html/" local="130344306180000000" remote="130344306180000000" Dst="1" />
 <file name="shop_user_order_.php" server="www.mapco.de/public_html/" local="130281160610000000" remote="130281160610000000" Dst="1" />
 <file name="shop_user_order_alt.php" server="www.mapco.de/public_html/" local="130344307230000000" remote="130344307230000000" Dst="1" />
@@ -328,7 +298,6 @@
 <file name="shop_user_lists.php" server="www.mapco.de/public_html/" local="130344306690000000" remote="130344306690000000" Dst="1" />
 <file name="backend_todo.php" server="www.mapco.de/public_html/" local="130383255329250287" remote="130383219000000000" Dst="2" />
 <file name="backend_online_prices.php" server="www.mapco.de/public_html/" local="130344219820000000" remote="130344219820000000" Dst="1" />
-<file name="mapco_catalogs.zip" server="www.mapco.de/public_html/" local="130251857054270189" remote="130247356800000000" Dst="2" />
 <file name="shop_search_oe.php" server="www.mapco.de/public_html/" local="130344305700000000" remote="130344305700000000" Dst="1" />
 <file name="sitemap_oenr.php" server="www.mapco.de/public_html/" local="130344309450000000" remote="130344309450000000" Dst="1" />
 <file name="sitemap_oenr_100t.php" server="www.mapco.de/public_html/" local="130344309640000000" remote="130344309640000000" Dst="1" />
@@ -368,7 +337,6 @@
 <file name="user_registrationb2b.php" server="www.mapco.de/public_html/" local="130344317500000000" remote="130344317500000000" Dst="1" />
 <file name="backend_mailbox.php" server="www.mapco.de/public_html/" local="130346858735271690" remote="130346858790000000" Dst="1" />
 <file name="Wartung.php" server="www.mapco.de/public_html/" local="130344268960000000" remote="130344268960000000" Dst="1" />
-<file name="amazon_de_asins.csv" server="www.mapco.de/public_html/" local="130298485160000000" remote="130298485160000000" Dst="1" />
 <file name="backend_amazon_order_import.php" server="www.mapco.de/public_html/" local="130421933527354374" remote="130421933400000000" Dst="2" />
 <file name="backend_shop_returns2.php" server="www.mapco.de/public_html/" local="130294241320000000" remote="130294241320000000" Dst="1" />
 <file name="config2.php" server="www.mapco.de/public_html/" local="130344234600000000" remote="130344234600000000" Dst="1" />
@@ -404,7 +372,7 @@
 <file name="test_zlg_transfer.php" server="www.mapco.de/public_html/" local="130344470170000000" remote="130344470170000000" Dst="1" />
 <file name="TestPNH.php" server="www.mapco.de/public_html/" local="130344312900000000" remote="130344312900000000" Dst="1" />
 <file name="shop_internal_news.php" server="www.mapco.de/public_html/" local="130359198821150991" remote="130359199240000000" Dst="1" />
-<file name="backend_amazon_products.php" server="www.mapco.de/public_html/" local="130486876037509025" remote="130486875600000000" Dst="2" />
+<file name="backend_amazon_products.php" server="www.mapco.de/public_html/" local="130486875600000000" remote="130486875600000000" Dst="2" />
 <file name="backend_amazon_orders.php" server="www.mapco.de/public_html/" local="130390799400000000" remote="130390799400000000" Dst="2" />
 <file name="backend_amazon_orders_list.php" server="www.mapco.de/public_html/" local="130474597800000000" remote="130474597800000000" Dst="2" />
 <file name="backend_amazon_order_item.php" server="www.mapco.de/public_html/" local="130392591096957554" remote="130392591000000000" Dst="1" />
@@ -412,7 +380,6 @@
 <file name="backend_amazon_product_bundle.php" server="www.mapco.de/public_html/" local="130404882069335879" remote="130404882000000000" Dst="1" />
 <file name="backend_amazon_products_bundle.php" server="www.mapco.de/public_html/" local="130404882000000000" remote="130404882000000000" Dst="1" />
 <file name="backend_amazon_auctions.php" server="www.mapco.de/public_html/" local="130408388137796856" remote="130408387800000000" Dst="2" />
-<file name="Amazon_BrowseNodes_UK" server="www.mapco.de/public_html/" local="130410679800000000" remote="130410679800000000" Dst="2" />
 <file name="backend_amazon_accounts_.php" server="www.mapco.de/public_html/" local="130363947600000000" remote="130363947600000000" Dst="2" />
 <file name="test200.php" server="www.mapco.de/public_html/" local="130438557600000000" remote="130438557600000000" Dst="2" />
 <file name="shop_checkout.php" server="www.mapco.de/public_html/" local="130457379600000000" remote="130457379600000000" Dst="2" />
@@ -422,4 +389,5 @@
 <file name="backend_cms_article_editor_alt.php" server="www.mapco.de/public_html/" local="130344144600000000" remote="130344144600000000" Dst="2" />
 <file name="backend_cms_site_editor.php" server="www.mapco.de/public_html/" local="130480918800000000" remote="130480918800000000" Dst="2" />
 <file name="backend_amazon_feed_submission.php" server="www.mapco.de/public_html/" local="130483522745509387" remote="130483522200000000" Dst="2" />
+<file name="backend_interna_catalog.php" server="www.mapco.de/public_html/" local="130487807804148511" remote="130487807400000000" Dst="2" />
 </dwsync>
