@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<dwsync>
+<file name="BulkDataExchangeSubmit.php" server="www.mapco.de/public_html/" local="130344316302331889" remote="130344316350000000" Dst="1" />
+<file name="createRecurringJob.php" server="www.mapco.de/public_html/" local="130344316131612125" remote="130344316190000000" Dst="1" />
+<file name="downloadFile.php" server="www.mapco.de/public_html/" local="130344315860456616" remote="130344315910000000" Dst="1" />
+<file name="FileTransferSubmit.php" server="www.mapco.de/public_html/" local="130344315703077614" remote="130344315770000000" Dst="1" />
+<file name="getJobs.php" server="www.mapco.de/public_html/" local="130344315480014856" remote="130344315530000000" Dst="1" />
+<file name="startDownloadJob.php" server="www.mapco.de/public_html/" local="130344314795695715" remote="130344314850000000" Dst="1" />
+<file name="JobsGet.php" server="www.mapco.de/public_html/" local="130344314954124776" remote="130344315030000000" Dst="1" />
+<file name="abortJob.php" server="www.mapco.de/public_html/" local="130344316453380529" remote="130344316510000000" Dst="1" />
+<file name="deleteRecurringJob.php" server="www.mapco.de/public_html/" local="130241940600000000" remote="130241976940000000" Dst="1" />
+<file name="getJobStatus.php" server="www.mapco.de/public_html/" local="130344315301574649" remote="130344315360000000" Dst="1" />
+<file name="getRecurringJobs.php" server="www.mapco.de/public_html/" local="130344315119854256" remote="130344315180000000" Dst="1" />
+<file name="startUploadJob.php" server="www.mapco.de/public_html/" local="130344314605924861" remote="130344314660000000" Dst="1" />
+</dwsync>

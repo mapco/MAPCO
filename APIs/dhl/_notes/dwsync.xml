@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<dwsync>
+<file name="CreateShipmentDD.php" server="www.mapco.de/public_html/" local="130344319450000000" remote="130344319450000000" Dst="1" />
+<file name="CreateShipmentTD.php" server="www.mapco.de/public_html/" local="130344321270000000" remote="130344321270000000" Dst="1" />
+<file name="GetLabelDD.php" server="www.mapco.de/public_html/" local="130344322110000000" remote="130344322110000000" Dst="1" />
+<file name="ShipmentCostsGet.php" server="www.mapco.de/public_html/" local="130344322430000000" remote="130344322430000000" Dst="1" />
+<file name="GetExportDocDD.php" server="www.mapco.de/public_html/" local="130344321800000000" remote="130344321800000000" Dst="1" />
+<file name="PrintersGet.php" server="www.mapco.de/public_html/" local="130177531337917964" remote="130167982200000000" Dst="2" />
+<file name="PrintPDF.php" server="www.mapco.de/public_html/" local="130177531338177979" remote="130167966000000000" Dst="2" />
+<file name="DPDImportFailure.php" server="www.mapco.de/public_html/" local="130201907157263848" remote="130178392200000000" Dst="2" />
+<file name="DPDImportSuccess.php" server="www.mapco.de/public_html/" local="130344321650000000" remote="130344321650000000" Dst="1" />
+</dwsync>

@@ -1,0 +1,44 @@
+<?php
+
+	if ( !isset($_POST["customer_id"]) )
+	{
+		echo '<crm_add_customer_noteResponse>'."\n";
+		echo '	<Ack>Failure</Ack>'."\n";
+		echo '	<Error>'."\n";
+		echo '		<Code>'.__LINE__.'</Code>'."\n";
+		echo '		<shortMsg>Customer nicht gefunden.</shortMsg>'."\n";
+		echo '		<longMsg>Es muss eine KundenID für die anzulegende Notiz angegeben werden.</longMsg>'."\n";
+		echo '	</Error>'."\n";
+		echo '</crm_add_customer_noteResponse>'."\n";
+		exit;
+	}
+
+	if ( !isset($_POST["note"]) )
+	{
+		echo '<crm_add_customer_noteResponse>'."\n";
+		echo '	<Ack>Failure</Ack>'."\n";
+		echo '	<Error>'."\n";
+		echo '		<Code>'.__LINE__.'</Code>'."\n";
+		echo '		<shortMsg>Notiz nicht gefunden.</shortMsg>'."\n";
+		echo '		<longMsg>Es muss eine Notiz angegeben werden.</longMsg>'."\n";
+		echo '	</Error>'."\n";
+		echo '</crm_add_customer_noteResponse>'."\n";
+		exit;
+	}
+	
+	if (isset($_POST["order_id"]))
+	{
+		$order_id=number_format($_POST["order_id"]);
+	}
+	else
+	{
+		$order_id=0;
+	}
+
+	q("INSERT INTO crm_customer_notes2 (customer_id, order_id, note, firstmod, firstmod_user, lastmod, lastmod_user) VALUES (".$_POST["customer_id"].", ".$order_id.", '".mysql_real_escape_string($_POST["note"], $dbweb)."', ".time().", ".$_SESSION["id_user"].", ".time().", ".$_SESSION["id_user"].");", $dbweb, __FILE__, __LINE__);
+	
+	echo "<crm_add_customer_noteResponse>\n";
+	echo "<Ack>Success</Ack>\n";
+	echo "</crm_add_customer_noteResponse>";
+
+?>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<dwsync>
+<file name="constants.php" server="www.mapco.de/public_html/" local="130119833066979701" remote="130059934800000000" Dst="2" />
+<file name="CallerService.php" server="www.mapco.de/public_html/" local="130119833058979244" remote="130059938400000000" Dst="2" />
+<file name="PayPalCheckStatus.php" server="www.mapco.de/public_html/" local="130119833067759746" remote="130026400200000000" Dst="2" />
+<file name="PayPalDoExpressCheckout.php" server="www.mapco.de/public_html/" local="130119833074910155" remote="130046954400000000" Dst="2" />
+<file name="PayPalGetExpressCheckout.php" server="www.mapco.de/public_html/" local="130119833076160226" remote="130046953800000000" Dst="2" />
+<file name="PayPalSetExpressCheckout.php" server="www.mapco.de/public_html/" local="130119833080540477" remote="130059939000000000" Dst="2" />
+<file name="PaymentlErrorMail.php" server="www.mapco.de/public_html/" local="130119833066979701" remote="130056567600000000" Dst="2" />
+<file name="PayPalErrorMail.php" server="www.mapco.de/public_html/" local="130119833075540191" remote="130054018200000000" Dst="2" />
+</dwsync>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Auftragsantwort>
+	<Status>Erfolg</Status>
+	<StatusNr>1</StatusNr>
+	<AufID>123456789</AufID>
+	<Statustext>Auftrag erfolgreich in IDIMS übernommen</Statustext>
+</Auftragsantwort>
+
+
+<Auftragsantwort>
+	<Status>Fehler</Status>
+	<StatusNr>0</StatusNr>
+	<Statustext>XML ungültig.</Statustext>
+</Auftragsantwort>
+
+
+<Auftragsantwort>
+	<Status>Fehler</Status>
+	<StatusNr>2</StatusNr>
+	<Statustext>Auftrag nicht übernommen. Artikel 59818/1HPS nur 5 mal verfügbar.</Statustext>
+	<Positionen>
+		<POS_ART_NR>59818HPS/1</POS_ART_NR>
+		<POS_MENGE>5</POS_MENGE>
+		<POS_WERT>359.74</POS_WERT>
+	</Positionen>
+</Auftragsantwort>
+
+
+<Auftragsantwort>
+	<Status>Fehler</Status>
+	<StatusNr>3</StatusNr>
+	<Statustext>Auftrag nicht übernommen. Preis für Artikel 59818/1HPS ungültig</Statustext>
+	<Positionen>
+		<POS_ART_NR>59818HPS/1</POS_ART_NR>
+		<POS_MENGE>10</POS_MENGE>
+		<POS_WERT>369.74</POS_WERT>
+	</Positionen>
+</Auftragsantwort>

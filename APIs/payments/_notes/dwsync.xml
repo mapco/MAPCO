@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<dwsync>
+<file name="paygenicDoPayment.php" server="www.mapco.de/public_html/" local="130344283433111878" remote="130344283490000000" Dst="1" />
+<file name="paygenicConstants.php" server="www.mapco.de/public_html/" local="130344283581830384" remote="130344283650000000" Dst="1" />
+<file name="blowfish.php" server="www.mapco.de/public_html/" local="130057416890000000" remote="130057416890000000" Dst="1" />
+<file name="PaymentlErrorMail.php" server="www.mapco.de/public_html/" local="130057416900000000" remote="130057416900000000" Dst="1" />
+<file name="PayPalCallerService.php" server="www.mapco.de/public_html/" local="130074822700000000" remote="130074822700000000" Dst="1" />
+<file name="PayPalConstants.php" server="www.mapco.de/public_html/" local="130344273899016559" remote="130344273950000000" Dst="1" />
+<file name="PayPalCheckStatus.php" server="www.mapco.de/public_html/" local="130344274357722795" remote="130344274410000000" Dst="1" />
+<file name="PayPalDoExpressCheckout.php" server="www.mapco.de/public_html/" local="130057416930000000" remote="130057416930000000" Dst="1" />
+<file name="PayPalGetExpressCheckout.php" server="www.mapco.de/public_html/" local="130344273590608919" remote="130344273650000000" Dst="1" />
+<file name="PayPalSetExpressCheckout.php" server="www.mapco.de/public_html/" local="130344273275070871" remote="130344273370000000" Dst="1" />
+<file name="PaymentGet.php" server="www.mapco.de/public_html/" local="130349603280000000" remote="130349603280000000" Dst="1" />
+<file name="PaymentNotificationHandler.php" server="www.mapco.de/public_html/" local="130392886800000000" remote="130392886800000000" Dst="1" />
+<file name="PaymentsNotificationSet_PayPal.php" server="www.mapco.de/public_html/" local="130344278165180569" remote="130344278230000000" Dst="1" />
+<file name="PaymentNotificationSet_Paygenic.php" server="www.mapco.de/public_html/" local="130344278697371009" remote="130344278760000000" Dst="1" />
+<file name="PaymentNotificationSet_Manual.php" server="www.mapco.de/public_html/" local="130368493200000000" remote="130368493200000000" Dst="1" />
+<file name="PaymentNotificationSet_COD.php" server="www.mapco.de/public_html/" local="2988952" remote="130344279490000000" Dst="1" />
+<file name="PaymentNotificationSet_BankTransfer.php" server="www.mapco.de/public_html/" local="130344279725099791" remote="130344279780000000" Dst="1" />
+<file name="PaymentNotificationSet.php" server="www.mapco.de/public_html/" local="130344280521525344" remote="130344280600000000" Dst="1" />
+<file name="PaymentNotificationListener_PayPal2.php" server="www.mapco.de/public_html/" local="130344280776469926" remote="130344280830000000" Dst="1" />
+<file name="PaymentNotificationLastUserDepositGet.php" server="www.mapco.de/public_html/" local="130344280992272270" remote="130344281050000000" Dst="1" />
+<file name="PaymentNotificationLastPaymentTotalGet.php" server="www.mapco.de/public_html/" local="130344281178522922" remote="130344281230000000" Dst="1" />
+<file name="PaymentNotificationLastPaymentGet.php" server="www.mapco.de/public_html/" local="130344281350242744" remote="130344281400000000" Dst="1" />
+<file name="PaymentNotificationLastPaymentDepositGet.php" server="www.mapco.de/public_html/" local="130344281570585347" remote="130344281630000000" Dst="1" />
+<file name="PaymentNotificationLastOrderTotalGet.php" server="www.mapco.de/public_html/" local="130344281717943776" remote="130344281780000000" Dst="1" />
+<file name="PaymentNotificationLastOrderIDGet.php" server="www.mapco.de/public_html/" local="130344281889753603" remote="130344281950000000" Dst="1" />
+<file name="PaymentNotificationLastOrderDepositGet.php" server="www.mapco.de/public_html/" local="130344282070153921" remote="130344282140000000" Dst="1" />
+<file name="OrderPaymentsGet2.php" server="www.mapco.de/public_html/" local="130347860640000000" remote="130347860640000000" Dst="1" />
+<file name="OrderPaymentsGet.php" server="www.mapco.de/public_html/" local="130344284287420741" remote="130344284340000000" Dst="1" />
+<file name="constants.php" server="www.mapco.de/public_html/" local="130334944390000000" remote="130334944390000000" Dst="1" />
+<file name="OrderPaymentsGet3.php" server="www.mapco.de/public_html/" local="130354025010000000" remote="130354025010000000" Dst="1" />
+</dwsync>
