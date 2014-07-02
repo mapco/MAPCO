@@ -3,7 +3,7 @@ MAPCO SYSTEM
 This is the MAPCO SYSTEM Version for any shops
 -----------------------------------------------------------------
 
-* author: Dev Team <webmaster@mapco.de>
+* author: Mapco Developer <webmaster@mapco.de>
 * version: 0.1
 
 ### Installation and Setup
