@@ -1,0 +1,22 @@
+#does not work with hetzner
+#php_value memory_limit 512M
+php_value session.gc_maxlifetime 90000
+
+#bug fix for Resource interpreted as Image but transferred with MIME type application/octet-stream
+AddType image/vnd.microsoft.icon .cur .ico
+
+# RewriteEngine On
+# RewriteCond %{REQUEST_URI} !^/$
+# RewriteCond %{REQUEST_FILENAME}
+# RewriteRule ^(.*)$ index.php?url=$1 [L,NC,QSA]
+# RewriteRule ^(.*) http://www.baustelle.redirect301.de/index.html? [R=302,L]
+
+#redirect all requests to index.php
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?url=$1 [L,NC,QSA]
+
+#remove phpsessid on googlebot requests
+RewriteCond %{HTTP_USER_AGENT} Googlebot
+RewriteRule ^(.*[^/])?/?PHPSESSID/[^/]+$ http://%{HTTP_HOST}/$1 [L,R=301]

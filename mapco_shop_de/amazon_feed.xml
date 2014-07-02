@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<AmazonEnvelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="amzn-envelope.xsd">
+<Header>
+<DocumentVersion>1.01</DocumentVersion>
+<MerchantIdentifier></MerchantIdentifier>
+</Header>
+<MessageType>Product</MessageType>
+<PurgeAndReplace>false</PurgeAndReplace>
+<Message>
+	<MessageID>1</MessageID>
+	<OperationType>Update</OperationType>
+	<Product>
+		<SKU>26752/7-1</SKU>
+		<DescriptionData>
+			<Title>ABS-Ring2 hinten  AUDI  A3 (8L1) ,  TT (8N3) ,  TT Roadster (8N9) , SEAT  AROSA (6H) ,  CORDOBA (6K2) ,  CORDOBA (6K2/C2)</Title>
+			<Brand>MAPCO</Brand>
+			<Description>This is an example product description.</Description>
+			<BulletPoint>Einbauseite: Hinterachse beidseitig</BulletPoint>
+			<MSRP currency="EUR">50.99</MSRP>
+			<Manufacturer>MAPCO Autotechnik GmbH</Manufacturer>
+			<MfrPartNumber>26752/7</MfrPartNumber>
+			<ItemType>AutoPart</ItemType>
+			<RecommendedBrowseNode>78191031</RecommendedBrowseNode>
+		</DescriptionData>
+		<ProductData>
+			<AutoAccessory>
+				<ProductType>
+					<AutoAccessoryMisc>
+						<NumberOfItems>1</NumberOfItems>
+					</AutoAccessoryMisc>
+				</ProductType>
+			</AutoAccessory>
+		</ProductData>
+	</Product>
+</Message>
+</AmazonEnvelope>
+	

@@ -1,0 +1,151 @@
+body
+{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:14px;
+	margin:0;
+	border:0;
+	padding:0;
+	background-color:#be3b1c;
+}
+.MAIN {
+	position: relative;
+	margin-left:auto;
+	margin-right:auto;
+	height: 768px;
+	width: 1024px;
+	background-image: url(images/punkte.png);
+}
+#lenkgetriebe {
+	position:absolute;
+	left: 468px;
+	top: 118px;
+}
+
+#lenkgetriebe a { 
+	background: url('images/lenkgetriebe_30.png') center no-repeat;
+	display:block;
+	width:448px;
+	height:31px;
+}
+
+#lenkgetriebe a:hover {
+	background: url('images/lenkgetriebe_85.png') center no-repeat;
+}
+
+#bremsen {
+	position:absolute;
+	left: 98px;
+	top: 177px;
+}
+
+#bremsen a { 
+	background: url('images/bremsenteile_30.png') center no-repeat;
+	display:block;
+	width:456px;
+	height:28px;
+}
+
+#bremsen a:hover {
+	background: url('images/bremsenteile_85.png') center no-repeat;
+}
+
+#mapco {
+	position:absolute;
+	left: 689px;
+	top: 241px;
+}
+
+#autoteile {
+	position:absolute;
+	left: 163px;
+	top: 274px;
+}
+
+#autoteile a { 
+	background: url('images/autoteile.png') center no-repeat;
+	display:block;
+	width:689px;
+	height:137px;
+}
+
+#autoteile a:hover {
+	background: url('images/autoteile_hv.png') center no-repeat;
+}
+
+#radlager {
+	position:absolute;
+	left: 351px;
+	top: 459px;
+}
+
+#radlager a { 
+	background: url('images/radlagersaetze_30.png') center no-repeat;
+	display:block;
+	width:480px;
+	height:31px;
+}
+
+#radlager a:hover {
+	background: url('images/radlagersaetze_85.png') center no-repeat;
+}
+
+#filter {
+	position:absolute;
+	left: 170px;
+	top: 519px;
+}
+
+#filter a { 
+	background: url('images/filter_30.png') center no-repeat;
+	display:block;
+	width:334px;
+	height:28px;
+}
+
+#filter a:hover {
+	background: url('images/filter_85.png') center no-repeat;
+}
+
+#fahrwerk {
+	position:absolute;
+	left: 412px;
+	top: 579px;
+}
+
+#fahrwerk a { 
+	background: url('images/fahrwerksteile_30.png') center no-repeat;
+	display:block;
+	width:475px;
+	height:28px;
+}
+
+#fahrwerk a:hover {
+	background: url('images/fahrwerksteile_85.png') center no-repeat;
+}
+
+#stossdaempfer {
+	position:absolute;
+	left: 239px;
+	top: 650px;
+}
+
+#stossdaempfer a { 
+	background: url('images/stossdaempfer_30.png') center no-repeat;
+	display:block;
+	width:481px;
+	height:31px;
+}
+
+#stossdaempfer a:hover {
+	background: url('images/stossdaempfer_85.png') center no-repeat;
+}
+
+#footer {
+	position: relative;
+	margin-left:auto;
+	margin-right:auto;
+	width: 1024px;
+	color:#FFFFFF;
+	text-align:center;
+	font-size:10px;
+}

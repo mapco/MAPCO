@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /templates/
+Disallow: /modules/
+Disallow: /jobs/
+Disallow: /functions/
+Disallow: /*?PHPSESSID

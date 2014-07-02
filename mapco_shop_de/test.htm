@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Chassis Number Test</title>
+</head>
+<body>
+	<input id="chassis_number" type="text" value="WAUzzzz8DZXA26839" />
+    <input type="button" value="Analysieren" onclick="chassis_number()" />
+    <script type="text/javascript">
+		function chassis_number()
+		{
+			var $manufacturers=new Array();
+			$manufacturers["WAU"]="Audi";
+			$manufacturers["WAP"]="Alpina";
+			$manufacturers["WBA"]="BMW";
+			$manufacturers["WBS"]="BMW M";
+			$manufacturers["WDB"]="Mercedes-Benz";
+			var $years=new Array();
+			$years["A"]=1980;
+			$years["B"]=1981;
+			$years["C"]=1982;
+			$years["D"]=1983;
+			$years["E"]=1984;
+			$years["F"]=1985;
+			$years["G"]=1986;
+			$years["H"]=1987;
+			$years["J"]=1988;
+			$years["K"]=1989;
+			$years["L"]=1990;
+			$years["M"]=1991;
+			$years["N"]=1992;
+			$years["P"]=1993;
+			$years["R"]=1994;
+			$years["S"]=1995;
+			$years["T"]=1996;
+			$years["V"]=1997;
+			$years["W"]=1998;
+			$years["X"]=1999;
+			$years["Y"]=1999;
+			$years["1"]=2001;
+			$years["2"]=2002;
+			$years["3"]=2003;
+			$years["4"]=2004;
+			$years["5"]=2005;
+			$years["6"]=2006;
+			$years["7"]=2007;
+			$years["8"]=2008;
+			$years["9"]=2009;
+			var $number = document.getElementById("chassis_number").value;
+			var $manufacturer=$number.substr(0, 3);
+			var $year=$number.substr(9, 1);
+			alert($manufacturers[$manufacturer]);
+			alert($years[$year]);
+		}
+	</script>
+</body>
+</html>
