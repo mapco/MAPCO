@@ -9,7 +9,7 @@
 <file name="AmazonShopItemsPriceGet.php" server="www.mapco.de/public_html/" local="130479959332070027" remote="130480851600000000" Dst="2" />
 <file name="AmazonShopItemsQuantitiesGet.php" server="www.mapco.de/public_html/" local="130481734800000000" remote="130481734800000000" Dst="2" />
 <file name="ProductImagesGet.php" server="www.mapco.de/public_html/" local="130475553000000000" remote="130475553000000000" Dst="2" />
-<file name="ProductPricesGet.php" server="www.mapco.de/public_html/" local="130475515455607634" remote="130475515200000000" Dst="2" />
+<file name="ProductPricesGet.php" server="www.mapco.de/public_html/" local="130475515200000000" remote="130475515200000000" Dst="2" />
 <file name="ProductQantitiesGet.php" server="www.mapco.de/public_html/" local="130476359400000000" remote="130476359400000000" Dst="2" />
 <file name="AmazonCategories.php" server="www.mapco.de/public_html/" local="130443773806718872" remote="130443773400000000" Dst="2" />
 <file name="AmazonOrderItemsUpdate.php" server="www.mapco.de/public_html/" local="130486010957010957" remote="130486010400000000" Dst="2" />
