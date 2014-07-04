@@ -9,6 +9,7 @@
  * 
  * @require     
  *          class MBillingAddress (Mapco.Shop.Order.BillingAddress)
+ *          class MShippingAddress (Mapco.Shop.Order.ShippingAddress)
  *          class MPaymentType    (Mapco.Shop.Payment.PaymentType)
  *          global function q()
  *          global function i()
@@ -20,6 +21,7 @@
  */
 
 i('Mapco.Shop.Order.BillingAddress');
+i('Mapco.Shop.Order.ShippingAddress');
 i('Mapco.Shop.Payment.PaymentType');
 
 class MOrder {
@@ -114,7 +116,27 @@ class MOrder {
         {
             return false;
         }
+    }
 
+    /*
+     * getShippingAddress
+     * 
+     * @description     get a MShippingAddress instance from the current order
+     * 
+     * @return  inst MShippingAddress    
+     * 
+     */
+    
+    public function getShippingAddress()
+    {
+        if (isset($this->getProp('ship_adr_id')))
+        {
+            return new MShippingAddress($this->getProp('ship_adr_id'));
+        }
+        else if (isset($this->getProp('bill_adr_id')))
+        {
+            return new MShippingAddress($this->getProp('bill_adr_id'));
+        }
     }
     
     /*

@@ -1,6 +1,7 @@
 <?php
 
-MLoader::import('Mapco.Object');
+i('Mapco.Object');
+i('Mapco.Order');
 
 /**
  * Description of MPayment
@@ -32,7 +33,7 @@ class MPayment extends MObject{
     }
     
     // sets the payment id
-    public function setID($id) 
+    public function setId($id) 
     {
         if (isset($id)) 
         {
@@ -41,7 +42,7 @@ class MPayment extends MObject{
     }
     
     // returns the payment id
-    public function getID() 
+    public function getId() 
     {
         return $this->id;
     }
