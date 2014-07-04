@@ -28,7 +28,7 @@
 <file name="PdfExport.php" server="www.mapco.de/public_html/" local="130344194762230193" remote="130344194400000000" Dst="1" />
 <file name="PriceSuggestionAdd.php" server="www.mapco.de/public_html/" local="130431493200000000" remote="130431493200000000" Dst="2" />
 <file name="VehicleAdd.php" server="www.mapco.de/public_html/" local="130344271297467758" remote="130344271360000000" Dst="1" />
-<file name="VehicleUpdate.php" server="www.mapco.de/public_html/" local="130344167522232155" remote="130344167580000000" Dst="1" />
+<file name="VehicleUpdate.php" server="www.mapco.de/public_html/" local="130344167522232155" remote="130344131400000000" Dst="2" />
 <file name="CategoryBox.php" server="www.mapco.de/public_html/" local="130349467627098528" remote="130349467770000000" Dst="1" />
 <file name="ItemsUpdate.php" server="www.mapco.de/public_html/" local="21897824022132676" remote="129989592000000000" Dst="2" />
 <file name="PromotionBox.php" server="www.mapco.de/public_html/" local="130348704630000000" remote="130348704630000000" Dst="1" />

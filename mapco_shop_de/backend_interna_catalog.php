@@ -8,7 +8,6 @@ include("templates/" . TEMPLATE_BACKEND . "/header.php");
 ?>
 <script type="text/javascript">
 
-
 	/**
      * show
      */
@@ -18,10 +17,15 @@ include("templates/" . TEMPLATE_BACKEND . "/header.php");
         $post_data['API'] = "catalog";
         $post_data['APIRequest'] = "CatalogCreate";
         $post_data['action'] = "showCatalog";
+        $post_data['vehicle_id'] = 1145;
         $.post('<?php echo PATH;?>soa2/', $post_data, function($data) {
             wait_dialog_show();
             try {$xml = $($.parseXML($data));} catch($err) {show_status2($err.message); return;}
             if ($xml.find('Ack').text() != 'Success') {show_status2($data); return;}
+
+			$('#showCatalog').append($xml.find('showCatalog').text());
+			
+			wait_dialog_hide();
         });
     }
 </script>
@@ -34,7 +38,8 @@ echo '
 		&#187; <a href="">Catalog</a>
 		&#187; Dashboard
 	</div>
-	<h1>Catalog - Dashboard</h1>';
+	<h1>Catalog - Dashboard</h1>
+	<div id="showCatalog"></div>';
 
 //	Footer
 echo '<script type="text/javascript">showCatalog(' . $get['orderBy'] . ');</script>';

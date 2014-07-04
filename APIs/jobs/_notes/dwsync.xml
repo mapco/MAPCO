@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <dwsync>
-<file name="AmazonProductsJob.php" server="www.mapco.de/public_html/" local="130476365151914826" remote="130476364800000000" Dst="2" />
+<file name="AmazonProductsJob.php" server="www.mapco.de/public_html/" local="130481713383055601" remote="130488601800000000" Dst="2" />
 <file name="AmazonShopItemsJob.php" server="www.mapco.de/public_html/" local="130475583000000000" remote="130475583000000000" Dst="2" />
 <file name="AmazonOrderImport.php" server="www.mapco.de/public_html/" local="130431436200000000" remote="130431436200000000" Dst="2" />
 <file name="AmazonOrderImportJob.php" server="www.mapco.de/public_html/" local="130486090309939685" remote="130486090200000000" Dst="2" />
 <file name="JobsView.php" server="www.mapco.de/public_html/" local="130485890380353682" remote="130485890400000000" Dst="2" />
-<file name="JobsGetJob.php" server="www.mapco.de/public_html/" local="130440964441767546" remote="130440964200000000" Dst="2" />
-<file name="JobsUpdateJob.php" server="www.mapco.de/public_html/" local="130440960116180137" remote="130440960000000000" Dst="2" />
+<file name="JobsGetJob.php" server="www.mapco.de/public_html/" local="130479959535251648" remote="130488601200000000" Dst="2" />
+<file name="JobsUpdateJob.php" server="www.mapco.de/public_html/" local="130479959581034267" remote="130488601200000000" Dst="2" />
 <file name="JobsAddJob.php" server="www.mapco.de/public_html/" local="130440959943200243" remote="130440960000000000" Dst="2" />
 <file name="AmazonOrdersGet.php" server="www.mapco.de/public_html/" local="130344273000000000" remote="130344273000000000" Dst="2" />
 <file name="AmazonOrderItemsUpdateJob.php" server="www.mapco.de/public_html/" local="130396071600000000" remote="130396071600000000" Dst="2" />
 <file name="AmazonUpdatePricesJob.php" server="www.mapco.de/public_html/" local="130344273000000000" remote="130344273000000000" Dst="2" />
 <file name="AmazonUpdateQuantitiesJob.php" server="www.mapco.de/public_html/" local="130396092000000000" remote="130396092000000000" Dst="2" />
-<file name="AmazonOfferImportJob.php" server="www.mapco.de/public_html/" local="130439428619084884" remote="130439428200000000" Dst="2" />
+<file name="AmazonOfferImportJob.php" server="www.mapco.de/public_html/" local="130479959538441831" remote="130488601200000000" Dst="2" />
 <file name="AmazonInventoryImportJob.php" server="www.mapco.de/public_html/" local="130482612997471059" remote="130482612600000000" Dst="2" />
 <file name="AmazonReportJob.php" server="www.mapco.de/public_html/" local="130482613314249177" remote="130482613200000000" Dst="2" />
 </dwsync>

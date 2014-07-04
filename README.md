@@ -22,6 +22,12 @@ xclip -sel clip < ~/.ssh/id_rsa.pub
 //copy your key in the github account ssh key
 ```
 
+```php
+install git for windows system
+http://msysgit.github.io/
+
+```
+
 Get the current repository.
 
 ```php
