@@ -33,5 +33,3 @@ if (isset($post['action']) && $post['action'] == 'showCatalog')
 	
 	echo '<showCatalog><![CDATA[' . $templateCar . ']]></showCatalog>';
 }
-
-//test
