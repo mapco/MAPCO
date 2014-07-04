@@ -1,13 +1,23 @@
 <?php
+/**
+ *
+ * @class MPayment
+ * @Namespace Mapco.Shop
+ * @author CHaendler    <chaendler (at) mapco.de>
+ * @version 1.0
+ * @modified     04/07/14
+ * 
+ * @require
+ *          class MObject (Mapco.Object)     
+ *          global function q()
+ *          global var $dbshop
+ *          php function mysqli_fetch_assoc()
+ *          php function mysqli_fetch_object()
+ * 
+ */
 
 i('Mapco.Object');
-i('Mapco.Order');
 
-/**
- * Description of MPayment
- *
- * @author CHaendler
- */
 class MPayment extends MObject{
     
     // assoc array sql table data of selected payment id
@@ -53,208 +63,80 @@ class MPayment extends MObject{
         return $this->type;
     }
     
-    public function getPayments($filter = NULL)
+    public static function queryResultFormat($QueryResult, $output_format)  
     {
-        // if filter is defined convert filter to assoc array
-        if (isset($filter)) 
+        switch ($output_format) 
         {
-            $filter_assoc = MObject::allToAssoc($filter);
+            case 'assoc':
+                $return = mysqli_fetch_assoc($QueryResult);
+                break;
+            case 'object':
+                $return = mysqli_fetch_object($QueryResult);
+                break;
+            case 'core_object':
+                $ArrayObjects = array();
+                while ( $PaymentTypesAssoc = mysqli_fetch_assoc($QueryResult) )
+                {
+                    array_push($ArrayObjects, new MObject($PaymentTypesAssoc));
+                }
+                $return = $ArrayObjects;
+                break;
+            case 'type_object':
+                $ArrayTypeObjects = array();
+                while ( $PaymentTypesAssoc = mysqli_fetch_assoc($QueryResult) )
+                {
+                    array_push($ArrayObjects, new MPaymentType($PaymentTypesAssoc));
+                }
+                $return = $ArrayTypeObjects; 
+                break;
+        } 
+        return $return;
+    }
+    
+    public function getPaymentTypes($filter_data, $output_format = "assoc")
+    {
+        
+        $filter = MObject::allToAssoc($filter_data);
+        
+        if (isset($filter['customer_type_id']) && isset($filter['shop_id']) && isset($filter['country_id']))
+        {
+            $QUERY = "SELECT
+                            shop_types.*
+                        FROM
+                            shop_shops_payment_types shop_types 
+                                INNER JOIN
+                                    shop_payment payments ON shop_types.payment_type_id = payments.paymenttype_id AND payments.shop_id = '" . $filter['shop_id'] . "' 
+                                INNER JOIN
+                                    shop_payment_countries countries ON payments.id_payment = countries.payment_id AND countries.country_id = '" . $filter['country_id'] . "'
+                                INNER JOIN
+                                    shop_payment_customer_types customers ON payments.id_payment = customers.payment_id AND customer_type_id = '" . $filter['customer_type_id'] . "' 
+                        WHERE 
+                            shop_types.shop_id = '" . $filter['shop_id'] . "'";
+
+            $QueryResult = q($QUERY, $dbshop, __FILE__, __LINE__);
+                        
+            return MPayment::queryResultFormat($QueryResult, $output_format);
         }
         
-        $filter_options = "
-            {
-                'order': 
-                    {
-                        'type': 'int',
-                        'obj': 'MOrder'
-                    },
-                'type':
-                    {
-                        'type': 'int',
-                        'obj': 'MPaymentType'
-                    },
-                'country':
-                    {
-                        'type': 'int',
-                        'obj': 'MCountry'
-                    },                    
-                'shop_id':
-                    {
-                        'type': 'int',
-                        'obj': 'MShop'
-                    },
-                'active':
-                    {
-                        'type':int'
-                    }
-            }
-        ";
-        
-        $filters = MObject::allToAssoc($filter_options);
-        
-        $filter_ref = array();
-        
-        foreach ($filters as $key => $option)
-        {
-            if (isset($filter_assoc[$key]))
-            {
-                if (isset($option['obj']))
-                {
-                    $class = $option['obj'];
-                    $filter_key = $filter_assoc[$key];
-                    $type = $option['type'];
-                }
-                if ($filter_key instanceof $class)
-                {
-                    // key is a instance of a class
-                    $filter_ref[$key] = $filter_key->getId();
-                }
-                else if(isset($type))
-                {
-                    switch ($type) {
-                        case 'int':
-                            if (is_numeric($filter['key'])) 
-                            {
-                               $filter_ref[$key] = $filter_key;
-                            }
-                        break;
-                    }
-                }
-                
-                
-            }
-            
-            // build sql query for payments with filter options
-            
-            if (isset($filter_ref['shop_id']))
-            {
-                $where .= "`shop_id`= '".$filter_ref['shop_id']."'";
-            }
-            
-            if (isset($filter_ref['order']))
-            {
-                $Order = new MOrder($filter_ref['order']);
-                $PaymentTypes = $Order->getPaymentTypes();
-                
-            }
-            
-            
-            $SQL_QUERY = "SELECT * FROM `shop_payment` WHERE $where";
-            
-            
-        }       
     }
-      
-}
-
-/*
- * Examples for using OOP in API services
- * 
- * 
- * 
- * 
- */
-
-
-
-
-/*************************************************************
- * Example for MOrder
- *  - get order by id
- *  - get possible PaymentTypes by order id
- *  requires:
- *               order_id
- */
-
-$order_id = 12345;
-
-i('Mapco.Shop.Order');
-
-
-// get all possible PaymentTypes of the current instance order id
-$PaymentTypes = MOrder::getPaymentTypes($ORDER_ID);
-
-
-
-
-
-
-/******************************************************************
- * Example
- *  - get possible payments by order id and payment_type_id
- *  required keys (json or array): 
- *              order (order_id)
- *              type (payment_type_id)
- */
-
-i('Mapco.Shop.Payment');
-
-// json example
-$Payments = MPayment::getPayments("{'order': $ORDER_ID, 'type': $PAYMENT_TYPE_ID}");
-
-// array example
-$filter = array();
-$filter['order'] = $order_id;
-$filter['type'] = $payment_type_id;
-$Payments = MPayment::getPayments($filter);
-
-
-
-// display the payments by loop $Payments
-
-
-/******************************************************************
- * Example
- *  Shipping Selection
- *  requires: 
- *              payment_id
- *              order_id
- *              
- */
-
-$order_id = $_POST['order_id'];
+    
+    public function getPaymentMethodsByType($data) 
+    {
+        $filter = MObject::allToAssoc($data);
         
-$payment_id = $_POST['payment_id'];
+        if (isset($data) && is_numeric($data))
+        {
+            $QUERY = "SELECT 
+                            id_payment
+                        FROM
+                            shop_payment
+                        WHERE 
+                            paymenttype_id = '" . $data . "'";
 
-i('Mapco.Shop.Payment');
-i('Mapco Shop.Order');
-
-// get instance of Payment
-$Payment = new MPayment();
-
-// get instance of the order
-$Order = MOrder::Get($order_id);
-
-
-// add payment method to payment
-$Payment->setID($payment_id);
-
-// add order and payment_type to payment
-$Payment->addOrder($Order);
-
-if ($Payment->isValid())
-{
-    $Shippings = $Payment->getAvailableShippings();
+            $Result = q($QUERY, $dbshop, __FILE__, __LINE__);
+            $Payments = mysqli_fetch_assoc($Result);
+            return $Payments;
+        } 
+    }
+     
 }
-
-// display the shippings by loop $Shippings
-
-/******************************************************************
- * Example
- *  Proceed checkout
- *  requires: 
- *              shipping_id
- *              order_id
- *              
- */
-
-$shipping_id = $_POST['shipping_id'];
-$order_id = $_POST['order_id'];
-
-
-
-
-
-
-
-

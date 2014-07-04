@@ -1,14 +1,21 @@
 <?php
 
 /**
- * Description of ShippingAddress
  *
- * @author CHaendler
+ * @class MShippingAddress
+ * @Namespace Mapco.Shop.Order
+ * @author CHaendler    <chaendler (at) mapco.de>
+ * @version 1.0
+ * @modified     04/07/14
+ * 
+ * @require     
+ *          global function q()
+ *          global var $dbshop
+ *          php function mysqli_fetch_assoc()
+ * 
  */
 
-i('Mapco.Object');
-
-class MShippingAddress extends MObject
+class MShippingAddress
 {
     
     protected $id;

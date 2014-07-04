@@ -1,14 +1,20 @@
 <?php
-
 /**
- * Description of BillingAddress
  *
- * @author CHaendler
+ * @class MBillingAddress
+ * @Namespace Mapco.Shop.Order
+ * @author CHaendler    <chaendler (at) mapco.de>
+ * @version 1.0
+ * @modified     04/07/14
+ * 
+ * @require     
+ *          global function q()
+ *          global var $dbshop
+ *          php function mysqli_fetch_assoc()
+ * 
  */
 
-i('Mapco.Object');
-
-class MBillingAddress extends MObject
+class MBillingAddress
 {
     
     protected $id;

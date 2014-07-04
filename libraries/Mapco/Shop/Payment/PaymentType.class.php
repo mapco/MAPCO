@@ -1,23 +1,37 @@
 <?php
-
 /**
- * Description of PaymentType
  *
- * @author CHaendler
+ * @class MPaymentType
+ * @Namespace Mapco.Shop.Payment
+ * @author CHaendler    <chaendler (at) mapco.de>
+ * @version 1.0
+ * @modified     04/07/14
+ * 
+ * @require
+ *          global function q()
+ *          global var $dbshop
+ *          php function mysqli_fetch_assoc()
+ * 
  */
 
-i('Mapco.Object');
-
-class MPaymentType extends MObject {
+class MPaymentType {
     
     protected $id;
     protected $_data;
     
-    public function __construct($id)
+    public function __construct($data)
     {
-       if (isset($id)) 
+       if (isset($data)) 
        {
-           $this->setId($id);
+           if (is_numeric($data))
+           {
+                $this->setId($id);
+           }
+           
+           if (is_array($data))
+           {
+               $this->_setData($data);
+           }
        }
     }
     
@@ -33,6 +47,11 @@ class MPaymentType extends MObject {
     public function getId() 
     {
         return $this->id;
+    }
+    
+    protected function _setData($data)
+    {
+        $this->_data = $data;
     }
     
     protected function _load() 
