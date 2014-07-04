@@ -1,14 +1,15 @@
 <?php
 
 /**
- * Description of PaymentType
+ * Description of BillingAddress
  *
  * @author CHaendler
  */
 
 i('Mapco.Object');
 
-class MPaymentType extends MObject {
+class MBillingAddress extends MObject
+{
     
     protected $id;
     protected $_data;
@@ -40,7 +41,7 @@ class MPaymentType extends MObject {
         if (isset($this->id))
         {
             // sql query to get the dataset of the order id
-            $results=q("SELECT * FROM `shop_payment_types` WHERE `adr_id`=".$this->id, $dbshop, __FILE__, __LINE__);
+            $results=q("SELECT * FROM `shop_bill_adr` WHERE `adr_id`=".$this->id, $dbshop, __FILE__, __LINE__);
             $this->_data = mysqli_fetch_assoc($results);
         }
     }
@@ -60,4 +61,5 @@ class MPaymentType extends MObject {
             return $this->_data;
         }
     }
+    
 }
