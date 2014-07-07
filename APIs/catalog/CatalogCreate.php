@@ -10,7 +10,7 @@
  *
  *
  *******************************************************************************/
-include("../functions/cms_core.php");
+require_once('/usr/www/users/admapco/APIs/apiCore/Images.php');
 
 $templateLoad = 'templates/template_';
 $GART = '00247';
@@ -27,7 +27,7 @@ if (isset($post['action']) && $post['action'] == 'showCatalog')
     $data['where'] = "
 		id_vehicle = " . $post["vehicle_id"];
     $vehicleResult = SQLSelect($data['from'], $data['select'], $data['where'], 0, 0, 1, 'shop', __FILE__, __LINE__);
-	
+
 	//	get shop items keyword
 	$data = array();
 	$data['from'] = 'shop_items_keywords';
@@ -37,7 +37,7 @@ if (isset($post['action']) && $post['action'] == 'showCatalog')
 		AND language_id = 1";
 	$data['orderBy'] = 'ordering ASC';
 	$shopItemsKeyword = SQLSelect($data['from'], $data['select'], $data['where'], $data['orderBy'], 0, 1, 'shop',  __FILE__, __LINE__);
-	
+
 	//	get shop items by GART
 	$data = array();
 	$data['from'] = 'shop_items';
@@ -46,7 +46,7 @@ if (isset($post['action']) && $post['action'] == 'showCatalog')
 		active = 1
 		AND GART = " . $GART;
 	$date['order'] = "lastmod DESC";
-	$shopItems = SQLSelect($data['from'], $data['select'], $data['where'], $date['order'], 0, 5, 'shop',  __FILE__, __LINE__);	
+	$shopItems = SQLSelect($data['from'], $data['select'], $data['where'], $date['order'], 0, 10, 'shop',  __FILE__, __LINE__);
 
     include($templateLoad . 'car.php');
 
