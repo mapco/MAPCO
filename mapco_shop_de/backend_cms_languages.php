@@ -32,10 +32,10 @@
 	//REMOVE
 	if (isset($_POST["remove"]))
     {
-		if ($_POST["id_language"]<=0) echo '<div class="failure">Es konnte keine ID für die Sprache gefunden werden!</div>';
+		if ($_POST["id"]<=0) echo '<div class="failure">Es konnte keine ID für die Sprache gefunden werden!</div>';
 		else
 		{
-			q("DELETE FROM cms_languages WHERE id_language=".$_POST["id_language"]." LIMIT 1;", $dbweb, __FILE__, __LINE__);
+			q("DELETE FROM cms_languages WHERE id_language=".$_POST["id"]." LIMIT 1;", $dbweb, __FILE__, __LINE__);
 			echo '<div class="success">Sprache erfolgreich gelöscht!</div>';
 		}
 	}
@@ -51,7 +51,6 @@
 	echo '		<th>Nr.</th>';
 	echo '		<th>Sprache</th>';
 	echo '		<th>Kürzel</th>';
-	echo '		<th>Sortierung</th>';
 	echo '		<th>Optionen</th>';
 	echo '	</tr>';
 	$results=q("SELECT * FROM cms_languages ORDER BY ordering;", $dbweb, __FILE__, __LINE__);
@@ -61,14 +60,13 @@
 		echo '	<td>'.$row["ordering"].'</td>';
 		echo '	<td><a href="backend_cms_language_editor.php?id_language='.$row["id_language"].'">'.$row["language"].'</a></td>';
 		echo '	<td>'.$row["code"].'</td>';
-		echo '	<td></td>';
 		echo '	<td>';
 		echo '<form action="backend_cms_languages.php" style="margin:0; border:0; padding:0; float:right;" method="post">';
-		echo '	<input type="hidden" name="id_language" value="'.$row["id_language"].'" />';
+		echo '	<input type="hidden" name="id" value="'.$row["id"].'" />';
 		echo '	<input type="hidden" name="remove" value="Sprache löschen" />';
-		echo '	<input style="margin:2px 8px 2px 0px; border:0; padding:0; float:right;" type="image" src="images/icons/24x24/page_remove.png" alt="Sprache löschen" title="Sprache löschen" onclick="return confirm(\'Sprache wirklich löschen?\');" />';
+		echo '	<input style="margin:2px 8px 2px 0px; border:0; padding:0; float:right;" type="image" src="images/icons/24x24/remove.png" alt="Sprache löschen" title="Sprache löschen" onclick="return confirm(\'Sprache wirklich löschen?\');" />';
 		echo '</form>';
-		echo '		<a href="backend_cms_language_editor.php?id_language='.$row["id_language"].'" title="Sprache bearbeiten"><img src="images/icons/24x24/page.png" alt="Sprache bearbeiten" title="Sprache bearbeiten" /></a>';
+		echo '		<a href="backend_cms_language_editor.php?id_language='.$row["id_language"].'" title="Sprache bearbeiten"><img src="images/icons/24x24/edit.png" alt="Sprache bearbeiten" title="Sprache bearbeiten" /></a>';
 		echo '	</td>';
 		echo '</tr>';
 	}

@@ -806,7 +806,7 @@
 						$xml.find("shop_countries").each(
 							function()
 							{
-								if($(this).find("active").text()=="1")
+//								if($(this).find("active").text()=="1")
 									html += '<option value="' + $(this).find("country_code").text() + '">' + $(this).find("country").text() + '</option>';
 								if(order_data["bill_adr_country_id"]==$(this).find("id_country").text())
 								 	actual_country = $(this).find("country_code").text();
@@ -820,7 +820,7 @@
 						$xml.find("shop_countries").each(
 							function()
 							{
-								if($(this).find("active").text()=="1")
+//								if($(this).find("active").text()=="1")
 									html += '<option value="' + $(this).find("country_code").text() + '">' + $(this).find("country").text() + '</option>';
 								if(order_data["ship_adr_country_id"]==$(this).find("id_country").text())
 								 	ship_actual_country = $(this).find("country_code").text();
@@ -1695,9 +1695,14 @@
 			$("#orders").html(html);
 
 			//Status_Box Anzeige
+/*			
 			html = '<div id="message_box_success" class="success" style="font-size: 16px; font-weight: bold; display: none; width: 732px"></div>';
 			html += '<div id="message_box_warning" class="warning" style="font-size: 16px; font-weight: bold; display: none; width: 732px"></div>';
 			html += '<div id="message_box_failure" class="failure" style="font-size: 16px; font-weight: bold; display: none; width: 732px"></div>';
+*/			
+			html = '<div id="message_box_success" class="success" style="font-size: 16px; font-weight: bold; display: none;"></div>';
+			html += '<div id="message_box_warning" class="warning" style="font-size: 16px; font-weight: bold; display: none;"></div>';
+			html += '<div id="message_box_failure" class="failure" style="font-size: 16px; font-weight: bold; display: none;"></div>';
 			$("#mid_right_column_header").html(html);
 			//alert(car_data_input + " " + kritdo4);
 			if(status_id == 1 || status_id == 7)
@@ -2383,6 +2388,7 @@
 		html = '';
 		html += '';
 		html += '<h1><?php echo t("Meine Fahrzeuge"); ?>:</h1>';
+		html += '<p style="color: red; font-weight: bold;"><?php echo t("Zum Zuordnen eines Fahrzeugs bitte auf den Fahrzeugnamen klicken!");?></p>'
 		html += '<table class="hover" style="font-size:12px; font-family: Arial">';									
 		html += '<tr>';
 		html += '<th><?php echo t("Fahrzeug auswählen"); ?></th>';
@@ -2405,7 +2411,7 @@
 					if ( $ack.text()=="Success" )
 					{
 						html += '<tr>';
-						html += '<td colspan="7" style="background: #98Fb98"><a href="javascript: car_data_new(' + customer_vehicle_id + ',' + id + ',' + order_id + ');"><?php echo t("Neues Fahrzeug anlegen"); ?></a></td>';
+						html += '<td colspan="7" style="background: #98Fb98"><a href="javascript: car_data_new(' + customer_vehicle_id + ',' + id + ',' + order_id + ');"title="<?php echo t("Hier können Sie ein neues Fahrzeug anlegen"); ?>"><?php echo t("Neues Fahrzeug anlegen"); ?></a></td>';
 						html += '</tr>';
 						$xml.find("vehicle").each(
 							function()
@@ -2413,7 +2419,7 @@
 								if($(this).find("vehicleActive").text()==1)
 								{
 									html += '<tr style="height:45px">';
-									html += '<td><a href="javascript:status_change(' + $(this).find("vehicleCustomerID").text() + ',' + id + ',' + order_id + ');">' + $(this).find("vehicleBrand").text() + ' ' + $(this).find("vehicleModel").text() + ' ' + $(this).find("vehicleModelType").text() + '</a></td>';
+									html += '<td><a href="javascript:status_change(' + $(this).find("vehicleCustomerID").text() + ',' + id + ',' + order_id + ');" style="color: red; font-weight: bold;" title="<?php echo t("Zum Zuordnen hier klicken!");?>">' + $(this).find("vehicleBrand").text() + ' ' + $(this).find("vehicleModel").text() + ' ' + $(this).find("vehicleModelType").text() + '</a></td>';
 									html += '<td>' + $(this).find("vehicleKBA").text().substr(0,4) + '/' + $(this).find("vehicleKBA").text().substr(4,3) + '</td>';
 									if($(this).find("vehicleDateBuilt").text()!=0)
 									{
@@ -3256,8 +3262,7 @@
 	}
 </script>
 <?php
-	echo '<div id="mid_right_column_header" style="width:776px;
-	margin:0px 0px 0px 10px;
+	echo '<div id="mid_right_column_header" style="	margin:0px 0px 0px 10px;
 	display:inline;
 	float:left;"></div>';
 	echo '<div id="mid_right_column">';

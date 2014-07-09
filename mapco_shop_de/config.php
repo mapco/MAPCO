@@ -1,4 +1,26 @@
 <?php
+/*
+*	MLOADER DEFINES START
+*/
+	define('M_PATH_BASE', dirname(__FILE__) );							// PATH TO MAPCO_SHOP_DE
+	define( 'DS', DIRECTORY_SEPARATOR );								// directory separator shortcut
+	$parts = explode( DS, M_PATH_BASE );		// path to array
+	array_pop( $parts );						// remove last element to get root path
+	
+	// directory path defines
+	define('M_PATH_ROOT',			implode( DS, $parts ) );			// PATH TO ROOT
+	define('M_PATH_LIBRARIES',		M_PATH_ROOT.DS.'libraries');		// PATH TO LIB
+	define('M_PATH_API',			M_PATH_ROOT.DS.'APIs');				// PATH TO API
+	define('M_PATH_TEMPLATES',		M_PATH_BASE.DS.'templates');		// PATH TO TEMPLATES
+	
+	// include the MLoader.class
+	require_once( M_PATH_LIBRARIES.DS.'MLoader.class.php');
+	MLoader::setup();
+	
+/*
+*	MLOADER DEFINES END
+*/
+
 	//GET["url"] is set by .htaccess
 
 	if( !isset($_SESSION) ) session_start();
@@ -396,9 +418,7 @@
 			if(mysqli_num_rows($results) == 0)
 			{
 				return("DE");
-			}
-			else
-			{
+			} else {
 				$row = mysqli_fetch_array($results);
 				return($row["country2"]);
 			}
@@ -426,12 +446,12 @@
          * @param $postfields
          * @param string $file
          * @param string $line
-         * @param string $responseType (obj, arr, xml)
+         * @param string $responseType (obj, arr, xml, obj_to_arr)
          * @return array|mixed|SimpleXMLElement|string
          */
         function soa2($postfields, $file = "", $line = "", $responseType = 'obj')
 		{
-			$responseXML = post(PATH."soa2/", $postfields);
+			$responseXML = post(PATH . "soa2/", $postfields);
 			$use_errors = libxml_use_internal_errors(true);
 			try
 			{
@@ -441,52 +461,84 @@
 			catch(Exception $e)
 			{
 				//XML FEHLERHAFT
-				$errorXML="";
-				$errorXML.="<?xml version='1.0'?>"."\n";
-				$errorXML.="<".$postfields["APIRequest"]."Response>"."\n";
-				$errorXML.="	<Ack>Error</Ack>"."\n";
-				$errorXML.="	<Error>"."\n";
-				$errorXML.="		<Code>9756</Code>"."\n";
-				$errorXML.="		<shortMsg>Invalid XML. Antwort vom Service fehlerhaft.</shortMsg>"."\n";
-				$errorXML.="		<longMsg>Invalid XML. Antwort vom Service fehlerhaft. Service aufgerufen durch ".$file." Zeile ".$line."</longMsg>"."\n";
-				$errorXML.="		<Response><![CDATA[".$responseXML."]]></Response>"."\n";
-				$errorXML.="	</Error>"."\n";
-				echo $errorXML.="</".$postfields["APIRequest"]."Response>"."\n";
+				$errorXML = "";
+				$errorXML.= "<?xml version='1.0'?>" . "\n";
+				$errorXML.= "<" . $postfields["APIRequest"] . "Response>" . "\n";
+				$errorXML.= "	<Ack>Error</Ack>" . "\n";
+				$errorXML.= "	<Error>" . "\n";
+				$errorXML.= "		<Code>9756</Code>" . "\n";
+				$errorXML.= "		<shortMsg>Invalid XML. Antwort vom Service fehlerhaft.</shortMsg>" . "\n";
+				$errorXML.= "		<longMsg>Invalid XML. Antwort vom Service fehlerhaft. Service aufgerufen durch " . $file . " Zeile " . $line . "</longMsg>" . "\n";
+				$errorXML.= "		<Response><![CDATA[" . $responseXML . "]]></Response>" . "\n";
+				$errorXML.= "	</Error>" . "\n";
+				echo $errorXML .= "</" . $postfields["APIRequest"] . "Response>" . "\n";
 
-				post(PATH."soa2/", array(
+				post(PATH . "soa2/", array(
 					"API" => "cms",
 					"APIRequest" => "ErrorAdd",
 					"id_errortype" => 1,
 					"id_errorcode" => 9756,
 					"file" => __FILE__,
 					"line" => __LINE__,
-					"text" => "POSTFIELDS: ".print_r($postfields, true).$responseXML
+					"text" => "POSTFIELDS: " . print_r($postfields, true) . $responseXML
 				));
 				exit;
 			}
 			libxml_clear_errors();
 			libxml_use_internal_errors($use_errors);
 
-			if ($responseType == 'obj') {
+			if ($responseType == 'obj') 
+			{
 				// returns an object
 				return $response;
-			} elseif ($responseType == 'arr') {
+			} 
+			elseif ($responseType == 'arr') 
+			{
                 foreach($response as $key => $value)
 				{
-					if (is_object($value)) {
+					if (is_object($value)) 
+					{
 						$var[$key] = (array)$value;
 					}
 				}
 				return $var;
+			}
+			elseif ($responseType == 'obj_to_arr')
+			{
+				$responseArray = json_decode(json_encode($response), true);
+				//$responseArray = objectToArray($response);
+				return $responseArray;
 			} else {
 				// returns a xml
 				return $responseXML;
 			}
 		}
 	}
+	
+	if (!function_exists("objectToArray"))
+	{	
+		/**
+		 * Convert an object to an array
+		 *
+		 * @param  object  $object The object to convert
+		 * @return array
+		 */
+		function objectToArray($object)
+		{
+			if (!is_object($object) && !is_array($object))
+			{
+				return $object;
+			}
+			
+			if (is_object($object))
+			{
+				$object = get_object_vars($object);
+				return array_map('objectToArray', $object);	
+			}
+		}
+	}
 
-
-//FUNCTION SOA3 angelegt von nputzing für tests
+	//FUNCTION SOA3 angelegt von nputzing für tests
 	if (!function_exists("soa3"))
 	{
         /**

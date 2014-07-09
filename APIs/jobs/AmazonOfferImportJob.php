@@ -23,14 +23,15 @@ $post = $_POST;
 
 	//	get amazon accountsites by account id
 	$amazonAccountsSitesResults = null;
-	if (isset($post['account_id']) && $post['account_id'] != 0) {
-	
+	if (isset($post['account_id']) && $post['account_id'] != 0) 
+	{
 		$amazonAccountsSitesQuery = "
 		SELECT *
 		FROM amazon_accounts_sites
 		WHERE account_id = '" . $post['account_id'] . "'";
 		//	and by marketplace id
-		if (isset($post['marketplaceID']) && $post['marketplaceID'] != null) {
+		if (isset($post['marketplaceID']) && $post['marketplaceID'] != null) 
+		{
 			$amazonAccountsSitesQuery.= "
 			AND marketplace_id = '" . $post['marketplaceID'] . "'";
 		} else {
@@ -46,8 +47,10 @@ $post = $_POST;
 	 *
 	 *
 	 */
-	if ($post['submitType'] == 'import')  {
-		if ($amazonAccountsSitesCount > 0) {
+	if ($post['submitType'] == 'import')  
+	{
+		if ($amazonAccountsSitesCount > 0) 
+		{
 			while($amazonAccountsSite = mysqli_fetch_assoc($amazonAccountsSitesResults))
 			{
 				$post_data = array();
@@ -70,8 +73,10 @@ $post = $_POST;
 	 *
 	 *
 	 */
-	if ($post['submitType'] == 'update') {
-		if ($amazonAccountsSitesCount > 0) {
+	if ($post['submitType'] == 'update') 
+	{
+		if ($amazonAccountsSitesCount > 0) 
+		{
 			while($amazonAccountsSite = mysqli_fetch_assoc($amazonAccountsSitesResults))
 			{
 				$post_data = array();
@@ -93,8 +98,10 @@ $post = $_POST;
 	 *
 	 *
 	 */
-	if ($post['submitType'] == 'criticalPrice') {
-		if ($amazonAccountsSitesCount > 0) {
+	if ($post['submitType'] == 'criticalPrice') 
+	{
+		if ($amazonAccountsSitesCount > 0) 
+		{
 			while($amazonAccountsSite = mysqli_fetch_assoc($amazonAccountsSitesResults))
 			{
 				$post_data = array();
@@ -113,11 +120,13 @@ $post = $_POST;
 	
 	/**
 	 *	Job for import amazon offers into the shop price research table
-	 *
+	 *	- set limit (500er)
 	 *
 	 */
-	if ($post['submitType'] == 'importShopPriceResearch') {
-		if ($amazonAccountsSitesCount > 0){
+	if ($post['submitType'] == 'importShopPriceResearch') 
+	{
+		if ($amazonAccountsSitesCount > 0) 
+		{
 			while($amazonAccountsSite = mysqli_fetch_assoc($amazonAccountsSitesResults))
 			{
 				$post_data = array();
@@ -132,4 +141,4 @@ $post = $_POST;
 			}
 			mysqli_data_seek($amazonAccountsSitesResults, 0);
 		}
-	}	
+	}

@@ -14,7 +14,7 @@
 <file name="AmazonCategories.php" server="www.mapco.de/public_html/" local="130443773806718872" remote="130443773400000000" Dst="2" />
 <file name="AmazonOrderItemsUpdate.php" server="www.mapco.de/public_html/" local="130486010957010957" remote="130486010400000000" Dst="2" />
 <file name="AmazonOrders.php" server="www.mapco.de/public_html/" local="130481672400000000" remote="130481672400000000" Dst="2" />
-<file name="AmazonOrdersImport.php" server="www.mapco.de/public_html/" local="130486003595029876" remote="130486003200000000" Dst="2" />
+<file name="AmazonOrdersImport.php" server="www.mapco.de/public_html/" local="130492777330286034" remote="130492777200000000" Dst="2" />
 <file name="AmazonProductAsinImport.php" server="www.mapco.de/public_html/" local="130470279600000000" remote="130470279600000000" Dst="2" />
 <file name="AmazonProductsBundles.php" server="www.mapco.de/public_html/" local="130481661294876328" remote="130481661000000000" Dst="2" />
 <file name="AmazonProductUpdate.php" server="www.mapco.de/public_html/" local="130479959326709720" remote="130488600000000000" Dst="2" />
@@ -22,8 +22,8 @@
 <file name="AmazonSubmissionResultGet.php" server="www.mapco.de/public_html/" local="130483558176305912" remote="130483557600000000" Dst="2" />
 <file name="AmazonOfferListingForAsin.php" server="www.mapco.de/public_html/" local="7916289182301493163" remote="130431649800000000" Dst="2" />
 <file name="AmazonOffersImport.php" server="www.mapco.de/public_html/" local="130479959331219978" remote="130480844400000000" Dst="2" />
-<file name="AmazonOffers.php" server="www.mapco.de/public_html/" local="130439442600000000" remote="130439442600000000" Dst="2" />
-<file name="AmazonProductsTasks.php" server="www.mapco.de/public_html/" local="130481641143983763" remote="130481640600000000" Dst="2" />
+<file name="AmazonOffers.php" server="www.mapco.de/public_html/" local="130493632723256663" remote="130493632200000000" Dst="2" />
+<file name="AmazonProductsTasks.php" server="www.mapco.de/public_html/" local="130493632674993903" remote="130493632200000000" Dst="2" />
 <file name="AmazonInventoryImport.php" server="www.mapco.de/public_html/" local="130479959335270210" remote="130481632200000000" Dst="2" />
 <file name="ProductDelete.php" server="www.mapco.de/public_html/" local="130481712063770142" remote="130488600000000000" Dst="2" />
 <file name="AmazonShopItemsSubTitle.php" server="www.mapco.de/public_html/" local="130483420047465395" remote="130483419600000000" Dst="2" />

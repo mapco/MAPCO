@@ -21,11 +21,11 @@ $post = $_POST;
 	$amazonAccountsSites = getAmazonAccountsites($post);
 
     /**
-     *	Detect critical price
+     *	Detect critical prices
      *
      */
-	if ($post['action'] == 'criticalPrice') {
-		
+	if ($post['action'] == 'criticalPrice') 
+	{	
 		$from = 'amazon_products';
 		$select = '*';
 		$addWhere = "
@@ -34,13 +34,15 @@ $post = $_POST;
 			AND TopPrice > 0";
 		$orderBy = 'id_product DESC';
 		$amazonProductsResults = SQLSelect($from, $select, $addWhere, $orderBy, 0, 0, 'shop',  __FILE__, __LINE__);
-		if (count($amazonProductsResults) > 0) {
+		if (count($amazonProductsResults) > 0) 
+		{
 			$countUpdate = 0;
 			foreach($amazonProductsResults as $amazonProductsResult)
 			{
 				//$amazonProductsResult['StandardPrice'] > $amazonProductsResult['TopPrice'] AND $amazonProductsResult['TopPrice'] > 0)
 				$data = array();
-				if (true == getBestOfferPriceForAmazon($amazonProductsResult['StandardPrice'], $amazonProductsResult['TopPrice'])) {
+				if (true == getBestOfferPriceForAmazon($amazonProductsResult['StandardPrice'], $amazonProductsResult['TopPrice'])) 
+				{
 					$data['CriticalPrice'] = 1;
 					$data['submitedProduct'] = 0;
 					$data['upload'] = 1;
@@ -64,8 +66,8 @@ $post = $_POST;
 	 *	Update offer top price into the amzon products table
 	 *
 	 */
-	if ($post['action'] == 'update') {
-
+	if ($post['action'] == 'update') 
+	{
 		$from = 'amazon_offers';
 		$select = '*';
 		$addWhere = "
@@ -76,7 +78,8 @@ $post = $_POST;
 		$countInsert = 0;
 		$countUpdate = 0;
 		
-		if (count($amazonOffersResults) > 0) { 
+		if (count($amazonOffersResults) > 0) 
+		{ 
 			foreach($amazonOffersResults as $amazonOffersResult)
 			{
 				$from = 'amazon_products';
@@ -85,8 +88,10 @@ $post = $_POST;
 					ASIN = '" . $amazonOffersResult['ASIN'] . "'
 					AND accountsite_id = '" . $amazonAccountsSites['id_accountsite'] . "'";
 				$amazonProductsResult = SQLSelect($from, $select, $addWhere, 0, 0, 1, 'shop',  __FILE__, __LINE__);
-				if (count($amazonProductsResult) > 0) {
-					if ($amazonProductsResult['TopPrice'] > 0 && $amazonProductsResult['TopPrice'] > $amazonOffersResult['PriceListingPriceAmount']) {
+				if (count($amazonProductsResult) > 0) 
+				{
+					if ($amazonProductsResult['TopPrice'] > 0 && $amazonProductsResult['TopPrice'] > $amazonOffersResult['PriceListingPriceAmount']) 
+					{
 						$data = array();
 						$data['TopPrice'] = $amazonOffersResult['PriceListingPriceAmount'];
 						$addWhere = "
@@ -94,7 +99,8 @@ $post = $_POST;
 						q_update("amazon_products", $data, $addWhere, $dbshop, __FILE__, __LINE__);
 						$countUpdate++;
 					} else {
-						if ($amazonProductsResult['TopPrice'] == 0) {
+						if ($amazonProductsResult['TopPrice'] == 0) 
+						{
 							$data = array();
 							$data['TopPrice'] = $amazonOffersResult['PriceListingPriceAmount'];
 							$addWhere = "
@@ -122,8 +128,8 @@ $post = $_POST;
 	 *	insert price research into the shop price research table
 	 *	and create a price suggestion
 	 */
-	if ($post['action'] == 'importShopPriceResearch') {
-		
+	if ($post['action'] == 'importShopPriceResearch') 
+	{
 		$from = 'amazon_offers';
 		$select = '*';
 		$addWhere = "
@@ -133,7 +139,8 @@ $post = $_POST;
 		$amazonOffersResults = SQLSelect($from, $select, $addWhere, $orderBy, 0, $post['limit'], 'shop',  __FILE__, __LINE__);
 		$countPriceResearchInsert = 0;
 
-		if (count($amazonOffersResults) > 0) { 
+		if (count($amazonOffersResults) > 0) 
+		{ 
 			foreach($amazonOffersResults as $amazonOffersResult)
 			{
 				$amazonProduct = findAmazonProductsByAsinAndByAccountsite($amazonOffersResult, $amazonAccountsSites);
@@ -158,7 +165,8 @@ $post = $_POST;
 					$countPriceResearchInsert++;
 					
 					//	create a price suggestion
-					if ($amazonProduct['TopPrice'] > 0) {
+					if ($amazonProduct['TopPrice'] > 0) 
+					{
 						$post_data = array();
 						$post_data['API'] = "shop";
 						$post_data['APIRequest'] = "PriceSuggestionAdd";
@@ -174,7 +182,8 @@ $post = $_POST;
 						list_id = '3125' AND item_id = '" . $itemID . "'";
 					$orderBy = 'PriceListingPriceAmount DESC';
 					$shopListItemsResult = SQLSelect($from, $select, $addWhere, 0, 0, 1, 'shop',  __FILE__, __LINE__);
-					if (count($shopListItemsResult) == 0) {
+					if (count($shopListItemsResult) == 0) 
+					{
 						$data = array();
 						$data['list_id'] = '3125';
 						$data['item_id'] = $itemID;

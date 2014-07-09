@@ -890,7 +890,7 @@ function getLanguageIds()
  * @param $dump
  * @param bool $exit
  */
-function pr($dump, $exit = false)
+function prAmazon($dump, $exit = false)
 {
 	echo '<pre>';
 		var_dump($dump);

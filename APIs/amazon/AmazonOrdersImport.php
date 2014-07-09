@@ -65,7 +65,7 @@ $post = $_POST;
 	$MWS_MESSAGE_TYPE = '<User teh MWS Message Type>';
 
 	$url = "AWSAccessKeyId=" . $AWS_ACCESS_KEY_ID . "&Action=ListOrders";
-	$url.= "&CreatedAfter=" . date('c', strtotime('-2 day', time())) . "&CreatedBefore=" . date('c', strtotime('-10 minutes', time()));
+	$url.= "&CreatedAfter=" . date('c', strtotime('-4 day', time())) . "&CreatedBefore=" . date('c', strtotime('-10 minutes', time()));
 	$url.= "&MarketplaceId.Id.1=" . $MARKETPLACE_ID . "&SellerId=" . $MERCHANT_ID;
 	$url.= "&SignatureMethod=HmacSHA256&SignatureVersion=2&Timestamp=" . gmdate("Y-m-d\TH:i:s\Z") . "&Version=" . $APPLICATION_VERSION;
 

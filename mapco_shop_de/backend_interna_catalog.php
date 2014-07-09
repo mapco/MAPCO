@@ -4,6 +4,8 @@
 include("config.php");
 include("templates/" . TEMPLATE_BACKEND . "/header.php");
 
+$get = $_GET;
+
 // Content
 ?>
     <script type="text/javascript">
@@ -11,13 +13,13 @@ include("templates/" . TEMPLATE_BACKEND . "/header.php");
         /**
          * show
          */
-        function showCatalog()
+        function showCatalog(KHerNr)
         {
             var $post_data = new Object();
             $post_data['API'] = "catalog";
             $post_data['APIRequest'] = "CatalogCreate";
             $post_data['action'] = "showCatalog";
-            $post_data['vehicle_id'] = 1145;
+            $post_data['KHerNr'] = KHerNr;
             $.post('<?php echo PATH;?>soa2/', $post_data, function($data) {
                 wait_dialog_show();
                 try {$xml = $($.parseXML($data));} catch($err) {show_status2($err.message); return;}
@@ -41,5 +43,5 @@ echo '
 <div id="showCatalog"></div>';
 
 // Footer
-echo '<script type="text/javascript">showCatalog(' . $get['orderBy'] . ');</script>';
+echo '<script type="text/javascript">showCatalog(' . $get['KHerNr'] . ');</script>';
 include("templates/" . TEMPLATE_BACKEND . "/footer.php");

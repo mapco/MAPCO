@@ -1,8 +1,7 @@
 <?php
 	//include("config.php");
 	
-	if ( !isset($_POST["MPN"]) )
-	{
+	if ( !isset( $_POST["MPN"] ) ) {
 		echo '<crm_get_order_detailResponse>'."\n";
 		echo '	<Ack>Failure</Ack>'."\n";
 		echo '	<Error>'."\n";
@@ -14,8 +13,7 @@
 		exit;
 	}
 	
-	if ( !isset($_POST["item_lauf"]) )
-	{
+	if ( !isset( $_POST["item_lauf"] ) ) {
 		echo '<crm_get_order_detailResponse>'."\n";
 		echo '	<Ack>Failure</Ack>'."\n";
 		echo '	<Error>'."\n";
@@ -27,8 +25,7 @@
 		exit;
 	}
 	
-	if ( !isset($_POST["KTypNr"]) )
-	{
+	if ( !isset( $_POST["KTypNr"] ) ) {
 		echo '<crm_get_order_detailResponse>'."\n";
 		echo '	<Ack>Failure</Ack>'."\n";
 		echo '	<Error>'."\n";
@@ -40,46 +37,45 @@
 		exit;
 	}
 	
-	$lang=$_SESSION["lang"];
+	$lang = $_SESSION["lang"];
 	
 	//SprachNr
-	$sprachnr=array("de" => "001",
-				   "en" => "004",
-				   "fr" => "006",
-				   "it" => "007",
-				   "es" => "008",
-				   "nl" => "009",
-				   "da" => "010",
-				   "sv" => "011",
-				   "no" => "012",
-				   "fi" => "013",
-				   "hu" => "014",
-				   "pt" => "015",
-				   "ru" => "016",
-				   "sk" => "017",
-				   "cs" => "018",
-				   "pl" => "019",
-				   "el" => "020",
-				   "ro" => "021",
-				   "tr" => "023",
-				   "hr" => "024",
-				   "sr" => "025",
-				   "zh" => "004", //031
-				   "bg" => "032",
-				   "lv" => "033",
-				   "lt" => "034",
-				   "et" => "035",
-				   "sl" => "036",
-				   "qa" => "037",
-				   "qb" => "038");
+	$sprachnr = array( 	"de" => "001",
+				   		"en" => "004",
+				   		"fr" => "006",
+				   		"it" => "007",
+				   		"es" => "008",
+				   		"nl" => "009",
+				   		"da" => "010",
+				   		"sv" => "011",
+				   		"no" => "012",
+				   		"fi" => "013",
+				   		"hu" => "014",
+				   		"pt" => "015",
+				   		"ru" => "016",
+				   		"sk" => "017",
+				   		"cs" => "018",
+				   		"pl" => "019",
+				   		"el" => "020",
+				   		"ro" => "021",
+				   		"tr" => "023",
+				   		"hr" => "024",
+				   		"sr" => "025",
+				   		"zh" => "004", //031
+				   		"bg" => "032",
+				   		"lv" => "033",
+				   		"lt" => "034",
+				   		"et" => "035",
+				   		"sl" => "036",
+				   		"qa" => "037",
+				   		"qb" => "038" );
 
 
 	//get languages
-	$sprache=array();
-	$results=q("SELECT * FROM cms_languages ORDER BY ordering;", $dbweb, __FILE__, __LINE__);
-	while($row=mysqli_fetch_array($results))
-	{
-		$sprache[sizeof($sprache)]=$row["code"];
+	$sprache = array();
+	$results = q( "SELECT * FROM cms_languages ORDER BY ordering", $dbweb, __FILE__, __LINE__ );
+	while ( $row = mysqli_fetch_array( $results ) ) {
+		$sprache[sizeof($sprache)] = $row["code"];
 	}
 	
 	
@@ -95,7 +91,7 @@
 	
 	$xmldata='';
 	$xmldata.="<item_lauf>".$_POST["item_lauf"]."</item_lauf>\n";
-	$xmldata.="<KTypNr>".$_POST["KTypNr"]."</KTypNr>\n";
+	$xmldata.="<KTypNr><![CDATA[".$_POST["KTypNr"]."]]></KTypNr>\n";
 			
 	//Gibt es überhaupt Kriterien?
 	$result_t_400=q("SELECT * FROM t_400 WHERE ArtNr='".$_POST["MPN"]."' AND KritWert='".$_POST["KTypNr"]."' AND KritNr='0002' AND KritNr!='0008' AND KritNr!='0016' AND SortNr='00001';", $dbshop, __FILE__, __LINE__);
@@ -115,7 +111,7 @@
 			{
 				$xmldata.="<Krit>\n";
 				$xmldata.="<cnt>".$kritcnt."</cnt>\n";
-				$xmldata.="<KritNr>".$row3["KritNr"]."</KritNr>\n";
+				$xmldata.="<KritNr><![CDATA[".$row3["KritNr"]."]]></KritNr>\n";
 				$xmldata.="<KritWert><![CDATA[".$row3["KritWert"]."]]></KritWert>\n";
 				$result_t_050=q("SELECT * FROM t_050 WHERE KritNr='".$row3["KritNr"]."';", $dbshop, __FILE__, __LINE__);
 				$row4=mysqli_fetch_array($result_t_050);
@@ -148,9 +144,9 @@
 				$bez=$row7["Bez"];
 				$bez=iconv("windows-".$codepage[$lang], "utf-8", utf8_decode($bez));
 				$wert=iconv("windows-".$codepage[$lang], "utf-8", utf8_decode($wert));
-				$xmldata.="<KritBez>".$bez."</KritBez>\n";
+				$xmldata.="<KritBez><![CDATA[".$bez."]]></KritBez>\n";
 				$xmldata.="<KritWertBez><![CDATA[".$wert."]]></KritWertBez>\n";
-				$xmldata.="<TabNr>".$row4["TabNr"]."</TabNr>\n";
+				$xmldata.="<TabNr><![CDATA[".$row4["TabNr"]."]]></TabNr>\n";
 //********************************************************************************************************
 				if($row4["TabNr"]!="000")
 				{
@@ -248,12 +244,12 @@
 							$find=array_search($row7["Schl"], $schl);
 							if($find!==false)
 							{
-								$xmldata.="    <TabItem id='".$row7["Schl"]."'>".$bez."</TabItem>\n";
+								$xmldata.="    <TabItem id='".$row7["Schl"]."'><![CDATA[".$bez."]]></TabItem>\n";
 							}
 						}
 						else
 						{
-							$xmldata.="    <TabItem id='".$row7["Schl"]."'>".$row7["Bez"]."</TabItem>\n";
+							$xmldata.="    <TabItem id='".$row7["Schl"]."'><![CDATA[".$row7["Bez"]."]]></TabItem>\n";
 						}
 					}
 					$xmldata.="  </TabItems>\n";
@@ -266,7 +262,7 @@
 					{
 						if(strpos($row9["KritWert"], "ABS: Bosch")===false)
 						{
-							$xmldata.="    <TabItem>".$row9["KritWert"]."</TabItem>\n";
+							$xmldata.="    <TabItem><![CDATA[".$row9["KritWert"]."]]></TabItem>\n";
 						}
 					}
 					$xmldata.="  </TabItems>\n";

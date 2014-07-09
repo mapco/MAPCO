@@ -98,6 +98,21 @@ function amazonSubmit($post, $host = null)
 }
 
 /**
+ * Debug view
+ *
+ * @param $dump
+ * @param bool $exit
+ */
+function pr($dump, $exit = false)
+{
+	echo '<pre>';
+		var_dump($dump);
+		if ($exit == true)
+		exit;
+	echo '</pre>' . "\n";
+}
+
+/**
  * Returns a html icon string
  *
  * @param $ico

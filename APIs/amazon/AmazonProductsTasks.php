@@ -5,7 +5,11 @@
  *	Amazon Services for Product Tasks
  *	- for all system intern products tasks
  *
- * @params
+	Servicename:
+	- AmazonProductsTasks
+	-- account_id=
+	-- submitType=
+	--- taskProductBundlePriceUpdate
  *
 *******************************************************************************/
 
@@ -13,12 +17,16 @@ $PATH = dirname(__FILE__);
 require_once($PATH . '/Model/AmazonModel.php');
 include("../functions/cms_core.php");
 
-//	keep post submit#
+//	keep post submit
 $post = $_POST;
 
 //	get amazon accountsites for amazon marketplaces by accountssites id
 $amazonAccountsSites = getAmazonAccountsitesByAccountId($post);
 
+/**
+ *	task for updating amazon product bundle prices
+ *
+ */
 if ($post['submitType'] == 'taskProductBundlePriceUpdate') 
 {
 	foreach($amazonAccountsSites as $amazonAccountsSite)
@@ -95,8 +103,14 @@ if ($post['submitType'] == 'taskProductBundlePriceUpdate')
 			}
 		}
 	}
+	echo $xml;	
 }
 
+
+/**
+ *	task for amazon product asin import
+ *
+ */
 if ($post['action'] == 'taskAsin') 
 {
 	$countUpdate = 0;   
