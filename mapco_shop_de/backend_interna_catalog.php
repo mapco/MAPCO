@@ -29,7 +29,7 @@ $get = $_GET;
 			wait_dialog_hide();
 		});
 	}
-	
+
 	/**
 	 * create catalog pdf
 	 */
@@ -49,8 +49,6 @@ $get = $_GET;
 			wait_dialog_hide();
 		});
 	}
-	
-	
 </script>
 
 <?php

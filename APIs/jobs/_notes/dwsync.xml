@@ -12,7 +12,11 @@
 <file name="AmazonOrderItemsUpdateJob.php" server="www.mapco.de/public_html/" local="130396071600000000" remote="130396071600000000" Dst="2" />
 <file name="AmazonUpdatePricesJob.php" server="www.mapco.de/public_html/" local="130344273000000000" remote="130344273000000000" Dst="2" />
 <file name="AmazonUpdateQuantitiesJob.php" server="www.mapco.de/public_html/" local="130396092000000000" remote="130396092000000000" Dst="2" />
+<<<<<<< HEAD
 <file name="AmazonOfferImportJob.php" server="www.mapco.de/public_html/" local="130492789866193047" remote="130492789800000000" Dst="2" />
+=======
+<file name="AmazonOfferImportJob.php" server="www.mapco.de/public_html/" local="130479959538441831" remote="130488601200000000" Dst="2" />
+>>>>>>> 9bee1381fb04c89b0c2821d7a819ff7e9b33434b
 <file name="AmazonInventoryImportJob.php" server="www.mapco.de/public_html/" local="130482612997471059" remote="130482612600000000" Dst="2" />
 <file name="AmazonReportJob.php" server="www.mapco.de/public_html/" local="130482613314249177" remote="130482613200000000" Dst="2" />
 <file name="JOBHANDLER.php" server="www.mapco.de/public_html/" local="130462568400000000" remote="130462568400000000" Dst="2" />

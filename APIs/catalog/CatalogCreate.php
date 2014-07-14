@@ -11,7 +11,6 @@
  *
  *******************************************************************************/
 include("../functions/cms_core.php");
-
 $templateLoad = 'templates/template_';
 $templateSet = 'car';
 $GART = '00247';
@@ -21,13 +20,13 @@ $post = $_POST;
 
 if (isset($post['action']) && $post['action'] == 'showCatalog')
 {
-	if (isset($post['KHerNr']) && $post['KHerNr'] != null) 
+	if (isset($post['KHerNr']) && $post['KHerNr'] != null)
 	{
 		$KHerNr = $post['KHerNr'];
 	} else {
 		$KHerNr = '00093';
-	}	
-	
+	}
+
 	//	get shop items by GART (category)
 	$data = array();
 	$data['from'] = 'shop_items';
@@ -37,7 +36,7 @@ if (isset($post['action']) && $post['action'] == 'showCatalog')
 		AND GART = " . $GART;
 	$date['order'] = "lastmod DESC";
 	$shopItems = SQLSelect($data['from'], $data['select'], $data['where'], $date['order'], 0, 0, 'shop',  __FILE__, __LINE__);
-	
+
     //	get vehicles by KHerNr
 	$data = array();
     $data['from'] = 'vehicles_de';
@@ -46,9 +45,9 @@ if (isset($post['action']) && $post['action'] == 'showCatalog')
 		KHerNr = '" . $KHerNr . "'
 	";
     $vehicleResult = SQLSelect($data['from'], $data['select'], $data['where'], 0, 0, 1, 'shop', __FILE__, __LINE__);
-	
+
 	//$results=q("SELECT * FROM vehicles_".$_SESSION["lang"]." WHERE Exclude=0 GROUP BY KHerNr ORDER BY BEZ1;", $dbshop, __FILE__, __LINE__);
-	
+
 	//	get shop items keyword by GART (category)
 	$data = array();
 	$data['from'] = 'shop_items_keywords';
@@ -62,14 +61,14 @@ if (isset($post['action']) && $post['action'] == 'showCatalog')
 		$keywords.= $shopItemsKeyword['keyword'] . " - ";
 	}
 	$pos = strrpos($keywords, "-");
-	if ($pos !== false) 
+	if ($pos !== false)
 	{
 		$keywords = substr($keywords,0, $pos);
 	}
 
 	//	load the template file
     include($templateLoad . $templateSet . '.php');
-	
+
 	//	cache result as html file
 	$buildHtmlFile = '
 		<!DOCTYPE html>
@@ -83,13 +82,13 @@ if (isset($post['action']) && $post['action'] == 'showCatalog')
 			</body>
 		</html>
 	';
-	
+
 	$catalogCacheFile = 'Catalog_' . ucfirst($templateSet) . '_' . $KHerNr . '.html';
 	$catalogCacheFolder = '../../assets/CmsCatalog/';
-	$file = fopen($catalogCacheFolder . $catalogCacheFile, 'w') or die('Can\'t open this file!');	
+	$file = fopen($catalogCacheFolder . $catalogCacheFile, 'w') or die('Can\'t open this file!');
 	fwrite($file, $buildHtmlFile);
 	fclose($file);
-	
+
 	//	save new catalog for caching
 	$data = array();
 	$data['from'] = 'cms_catalog';
@@ -100,8 +99,8 @@ if (isset($post['action']) && $post['action'] == 'showCatalog')
 		AND template = '" . $templateSet . "'
 	";
 	$cmsCatalog = SQLSelect($data['from'], $data['select'], $data['where'], 0, 0, 1, 'web',  __FILE__, __LINE__);
-	
-	if (count($cmsCatalog) > 0) 
+
+	if (count($cmsCatalog) > 0)
 	{
 		$data = array();
 		//	user insert data
@@ -113,20 +112,20 @@ if (isset($post['action']) && $post['action'] == 'showCatalog')
 	} else {
 		$field = array(
 			'table' => 'cms_catalog'
-		);	
+		);
 		$data = array();
 		//	content data
 		$data['KHerNr'] = $KHerNr;
 		$data['GART'] = $GART;
 		$data['template'] = $templateSet;
 		$data['filename'] = $catalogCacheFile;
-		
+
 		//	user insert data
 		$data['firstmod'] = time();
 		$data['firstmod_user'] = $_SESSION["id_user"];
 		$data['lastmod'] = time();
 		$data['lastmod_user'] = $_SESSION["id_user"];
-		SQLInsert($field, $data, 'web', __FILE__, __LINE__);		
+		SQLInsert($field, $data, 'web', __FILE__, __LINE__);
 	}
     echo '<showCatalog><![CDATA[' . $showTemplate . ']]></showCatalog>';
 }
@@ -205,7 +204,7 @@ function getCssForTable()
 		table.vehicles-catalog tr.navigation th .image {
             width: 15%;
         }
-    </style>	
+    </style>
 	";
 	return $css;
 }
