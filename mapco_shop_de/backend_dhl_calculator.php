@@ -4,6 +4,19 @@
 	
 ?>
 	<script>
+		function gross_weights_check()
+		{
+			wait_dialog_show("Überprüfe Bruttogewichte...");
+			var $postdata=new Object();
+			$postdata["API"]="dhl";
+			$postdata["APIRequest"]="GrossWeightsCheck";
+			$.post("<?php echo PATH; ?>soa2/", $postdata, function($data)
+			{
+				wait_dialog_hide();
+				show_status2($data);
+			});
+		}
+	
 		function calculate(b)
 		{
 			if(b=="b")
@@ -52,6 +65,7 @@
 			if($WeightInKG=="")
 			{
 				$("#OurNetPrice").html("-");
+				$("#OurNetPriceWithFuelSurcharge").html("-");
 				$("#OurGrossPrice").html("-");
 				$("#CustomerNetPrice").html("-");
 				$("#CustomerGrossPrice").html("-");
@@ -77,6 +91,7 @@
 						if ( $ack!="Success" )
 						{
 							$("#OurNetPrice").html("???");
+							$("#OurNetPriceWithFuelSurcharge").html("???");
 							$("#OurGrossPrice").html("???");
 							$("#CustomerNetPrice").html("???");
 							$("#CustomerGrossPrice").html("???");
@@ -90,7 +105,30 @@
 						wait_dialog_hide();
 						return;
 					}
+					//additional
+					if( $xml.find("Additional").length == 0 ) $("#additional").hide();
+					else
+					{
+						$("#additional").show();
+						$("#Additional").html($xml.find("Additional").text());
+					}
+					//runtime
+					if( $xml.find("Runtime").length == 0 ) $("#runtime").hide();
+					else
+					{
+						$("#runtime").show();
+						$("#Runtime").html($xml.find("Runtime").text());
+					}
+					//net price
 					$("#OurNetPrice").html($xml.find("OurNetPrice").text()+" €");
+					//net price with fuel surcharge price
+					if( $xml.find("OurNetPriceWithFuelSurcharge").length == 0 ) $("#fuel_price").hide();
+					else
+					{
+						$("#fuel_price").show();
+						$("#FuelSurcharge").html($xml.find("FuelSurcharge").text());
+						$("#OurNetPriceWithFuelSurcharge").html($xml.find("OurNetPriceWithFuelSurcharge").text()+" €");
+					}
 					$("#OurGrossPrice").html($xml.find("OurGrossPrice").text()+" €");
 					$("#CustomerNetPrice").html($xml.find("CustomerNetPrice").text()+" €");
 					$("#CustomerGrossPrice").html($xml.find("CustomerGrossPrice").text()+" €");
@@ -109,6 +147,7 @@
 	echo '</p>';
 
 	echo '<h1>Versandkostenrechner</h1>';
+	echo '<img alt="Bruttogewichte prüfen" src="'.PATH.'images/icons/24x24/help.png" onclick="gross_weights_check();" style="cursor:pointer;" title="Bruttogewichte prüfen" />';
 
 	echo '	<table>';
 	echo '		<tr>';
@@ -117,6 +156,9 @@
 	echo '				<select id="shipping_type" onchange="calculate();">';
 	echo '					<option value="1">DHL</option>';
 	echo '					<option value="2">DHL Express</option>';
+	echo '					<option value="3">DHL Retoure</option>';
+	echo '					<option value="4">DHL Economy Select Import (Abholung)</option>';
+	echo '					<option value="5">DHL Economy Select Export</option>';
 	echo '				</select>';
 	echo '			</td>';
 	echo '		</tr>';
@@ -174,17 +216,22 @@
 	echo '		<tr>';
 	echo '			<td colspan="2"><input type="button" onclick="calculate();"  value="Berechnen" /></td>';
 	echo '		</tr>';
-	if( $_SESSION["userrole_id"]==1 )
-	{
-		echo '		<tr>';
-		echo '			<td>Unser Nettopreis</td>';
-		echo '			<td><span id="OurNetPrice">-</span></td>';
-		echo '		</tr>';
-		echo '		<tr>';
-		echo '			<td>Unser Bruttopreis</td>';
-		echo '			<td><span id="OurGrossPrice">-</span></td>';
-		echo '		</tr>';
-	}
+	echo '		<tr id="runtime" style="display:none;">';
+	echo '			<td>Laufzeit</td>';
+	echo '			<td><span id="Runtime">-</span> Tage</td>';
+	echo '		</tr>';
+	echo '		<tr>';
+	echo '			<td>Unser Nettopreis</td>';
+	echo '			<td><span id="OurNetPrice">-</span></td>';
+	echo '		</tr>';
+	echo '		<tr id="fuel_price" style="display:none;">';
+	echo '			<td>mit <span id="FuelSurcharge">-</span>% Treibstoffzuschlag </td>';
+	echo '			<td><span id="OurNetPriceWithFuelSurcharge">-</span></td>';
+	echo '		</tr>';
+	echo '		<tr>';
+	echo '			<td>Unser Bruttopreis</td>';
+	echo '			<td><span id="OurGrossPrice">-</span></td>';
+	echo '		</tr>';
 	echo '		<tr>';
 	echo '			<td>Kunden-Nettopreis</td>';
 	echo '			<td><span id="CustomerNetPrice">-</span></td>';
@@ -192,6 +239,10 @@
 	echo '		<tr>';
 	echo '			<td>Kunden-Bruttopreis</td>';
 	echo '			<td><span style="font-weight:bold; font-size:20px;" id="CustomerGrossPrice">-</span></td>';
+	echo '		</tr>';
+	echo '		<tr id="additional" style="display:none;">';
+	echo '			<td>Zusatzinformationen</td>';
+	echo '			<td><span id="Additional"></span></td>';
 	echo '		</tr>';
 	echo '	</table>';
 	

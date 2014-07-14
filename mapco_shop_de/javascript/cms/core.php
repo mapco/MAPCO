@@ -1,5 +1,6 @@
 <?php
 	include("../../config.php");
+	include("../../functions/cms_tl.php");
 	header('Content-type: text/javascript');
 	
 	//make dreamweaver highlight javascript
@@ -242,7 +243,7 @@
 		var code = e.keyCode || e.which;
 		if( code === 13 )
 		{
-			window.location.href="<?php echo PATHLANG; ?>oe-nummern-suche/"+text+"/";
+			window.location.href="<?php echo PATHLANG.tl(832, "alias"); ?>"+text+"/";
 		}
 		else
 		{
@@ -916,6 +917,37 @@
 	function soa2($postdata, $function, $mode)
 	{
 		$.post("<?php echo PATH; ?>soa2/", $postdata, function($data)
+		{
+			if( typeof $mode === "undefined" ) $mode="obj";
+			wait_dialog_hide();
+			if ($mode=="xml") $xml=$data;
+			else
+			{
+				try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
+				$ack = $xml.find("Ack");
+				if ( $xml.find("Error").length>0 )
+				{
+					var $Code=$xml.find("Error Code").text();
+					var $shortMsg=$xml.find("Error shortMsg").text();
+					var $longMsg=$xml.find("Error longMsg").text();
+					alert("Fehler "+$Code+"\n\n"+$longMsg);
+					return;
+				}
+				if ( $ack.text()!="Success" ) { show_status2($data); return; }
+			
+				if ($mode=="array")
+				{
+					//convert XML to Array
+				}
+			}
+			window[$function]($xml); //call the return function
+		});
+	}
+
+	//FUNCTION SOA3 angelegt von nputzing für tests
+	function soa3($postdata, $function, $mode)
+	{
+		$.post("<?php echo PATH; ?>soa3/", $postdata, function($data)
 		{
 			if( typeof $mode === "undefined" ) $mode="obj";
 			wait_dialog_hide();

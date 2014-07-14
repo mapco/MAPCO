@@ -32,7 +32,7 @@
 
 	var aktiv = '';
 	var cnt = 0;
-
+	
 	function registerb2b()
 	{
 		if($('#company').val().length == 0) {show_message_dialog("<?php echo t("Sie müssen einen Firmennamen angeben")?>."); return;}
@@ -184,15 +184,15 @@
 				tr.append(td);
 			table.append(tr);
 			tr = $('<tr></tr>');
-				td = $('<td style="font-weight: bold; text-align: right; width: 50%"><?php echo t("Steuernummer");?>:</td>');
+				td = $('<td style="font-weight: bold; text-align: right; width: 50%; vertical-align:top;"><?php echo t("Steuernummer");?>:</td>');
 				tr.append(td);
-				td = $('<td style="text-align: left;"><input type="text" id="tax_number" style="width: 150px" /><span style="color: #FF0000;">*</span></td>');
+				td = $('<td style="text-align: left;"><input type="text" id="tax_number" style="width: 150px" /><span style="color: #FF0000;">*</span><br /><p><?php  echo t('Hier können Sie Ihre Steuernummer auf EU-Gültigkeit prüfen'); ?>: <a target="_blank" href="http://ec.europa.eu/taxation_customs/vies/?locale=<?php echo $_SESSION["lang"]; ?>">http://ec.europa.eu/taxation_customs/vies/</a></p></td>');
 				tr.append(td);
 			table.append(tr);
 			tr = $('<tr></tr>');
-				td = $('<td style="font-weight: bold; text-align: right; width: 50%"><?php echo t("Gewerbeanmeldung (als Datei)");?>:</td>');
+				td = $('<td style="font-weight: bold; text-align: right; width: 50%;"><?php echo t("Gewerbeanmeldung (als Datei)");?>:</td>');
 				tr.append(td);
-				td = $('<td style="text-align: left;"><input type="button" id="trade_registration_button" value="Datei hochladen" /><span id="trade_registration_text">Keine Datei ausgewählt</span><span style="color: #FF0000;">*</span></td>');
+				td = $('<td style="text-align: left;"><input type="button" id="trade_registration_button" value="<?php echo t("Datei hochladen");?>" /><span id="trade_registration_text"><?php echo t("Keine Datei ausgewählt");?></span><span style="color: #FF0000;">*</span></td>');
 				tr.append(td);
 			table.append(tr);
 			tr = $('<tr></tr>');
@@ -313,12 +313,12 @@
 			[
 				{ text: "Ok", click: function() {$(this).dialog("close");} }
 			],
-			closeText:"Fenster schließen",
+			closeText:"<?php echo t("Fenster schließen");?>",
 			hide: { effect: 'drop', direction: "up" },
 			modal:true,
 			resizable:false,
 			show: { effect: 'drop', direction: "up" },
-			title:"Achtung!",
+			title:"<?php echo t("Achtung!");?>",
 			width:300
 		});
 	}

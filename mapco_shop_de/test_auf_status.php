@@ -1,34 +1,7 @@
 <?php
-	function q($query, $db, $file="", $line="", $error_txt="")
-	{
-		global $dbweb;
-		global $dbshop;
-		global $debug;
-		global $queries;
-		if ( isset($debug) )
-		{
-			$start=strpos($query, "FROM ")+5;
-			$stop=strpos($query, " ", $start)-$start;
-			$tablename=substr($query, $start, $stop);
-			if ( !isset($queries[$tablename]) ) $queries[$tablename]=1; else $queries[$tablename]++;
-		}
-		$starttime=time()+microtime();
-		$results = mysqli_query($db, $query) or error($file, $line, "<br />".$query."<br />".mysqli_error($db)."<br />".$error_txt);
-		$stoptime=time()+microtime();
-		$time=$stoptime-$starttime;
-		if( $time>1 )
-		{
-			mysqli_query($dbweb, "INSERT INTO cms_errors_sql (query, time) VALUES('".mysqli_real_escape_string($dbweb, $query)."', '".$time."');");
-		}
-		return $results;
-	}
+	include("config.php");
 
-	$dbweb=mysqli_connect("localhost", "dedi473_14", "Merci2664!", "admapco_mapcoweb");
-	q("SET NAMES utf8", $dbweb, __FILE__, __LINE__);
-	$dbshop=mysqli_connect("localhost","mapcoshop","merci2664", "admapco_mapcoshop");
-	q("SET NAMES utf8", $dbshop, __FILE__, __LINE__);
-
-	$_POST["AUF_ID"]="1611184, 1611374, 1682969, 1682976, 1682979";
+	$_POST["AUF_ID"]="1831940";
 
 	if ( !isset($_POST["AUF_ID"]) or !($_POST["AUF_ID"]>0) )
 	{
@@ -72,30 +45,41 @@
 	//it@mapco.de
 	//it@mapco.de<TESTDB/>
 	
-	echo $statusXml;
+//	echo $statusXml;
 //	exit;
 
-	$serverUrl='http://80.146.160.154/idims/service1.asmx/WEB_AUF_STATUS?Token=it@mapco.de&aufXML='.urlencode($statusXml);
-	$headers = array (
-		'Content-Type: application/x-www-form-urlencoded',
-		'Content-Length:'.strlen($serverUrl),
-		'Cache-Control: max-age=0',
-		'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-		'Accept-Encoding: gzip,deflate,sdch',
-		'Accept-Language: de-DE,de;q=0.8,en-US;q=0.6,en;q=0.4'
-	);
-
+	//set POST variables
+	$serverUrl = 'http://80.146.160.154/idims/service1.asmx/WEB_AUF_STATUS';
+	$fields = array(
+						'Token' => "it@mapco.de",
+						'aufXML' => urlencode($statusXml),
+						'booleanPDF' => "TRUE",
+					);
+	
+	//url-ify the data for the POST
+	foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+	rtrim($fields_string, '&');
+	
+	//open connection
 	$connection = curl_init();
+	//set the url, number of POST vars, POST data
 	curl_setopt($connection, CURLOPT_FORBID_REUSE, true); 
 	curl_setopt($connection, CURLOPT_FRESH_CONNECT, true);
 	curl_setopt($connection, CURLOPT_URL, $serverUrl);
 	curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($connection, CURLOPT_SSL_VERIFYHOST, false);
-	curl_setopt($connection, CURLOPT_HTTPHEADER, $headers);
-	curl_setopt($connection, CURLOPT_POST, false);
+	curl_setopt($connection, CURLOPT_POST, true);
+	curl_setopt($connection, CURLOPT_POSTFIELDS, $fields_string);
 	curl_setopt($connection, CURLOPT_RETURNTRANSFER, true);
+//	curl_setopt($connection,CURLOPT_URL, $url);
+//	curl_setopt($connection,CURLOPT_POST, true);
+//	curl_setopt($connection,CURLOPT_POSTFIELDS, $fields_string);
+//	curl_setopt($connection, CURLOPT_RETURNTRANSFER, true);
+
 	$responseXml = curl_exec($connection);
 	curl_close($connection);
+	unset($fields);
+	unset($fields_string);
 
 	//xml validation fix
 	$responseXml=str_replace('&lt;', '<', $responseXml);
@@ -135,6 +119,16 @@
 		echo '  <Response><![CDATA['.$responseXml.']]></Response>';
 		echo '</PriceUpdateResponse>'."\n";
 		exit;
+	}
+	
+	if (strpos($responseXml, "<PDF>")>0)
+	{
+		$RNG_ID=$response->AUFID[0]->RNG_ID[0];
+		$PDF=$response->AUFID[0]->PDF[0];
+		$file = fopen( $RNG_ID.".pdf", "w" ); 
+		fwrite( $file, base64_decode($PDF) ); 
+		fclose( $file ); 
+		echo '<a href="http://www.mapco.de/'.$RNG_ID.'.pdf">'.$RNG_ID.'</a>'."\n";
 	}
 
 	echo '<OrderStausResponse>'."\n";

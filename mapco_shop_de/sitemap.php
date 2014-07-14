@@ -7,41 +7,37 @@
 	echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.sitemaps.org/schemas/sitemap-image/1.1" xmlns:video="http://www.sitemaps.org/schemas/sitemap-video/1.1">'."\n";
 
 	//content menus
-	$results3=q("SELECT * FROM cms_languages ORDER BY ordering;", $dbweb, __FILE__, __LINE__);
-	while( $row3=mysqli_fetch_array($results3) )
+	$results=q("SELECT * FROM cms_sites_languages WHERE site_id=".$_SESSION["id_site"]."  ORDER BY ordering;", $dbweb, __FILE__, __LINE__);
+	while( $row=mysqli_fetch_array($results) )
 	{
-		$results=q("SELECT * FROM cms_menus WHERE NOT idtag='backendmenu' AND site_id IN(0, ".$_SESSION["id_site"].");", $dbweb, __FILE__, __LINE__);
-		while( $row=mysqli_fetch_array($results) )
+		$results2=q("SELECT * FROM cms_languages WHERE id_language=".$row["language_id"].";", $dbweb, __FILE__, __LINE__);
+		$row2=mysqli_fetch_array($results2);
+
+		$results3=q("SELECT * FROM cms_menus WHERE NOT idtag='backendmenu' AND site_id IN(0, ".$_SESSION["id_site"].");", $dbweb, __FILE__, __LINE__);
+		while( $row3=mysqli_fetch_array($results3) )
 		{
-			$results2=q("SELECT * FROM cms_menuitems WHERE menu_id=".$row["id_menu"].";", $dbweb, __FILE__, __LINE__);
-			while( $row2=mysqli_fetch_array($results2) )
+			$results4=q("SELECT * FROM cms_menuitems WHERE menu_id=".$row3["id_menu"].";", $dbweb, __FILE__, __LINE__);
+			while( $row4=mysqli_fetch_array($results4) )
 			{
-				echo '<url>'."\n";
-				if ( $row2["alias"]!="" )
+				$results5=q("SELECT * FROM cms_menuitems_languages WHERE menuitem_id=".$row4["id_menuitem"]." and language_id=".$row["language_id"].";", $dbweb, __FILE__, __LINE__);
+				while( $row5=mysqli_fetch_array($results5) )
 				{
-					if( $row3["code"]=="de" ) echo '	<loc>'.PATH.$row2["alias"].'</loc>'."\n";
-					else echo '	<loc>'.PATH.$row3["lang"].'/'.$row2["alias"].'</loc>'."\n";
+					echo '<url>'."\n";
+					if ( $row5["alias"]!="" )
+					{
+						if( $row["ordering"]==1 ) echo '	<loc>'.PATH.$row5["alias"].'</loc>'."\n";
+						else echo '	<loc>'.PATH.$row2["code"].'/'.$row5["alias"].'</loc>'."\n";
+					}
+					elseif ($row4["home"]=1)
+					{
+						if( $row["ordering"]==1 ) echo '	<loc>'.PATH.'</loc>'."\n";
+						else echo '	<loc>'.PATH.$row2["code"].'/'.'</loc>'."\n";
+					}
+					echo '</url>'."\n";
 				}
-				else
-				{
-					echo '	<loc>'.PATH.$row2["link"].'</loc>'."\n";
-				}
-/*
-				echo '	<image:image>';
-				echo '		<image:loc>http://example.com/image.jpg</image:loc> ';
-				echo '	</image:image>';
-				echo '  <video:video>     ';
-				echo '		<video:content_loc>http://www.example.com/video123.flv</video:content_loc>';
-				echo '		<video:player_loc allow_embed="yes" autoplay="ap=1">http://www.example.com/videoplayer.swf?video=123</video:player_loc>';
-				echo '		<video:thumbnail_loc>http://www.example.com/miniaturbilder/123.jpg</video:thumbnail_loc>';
-				echo '		<video:title>Grillen im Sommer</video:title>  ';
-				echo '		<video:description>So grillen Sie jedes Mal perfekte Steaks</video:description>';
-				echo '	</video:video>';
-*/
-				echo '</url>'."\n";
 			}
 		}
 	}
-
+	
 	echo '</urlset>'."\n";
 ?>

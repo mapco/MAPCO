@@ -1,4 +1,7 @@
 <?php
+
+
+						
 //	include("Wartung.php");
 //	exit;
 	include("config.php");

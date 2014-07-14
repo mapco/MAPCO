@@ -3,6 +3,38 @@
 $vehiclesRow = "";
 foreach($shopItems as $shopItem)
 {
+	//	get criterias
+	$data = array();
+	$data['from'] = 'shop_items_de';
+	$data['select'] = '*';
+	$data['where'] = "
+		id_item = " . $shopItem['id_item'];
+	$shopItemsDe = SQLSelect($data['from'], $data['select'], $data['where'], 0, 0, 1, 'shop', __FILE__, __LINE__);
+	$criterias = explode("; ", $shopItemsDe["short_description"]);
+	$criteriasList = null;
+	$criteriaTemp['Einbauseite'] = array();
+	foreach($criterias as $criteria)
+	{
+		$pos = strpos($criteria, 'Einbauseite');
+		if ($pos !== false) 
+		{
+			$criteriaTemp['Einbauseite'][] = str_replace('Einbauseite:', "", $criteria);
+		} else {
+			$criteria = str_replace('Lagerungsart:', "", $criteria);
+			$criteria = str_replace('Farbe:', "", $criteria);
+			$pos = strpos($criteria, 'Gewicht');
+			if ($pos === false) 
+			{
+				$criteriasList.= $criteria . ', ';
+			}
+		}
+	}
+	if (count($criteriaTemp['Einbauseite']) > 0) 
+	{
+		$criteriaTempList = 'Einbauseite:' . implode(',', $criteriaTemp['Einbauseite']) . ', ';		
+	}
+	$criteriasList = rtrim($criteriaTempList . $criteriasList, ', '); 
+		
 	//	get vehicles
 	$data = array();
 	$data['from'] = 'shop_items_vehicles';
@@ -13,26 +45,43 @@ foreach($shopItems as $shopItem)
 	";
 	$shopItemsVehicles = SQLSelect($data['from'], $data['select'], $data['where'], 0, 0, 0, 'shop', __FILE__, __LINE__);		
 	$showVehicles = "";
-	foreach($shopItemsVehicles as $shopItemsVehicle)
+	if (count($shopItemsVehicles) > 0)
 	{
-		//	get vehicles
-		$data = array();
-		$data['from'] = 'vehicles_de';
-		$data['select'] = '*';
-		$data['where'] = "
-			id_vehicle = " . $shopItemsVehicle['vehicle_id'] . "
-			AND KHerNr = " .$KHerNr;
-		$vehicles = SQLSelect($data['from'], $data['select'], $data['where'], 0, 0, 0, 'shop', __FILE__, __LINE__);
-		if (count($vehicles) > 0) {
-			foreach($vehicles as $vehicle)
-			{
-				$showVehicles.= $vehicle["BEZ1"] . ' ' . $vehicle["BEZ2"] . ' ' . $vehicle["BEZ3"] . '<br />';
+		foreach($shopItemsVehicles as $shopItemsVehicle)
+		{
+			//	get vehicles
+			$data = array();
+			$data['from'] = 'vehicles_de';
+			$data['select'] = '*';
+			$data['where'] = "
+				id_vehicle = " . $shopItemsVehicle['vehicle_id'] . "
+				AND KHerNr = " .$KHerNr;
+			$vehicles = SQLSelect($data['from'], $data['select'], $data['where'], 0, 0, 0, 'shop', __FILE__, __LINE__);
+			if (count($vehicles) > 0) {
+				foreach($vehicles as $vehicle)
+				{
+					$stringOne = '<b>' . $vehicle["BEZ1"] . ' ' . $vehicle["BEZ2"] . '</b>';
+					$stringTwo = $stringTemp;
+					
+					if ($stringOne == $stringTwo) 
+					{
+						$showVehicles.= $vehicle["BEZ3"] . ', ';
+					} else {
+						if (empty($stringTemp)) 
+						{
+							$showVehicles.= $stringOne . ' ' . $vehicle["BEZ3"] . ', ';
+						} else {
+							$showVehicles.= '<br />' . $stringOne . ' ' . $vehicle["BEZ3"];
+						}
+					}
+					$stringTemp = $stringOne;
+				}
 			}
 		}
-	}		
+	}
 
-	$criteria['htmlImgTag'] = true;
-	$image = getImagesByArticleId($shopItem, $criteria);
+	$setCriteria['htmlImgTag'] = true;
+	$image = getImagesByArticleId($shopItem, $setCriteria);
 	
 	$data = array();
 	$data['from'] = 't_203';
@@ -43,54 +92,26 @@ foreach($shopItems as $shopItem)
 	";
     $t203Results = SQLSelect($data['from'], $data['select'], $data['where'], 0, 0, 2, 'shop', __FILE__, __LINE__);	
 	$oeNumbers = "";
-	foreach($t203Results as $t203Result)
+	if (count($t203Results) > 0) 
 	{
-		$oeNumbers.= $t203Result['OENr'] . "<br />"; 	
-	}
-	
-	$data = array();
-	$data['from'] = 't_210';
-	$data['select'] = '*'; 
-	$data['where'] = "
-		ArtNr = '" . $shopItem['MPN'] . "'
-	";
-	$t210Results = SQLSelect($data['from'], $data['select'], $data['where'], 0, 0, 0, 'shop', __FILE__, __LINE__);
-	foreach($t210Results as $t210Results)
-	{
-		$data = array();
-		$data['from'] = 't_050';
-		$data['select'] = '*'; 
-		$data['where'] = "
-			KritNr = '" . $t210Results['KritNr'] . "'
-		";
-		$t050Results = SQLSelect($data['from'], $data['select'], $data['where'], 0, 0, 0, 'shop', __FILE__, __LINE__);
-		foreach($t050Results as $t050Result)
+		foreach($t203Results as $t203Result)
 		{
-			if ($t050Result["Typ"] == "K")
-			{
-				$data = array();
-				$data['from'] = 't_052';
-				$data['select'] = '*'; 
-				$data['where'] = "
-					TabNr = '" . $t050Results['KritNr'] . "'
-					AND Schl = '" . $t050Result['KritVal'] . "'
-				";
-				$t052Results = SQLSelect($data['from'], $data['select'], $data['where'], 0, 0, 0, 'shop', __FILE__, __LINE__);				
-			}
+			$oeNumbers.= $t203Result['OENr'] . "<br />"; 	
 		}
-	}
+	}	
 	
+	// build template body
 	$templateRow = '
-	<tr>
-		<td>' . $showVehicles . '
-			<br />
-			<div>
-				<strong>' . $keywords . '</strong>
-			</div>
-			<div>' . $shopItemsVehicle['criteria'] . '</div>
+	<tr class="content-list">
+		<td class="description">
+			<span class="keywords-list">' . $keywords . '</span>
+			<span class="vehicles-list">' . $showVehicles . '</span>
+			<span class="criteria-list"><i class="fa fa-info-circle"></i>' . $criteriasList . '</span>
 		</td>
-		<td style="text-align: center;"><span style="font-size: 16px"><strong>' . $shopItem['MPN'] . '</strong></span><br />' . $oeNumbers . '</td>
-		<td style="text-align: center; width:200px;">' . $image . '</td>
+		<td class="center numbers">
+			<span class="mpn"><strong>' . $shopItem['MPN'] . '</strong></span><br /><br />' . $oeNumbers . '
+		</td>
+		<td class="center image">' . $image . '</td>
 	</tr>';	
 	if (!empty($showVehicles)) 
 	{	
@@ -98,24 +119,28 @@ foreach($shopItems as $shopItem)
 	}
 }
 
-$templateCar = '
-	<table>
-		<thead>
-			<tr>
-				<th colspan="3">' . $vehicleResult['BEZ1'] . '</th>
-			</tr>
-			<tr>
-				<th style="font-size: 12px;">Fahrzeug</th>
-				<th style="font-size: 12px;">vergleichbar mit</th>
-				<th style="font-size: 12px;">Bild</th>
-			</tr>
-		</thead>
+$showTemplate = "";
+$showTemplateHeadline = $vehicleResult['BEZ1'];
 
-		<tbody>';
-			$templateCar.= $vehiclesRow;
-			$templateCar.= '
-		</tbody>
-	</table>';
+if (!empty($vehiclesRow))
+{
+	$templateCar = '
+		<table class="vehicles-catalog">
+			<thead>
+				<tr class="headline">
+					<th colspan="3">' . $showTemplateHeadline . '</th>
+				</tr>
+				<tr class="navigation">
+					<th class="description">Fahrzeuge</th>
+					<th class="center numbers">vergleichbar mit</th>
+					<th class="center image">Bild</th>
+				</tr>
+			</thead>
+			<tbody>' . $vehiclesRow . '</tbody>
+		</table>';
+}
+$showTemplate = $templateCar;
+
 
 	/*
 	$post_data = array();
@@ -209,12 +234,12 @@ DEFINE('IMAGE_FORMAT_THUMB_ID',      	8);
                 if (!empty($images['imageLocationThumb'])) {
                     return '<img style="float: none;" src="' . $images['imageLocationThumb'] . '">';
                 } else {
-                    return '<img style="float: none;" src="' . IMAGE_NO_PATH . '">';
+                    //return '<img style="float: none;" src="' . IMAGE_NO_PATH . '">';
                 }
             }
 
             return $images;
         }
-        return '<img src="' . IMAGE_NO_PATH . '">';
+        //return '<img src="' . IMAGE_NO_PATH . '">';
     }
 }

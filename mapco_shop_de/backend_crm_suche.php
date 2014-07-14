@@ -263,9 +263,11 @@ reminder_type="";
 				var itemList=$("#send_mailDialog_itemList").val();
 				var subject=$("#send_mailDialog_subject").val();
 			//	var mailFrom=$("#send_mailDialog_copyTo").val();
+			//	alert(itemList);
 				$.post("<?php echo PATH; ?>soa/", { API: "crm", Action: "send_item_mail", account_user_id:account_user_id, itemList:itemList, mail:mail, subject:subject},
 					function(data2)
 					{
+						show_status2(data2);
 					//	alert(data2);
 						var $xml=$($.parseXML(data2));
 						var Ack = $xml.find("Ack").text();
@@ -631,6 +633,7 @@ reminder_type="";
 	
 	function add_customer_to_costumer_list()
 	{
+		
 		$("#add_customerToListDialog").dialog
 		({	buttons:
 			[
@@ -1076,7 +1079,7 @@ reminder_type="";
 			var Ack = $xml.find("Ack").text();
 			if (Ack=="Success") 
 			{
-				show_status("Der Eintag zur Kundenkommunikation wurde erfolgreich gespeichert!");
+				show_status("Der Eintrag zur Kundenkommunikation wurde erfolgreich gespeichert!");
 				$("#add_communication_note").val(""); 
 				$("#add_communication_contacttype").val("");
 				$("#add_communication_reminder_date").val("");
@@ -1197,7 +1200,7 @@ reminder_type="";
 			var Ack = $xml.find("Ack").text();
 			if (Ack=="Success") 
 			{
-				show_status("Der Eintag zur Kundenkommunikation wurde erfolgreich geändert!");
+				show_status("Der Eintrag zur Kundenkommunikation wurde erfolgreich geändert!");
 				$("#add_communication_note").val(""); 
 				$("#add_communication_contacttype").val("");
 				$("#add_communication_reminder_date").val("");
@@ -1773,6 +1776,23 @@ reminder_type="";
 	echo '	<td>';
 	echo '		<select id="send_mailDialog_itemList" size="1">';
 	echo '			<option value="">Bitte eine Liste auswählen</option>';
+	
+	$res3 = q( "SELECT * FROM shop_listtypes WHERE id_listtype!=5 AND id_listtype!=3 AND id_listtype!=4 ORDER BY ordering", $dbshop, __FILE__, __LINE__ );
+	while ( $shop_listtypes = mysqli_fetch_assoc( $res3 ) ) {
+		echo '		<optgroup label="' . $shop_listtypes[ 'title' ] . '">';
+		if ( $shop_listtypes[ 'id_listtype' ] == 2 ) {
+			$res4 = q( "SELECT * FROM shop_lists WHERE listtype_id=" . $shop_listtypes[ 'id_listtype' ] . " AND firstmod_user=" . $_SESSION[ 'id_user' ] . " ORDER BY title", $dbshop, __FILE__, __LINE__ );
+		} else {
+			$res4 = q( "SELECT * FROM shop_lists WHERE listtype_id=" . $shop_listtypes[ 'id_listtype' ] . " ORDER BY title", $dbshop, __FILE__, __LINE__ );
+		}
+		while ( $shop_lists = mysqli_fetch_assoc( $res4 ) ) {
+			echo '		<option value="' . $shop_lists[ 'id_list' ] . '">' . $shop_lists[ 'title' ] . '</option>';
+		}
+		echo '		</optgroup>';
+	}
+	
+//*******************************alt***************************************************	
+/*
 	echo '			<optgroup label="öffentliche Listen">';
 	$res=q("SELECT * FROM shop_lists WHERE private = 0;", $dbshop, __LINE__, __FILE__);
 	while ($row=mysqli_fetch_array($res)		)
@@ -1787,6 +1807,9 @@ reminder_type="";
 		echo '		<option value='.$row["id_list"].'>'.$row["title"].'</option>';
 	}
 	echo '			</optgroup>';
+*/
+//************************************************************************************	
+	
 	echo '		</select>';
 	echo '	</td>';
 	echo '</tr>';

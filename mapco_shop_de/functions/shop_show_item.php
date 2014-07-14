@@ -2,7 +2,7 @@
 	///äöüÄÖÜ UTF-8
 	if (!function_exists("show_item"))
 	{
-		function show_item($id_item, $artnr, $title, $description, $oenr="", $vehicle_save=0)
+		function show_item($id_item, $artnr, $title, $description, $oenr="", $vehicle_save=0, $alt="")
 		{
 			global $dbweb;
 			global $dbshop;
@@ -27,21 +27,19 @@
 			}
 			else
 			{
-				$results55=q("SELECT * FROm shop_shops WHERE id_shop=".$_SESSION["id_shop"].";", $dbshop, __FILE__, __LINE__);
+				$results55=q("SELECT * FROM shop_shops WHERE id_shop=".$_SESSION["id_shop"].";", $dbshop, __FILE__, __LINE__);
 				$shop=mysqli_fetch_array($results55);
 				$row3=mysqli_fetch_array($results3);
 				$results=q("SELECT * FROM cms_files WHERE original_id='".$row3["file_id"]."' AND imageformat_id=".$shop["imageformat_id"]." LIMIT 1;", $dbweb, __FILE__, __LINE__);
 				$row=mysqli_fetch_array($results);
-				$src='files/'.floor(bcdiv($row["id_file"], 1000)).'/'.$row["id_file"].'.'.$row["extension"];
-				if ( file_exists($src) ) $src=PATH.$src;
-				else
-				{
-					if( $_SESSION["id_shop"]==2 ) $src=PATH.'images/library/ap_frame_noimage.jpg';
-					else $src=PATH.'files_thumbnail/0.jpg';
-				}
+				$postdata=array();
+				$postdata["API"]="cms";
+				$postdata["Action"]="ImageThumbnail";
+				$postdata["id_file"]=$row["id_file"];
+				$src=$response=post(PATH."soa/", $postdata);
 			}
 			if ($oenr!="") echo '<b>'.t("Gefunden über OE-Nr.").' '.$oenr.'</b><br style="clear:both;" /><br />';
-			echo '<a href="'.PATHLANG.'online-shop/autoteile/'.$id_item.'/'.url_encode($title).'">';
+			echo '<a href="'.PATHLANG.tl(800, "alias").$id_item.'/'.url_encode($title).'">';
 //			echo '<img alt="'.$row["id_file"].'" class="lazyimage" src="'.PATH.'images/icons/loaderb64.gif" title="'.$title.'" />';
 			echo '<img src="'.$src.'" alt="'.$title.'" style="width:120px;" title="'.$title.'" onmouseover="document.getElementById(\'bigimage\').src=this.src" />';
 			echo '</a>';
@@ -52,8 +50,8 @@
 			//title and description
 			echo '<div class="shopitem_description">';
 			
-			echo '<a class="shopitem_title" href="'.PATHLANG.'online-shop/autoteile/'.$id_item.'/'.url_encode($title).'" alt="'.$title.'" title="'.$title.'">';
-			echo strtoupper($title);
+			echo '<a class="shopitem_title" href="'.PATHLANG.tl(800, "alias").$id_item.'/'.url_encode($title).'" alt="'.$alt.'" title="'.$alt.'">';
+			echo mb_strtoupper($title,'UTF-8');
 			echo '</a>';
 			echo '<div class="shopitem_description">'.$description;
 			echo '</div>';
@@ -121,7 +119,7 @@
 				}
 			}
 
-			if($_SESSION["rcid"]!=9999 and $_SESSION["rcid"]>0)
+			if($_SESSION["id_shop"]>=9 and $_SESSION["id_shop"]<=17)
 			{
 				echo '<br /><span style="float:right;">'.itemstatus_rc($id_item).'</span>';
 			}
@@ -148,16 +146,6 @@
 			
 			//Gewerbskunde?
 			$gewerblich=gewerblich($_SESSION["id_user"]);
-/*			$titles=get_titles($artnr, 8192);
-			if ($titles == "MAPCO - Autoteile vom Hersteller")
-			{
-				$alt_title=$title;
-			}
-			else
-			{
-				$alt_title=$titles[0];
-			}
-*/			
 			echo '<tr>';
 			
 			//Compare
@@ -175,13 +163,13 @@
 				$row2=mysqli_fetch_array($results2);
 				$filename=PATH.'files/'.floor(bcdiv($row2["id_file"], 1000)).'/'.$row2["id_file"].'.'.$row2["extension"];
 //				echo '<a href="shop_item.php?lang='.$_GET["lang"].'&id_item='.$row["id_item"].'">';
-				echo '<a href="'.PATHLANG.'online-shop/autoteile/'.$row["id_item"].'/'.url_encode($row["title"]).'">';
+				echo '<a href="'.PATHLANG.tl(800, "alias").$row["id_item"].'/'.url_encode($row["title"]).'">';
 				echo '<img style="width:100px; margin:2px; border:0; padding:0;" src="'.$filename.'" alt="'.$row["title"].'" title="'.$row["title"].'" onmouseover="document.getElementById(\'bigimage\').src=this.src" />';
 				echo '</a>';
 			}
 			else
 			{
-				echo '<a href="'.PATHLANG.'online-shop/autoteile/'.$row["id_item"].'/'.url_encode($row["title"]).'" alt="'.$row["title"].'" title="'.$row["title"].'">';
+				echo '<a href="'.PATHLANG.tl(800, "alias").$row["id_item"].'/'.url_encode($row["title"]).'" alt="'.$row["title"].'" title="'.$row["title"].'">';
 				if($_SESSION["id_user"]==21371) print_r($_SESSION);
 				if( $_SESSION["id_shop"]==2 ) echo '<img src="'.PATH.'images/library/ap_frame_noimage.jpg" />';
 				else echo '<img src="'.PATH.'images/library/rahmen-bild-folgt.jpg" />';
@@ -196,7 +184,7 @@
 			echo '<td>';
 			if (isset($oenr) && $oenr!="") echo '<b>'.t("Gefunden über OE-Nr.").' '.$oenr.'</b>';
 			
-			echo '<a href="'.PATHLANG.'online-shop/autoteile/'.$row["id_item"].'/'.url_encode($row["title"]).'" alt="'.$row["title"].'" title="'.$row["title"].'">';
+			echo '<a href="'.PATHLANG.tl(800, "alias").$row["id_item"].'/'.url_encode($row["title"]).'" alt="'.$row["title"].'" title="'.$row["title"].'">';
 			echo '	<h1>'.strtoupper($row["title"]).'</h1>';
 			echo '</a>';
 			echo '<br style="clear:both;" /><br />'.$row["short_description"];
@@ -255,7 +243,7 @@
 			echo '	<br /><input style="width:30px;" id="article'.$row["id_item"].'" type="text" value="1" onkeyup="cart_add_enter('.$row["id_item"].')" />';
 			echo '	<input style="width:160px;" type="button" onclick="javascript:cart_add('.$row["id_item"].');" value="'.t("In den Warenkorb").'" name="form_button" />';
 
-			if($_SESSION["rcid"]!=9999 and $_SESSION["rcid"]>0)
+			if($_SESSION["id_shop"]>=9 and $_SESSION["id_shop"]<=17)
 			{
 				echo '<br /><span style="float:right;">'.itemstatus_rc($row["id_item"]).'</span>';
 			}

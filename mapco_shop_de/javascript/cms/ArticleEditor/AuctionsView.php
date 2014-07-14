@@ -14,6 +14,19 @@
 	var $auction_call=new Array();
 	var $auction_ItemID=new Array();
 	
+	function top_offer_toggle($id_auction)
+	{
+		wait_dialog_show('Ändere Top-Angebots-Status',0);
+		$.post("<?php echo PATH; ?>soa2/", { API:"ebay", APIRequest:"AuctionTopOffer", id_auction:$id_auction }, function($data)
+		{
+			try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
+			$ack = $xml.find("Ack");
+			if ( $ack.text()!="Success" ) { show_status2($data); return; }
+			
+			load_auctions();
+		});
+	}
+
 	function auctions_submit()
 	{
 		var id_item = $("#editor_tabs").attr('shop_item');
@@ -69,7 +82,16 @@
 			{
 				try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
 				$ack = $xml.find("Ack");
-				if ( $ack.text()!="Success" ) { show_status2($data); return; }
+				if ( $ack.text()!="Success" )
+				{
+					if( $data.indexOf('<Error ErrorCode="291">')>-1 )
+					{
+						item_create_auctions(true);
+						return;
+					}
+					show_status2($data);
+					return;
+				}
 
 				auctions_submit_auction($i+1);
 				return;
@@ -166,7 +188,7 @@
 		);
 	}
 		
-	function item_create_auctions()
+	function item_create_auctions($submit)
 	{
 		wait_dialog_show();
 		
@@ -192,7 +214,14 @@
 				return;
 			}
 			load_auctions();
-			show_status("Auktionen neu erstellt und in die Warteschlange gestellt. Die Auktionen werden in den nächsten 30min auf eBay hochgeladen.");
+			if( $submit )
+			{
+				auctions_submit();
+			}
+			else
+			{
+				show_status("Auktionen neu erstellt und in die Warteschlange gestellt. Die Auktionen werden in den nächsten 30min auf eBay hochgeladen.");
+			}
 		});
 	}
 
@@ -336,8 +365,8 @@
 		wait_dialog_show();
 		var item_id = $("#editor_tabs").attr('shop_item');
 		
-		var select_cols = 'id_auction, Currency, ItemID, ShippingServiceCost, StartPrice, QuantitySold, Title, SubTitle, firstmod, firstmod_user, lastmod, lastmod_user, lastupdate, `Call`, upload';		
-		var where = 'WHERE shopitem_id="'+item_id+'" AND account_id="'+id_account+'" and accountsite_id="'+id_accountsite+'" ORDER BY id_auction';
+		var select_cols = 'id_auction, Currency, ItemID, ShippingServiceCost, StartPrice, QuantitySold, Title, SubTitle, firstmod, firstmod_user, lastmod, lastmod_user, lastupdate, `Call`, upload, premium, responseXml';
+		var where = 'WHERE shopitem_id="'+item_id+'" AND account_id="'+id_account+'" and accountsite_id="'+id_accountsite+'" ORDER BY ItemID';
 		$.post("<?php print PATH; ?>soa2/", { API:"cms", APIRequest:"TableDataSelect", db:'dbshop', table:'ebay_auctions', where:where, select:select_cols  }, function($data)
 		{ 
 			//show_status2($data); return;
@@ -373,15 +402,18 @@
 				var i = 0;
 				$xml.find('ebay_auctions').each(function(){
 					i++;
-					auctions_content += '<tr>';
+					if( $(this).find('premium').text()==1 ) $style=' style="background-color:#fef070;"'; else $style='';
+					auctions_content += '<tr'+$style+'>';
 					auctions_content += '	<td>'+i+'</td>';
 					auctions_content += '	<td>'+$(this).find('id_auction').text()+'</td>';
 					auctions_content += '	<td>';
 					auctions_content += $(this).find('Title').text();
 					if( $(this).find('SubTitle').text() !="" ) auctions_content += '<br /><span style="font-family: Arial, sans-serif, Verdana; font-size:11px; color:rgb(102, 102, 102);">'+$(this).find('SubTitle').text()+'</span>';
 					auctions_content += '</td>';
-					auctions_content += '	<td>'+Math.round($(this).find('StartPrice').text(), 2)+' '+$(this).find('Currency').text()+'</td>';
-					auctions_content += '	<td>'+Math.round($(this).find('ShippingServiceCost').text(), 2)+' '+$(this).find('Currency').text()+'</td>';
+					var $StartPrice=Math.round($(this).find('StartPrice').text()*100)/100;
+					auctions_content += '	<td>'+$StartPrice+' '+$(this).find('Currency').text()+'</td>';
+					var $ShippingServiceCost=Math.round($(this).find('ShippingServiceCost').text()*100)/100;
+					auctions_content += '	<td>'+$ShippingServiceCost+' '+$(this).find('Currency').text()+'</td>';
 					auctions_content += '	<td>'+$(this).find('QuantitySold').text()+'</td>';
 					auctions_content += '	<td><a href="http://www.ebay.de/itm/'+$(this).find('ItemID').text()+'" target="_blank">'+$(this).find('ItemID').text()+'</a></td>';
 					var firstmod = new Date($(this).find('firstmod').text()*1000);
@@ -401,10 +433,12 @@
 					auctions_content += '	<td>'+$(this).find('Call').text()+'</td>';
 					auctions_content += '	<td>'+$(this).find('upload').text()+'</td>';
 					auctions_content += '	<td>';
+
+					auctions_content += '		<img alt="TOP-Angebot" onclick="top_offer_toggle('+$(this).find('id_auction').text()+');" src="<?php print PATH; ?>images/icons/24x24/favorite.png" style="cursor:pointer;" title="TOP-Angebot" />';
 					var icon='accept.png';
 					var responseXml = $(this).find('responseXml').text();
-					if( responseXml.search("<SeverityCode>Error</SeverityCode>") != -1 ) icon='remove.png';
-					else if( responseXml.search("<SeverityCode>Warning</SeverityCode>") != -1 ) icon='warning.png';
+					if( responseXml.indexOf("<SeverityCode>Error</SeverityCode>") != -1 ) icon='remove.png';
+					else if( responseXml.indexOf("<SeverityCode>Warning</SeverityCode>") != -1 ) icon='warning.png';
 					auctions_content += '		<img alt="Zeige letzte Serverantwort an" onclick="get_last_response('+$(this).find('id_auction').text()+');" src="<?php print PATH; ?>images/icons/24x24/'+icon+'" style="cursor:pointer;" title="Zeige letzte Serverantwort an" />';
 					auctions_content += '		<img alt="Rufe Auktionsdaten ab" onclick="get_item('+$(this).find('ItemID').text()+');" src="<?php print PATH; ?>images/icons/24x24/info.png" style="cursor:pointer;" title="Rufe Auktionsdaten ab" />';
 					auctions_content += '		<img alt="Auktion an eBay senden" onclick="auction_submit(\''+$(this).find('Call').text()+'\', '+$(this).find('id_auction').text()+')" src="<?php print PATH; ?>images/icons/24x24/up.png" style="cursor:pointer;" title="Auktion an eBay senden" />';

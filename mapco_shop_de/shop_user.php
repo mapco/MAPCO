@@ -1,17 +1,40 @@
 <?php
 	include("config.php");
 	include("functions/cms_t.php");
+	include("functions/cms_tl.php");
 	$login_required=true;
 	
-	include("templates/".TEMPLATE."/header.php");
-	include("templates/".TEMPLATE."/cms_leftcolumn.php");
-	include("functions/mapco_gewerblich.php");
+	//user login wenn nicht angemeldet
+	if( !isset($_SESSION["id_user"]) )
+	{
+		include("templates/".TEMPLATE."/header.php");
+		include("templates/".TEMPLATE."/cms_leftcolumn.php");
+		include("functions/mapco_gewerblich.php");
+		echo '<div id="mid_column">';
+		echo '<p>';
+		echo '<a href="'.PATHLANG.'online-shop/mein-konto/">'.t("Mein Konto").'</a>';
+		echo ' > '.t("Benutzerkonto");
+		echo '</p>';
+		echo '<p>'.t("Sie müssen sich zuerst anmelden, um auf diese Seite zugreifen zu können.").'</p>';
+		include("templates/".TEMPLATE."/cms_rightcolumn.php");
+		include("templates/".TEMPLATE."/footer.php");
+		exit;
+	}
 
-	echo '<div id="mid_column">';
+	//prüfen, ob eine Newsletteranmeldung möglich sein soll
+	$b2b_reg=0;
+	$news_reg=0;
+	$results=q("SELECT * FROM shop_shops WHERE site_id=".$_SESSION["id_site"].";", $dbshop, __FILE__, __LINE__);
+	if(mysqli_num_rows($results)>0)
+	{
+		$row=mysqli_fetch_array($results);
+		$b2b_reg=$row["b2b"];
+		$news_reg=$row["newsletter"];
+	}
 
 	//Nutzerdaten auslesen
 	$results=q("SELECT * FROM cms_users WHERE id_user=".$_SESSION["id_user"]." LIMIT 1;", $dbweb, __FILE__, __LINE__);
-	$row=mysqli_fetch_array($results);
+	$user=mysqli_fetch_array($results);
 
 	//UPDATE
 	if (isset($_POST["update"]))
@@ -20,7 +43,7 @@
 		
 		if ($_POST["firstname"]==t("Vorname")."...") $_POST["firstname"]="";	
 	  	if ($_POST["lastname"]==t("Nachname")."...") $_POST["lastname"]="";	
-		if ($_POST["gender"]!=$row["gender"] or $_POST["firstname"]!=$row["firstname"] or $_POST["lastname"]!=$row["lastname"])
+		if ($_POST["gender"]!=$user["gender"] or $_POST["firstname"]!=$user["firstname"] or $_POST["lastname"]!=$user["lastname"])
 		{
 			q("UPDATE cms_users SET gender='".$_POST["gender"]."', firstname='".$_POST["firstname"]."', lastname='".$_POST["lastname"]."' WHERE id_user=".$_SESSION["id_user"].";", $dbweb, __FILE__, __LINE__);
 		}
@@ -31,7 +54,7 @@
 		{
 			//**********Verschlüsseln**************
 			$pw=md5($_POST["pass"]);
-			$pw=md5($pw.$row["user_salt"]);
+			$pw=md5($pw.$user["user_salt"]);
 			$pw=md5($pw.PEPPER);
 			q("UPDATE cms_users SET language_id=".$_POST["language_id"].", password='".$pw."', hide_price='".$_POST["hide_price"]."' WHERE id_user=".$_SESSION["id_user"].";", $dbweb, __FILE__, __LINE__);
 			//*************************************
@@ -63,16 +86,25 @@
 			q("UPDATE cms_users SET newsletter=0 WHERE id_user=".$_SESSION["id_user"].";", $dbweb, __FILE__, __LINE__);
 		}
 
-		echo '<div class="success">'.t("Die Einstellungen wurden erfolgreich gespeichert.", __FILE__, __LINE__).'</div>';
+		$update=true;
 
 		//gespeicherte Nutzerdaten neu auslesen
 		$results=q("SELECT * FROM cms_users WHERE id_user=".$_SESSION["id_user"]." LIMIT 1;", $dbweb, __FILE__, __LINE__);
-		$row=mysqli_fetch_array($results);
+		$user=mysqli_fetch_array($results);
 	}
+
+	include("templates/".TEMPLATE."/header.php");
+	include("templates/".TEMPLATE."/cms_leftcolumn.php");
+	include("functions/mapco_gewerblich.php");
+
+	echo '<div id="mid_column">';
+
+	if($update)	echo '<div class="success">'.t("Die Einstellungen wurden erfolgreich gespeichert.", __FILE__, __LINE__).'</div>';
+
 
 	//PATH
 	echo '<p>';
-	echo '<a href="'.PATHLANG.'online-shop/mein-konto/">Mein Konto</a>';
+	echo '<a href="'.PATHLANG.'online-shop/mein-konto/">'.t("Mein Konto").'</a>';
 	echo ' > '.t("Benutzerkonto");
 	echo '</p>';
 
@@ -81,7 +113,7 @@
 	//Preisgruppe
 	$gewerblich=gewerblich($_SESSION["id_user"]);
 	$preisgr=2;
-	$results2=q("SELECT * FROM kunde WHERE ADR_ID='".$row["idims_adr_id"]."' LIMIT 1;", $dbshop, __FILE__, __LINE__);
+	$results2=q("SELECT * FROM kunde WHERE ADR_ID='".$user["idims_adr_id"]."' LIMIT 1;", $dbshop, __FILE__, __LINE__);
 	if (mysqli_num_rows($results2)>0)
 	{
 		$row2=mysqli_fetch_array($results2);
@@ -102,17 +134,17 @@
 	echo '	<td>'.t("Ansprechpartner", __FILE__, __LINE__).'</td>';
 	echo '	<td>';
 	echo '		<select name="gender">';
-					if($row["gender"]==0) $selected=' selected="selected"'; else $selected='';
+					if($user["gender"]==0) $selected=' selected="selected"'; else $selected='';
 	echo '			<option'.$selected.'  value="0">'.t("Herr").'</option>';
-					if($row["gender"]==1) $selected=' selected="selected"'; else $selected='';
+					if($user["gender"]==1) $selected=' selected="selected"'; else $selected='';
 	echo '			<option'.$selected.' value="1">'.t("Frau").'</option>';
 	echo '		</select>';
-				if(!isset($row["firstname"]) or $row["firstname"]=="") $firstname_value=t("Vorname")."...";
-				else $firstname_value=$row["firstname"];
+				if(!isset($user["firstname"]) or $user["firstname"]=="") $firstname_value=t("Vorname")."...";
+				else $firstname_value=$user["firstname"];
 	echo '   	<input type="text" name="firstname" value="'.$firstname_value.'" onfocus="if (this.value==\''.t("Vorname").'...'.'\') this.value=\'\';" onblur="if (this.value==\'\') this.value=\''.t("Vorname").'...'.'\';" />';
 	echo '		 ';
-				if(!isset($row["lastname"]) or $row["lastname"]=="") $lastname_value=t("Nachname")."...";
-				else $lastname_value=$row["lastname"];
+				if(!isset($user["lastname"]) or $user["lastname"]=="") $lastname_value=t("Nachname")."...";
+				else $lastname_value=$user["lastname"];
 	echo '   	<input type="text" name="lastname" value="'.$lastname_value.'" onfocus="if (this.value==\''.t("Nachname").'...'.'\') this.value=\'\';" onblur="if (this.value==\'\') this.value=\''.t("Nachname").'...'.'\';" />';
 	echo '	</td>';
 	echo '</tr>';
@@ -120,7 +152,7 @@
 	//Kundennummer
 	echo '<tr>';
 	echo '	<td>'.t("Benutzername", __FILE__, __LINE__).'</td>';
-	echo '	<td>'.$row["username"].'</td>';
+	echo '	<td>'.$user["username"].'</td>';
 	echo '</tr>';
 
 	//Passwort
@@ -128,14 +160,14 @@
 	{
 		echo '<tr>';
 		echo '	<td>'.t("Passwort", __FILE__, __LINE__).'</td>';
-		echo '	<td><input type="password" name="pass" value="'.$row["password"].'" /></td>';
+		echo '	<td><input type="password" name="pass" value="'.$user["password"].'" /></td>';
 		echo '</tr>';
 	}
 
 	//E-Mail
 	echo '<tr>';
 	echo '	<td>'.t("E-Mail", __FILE__, __LINE__).'</td>';
-	echo '	<td>'.$row["usermail"].'</td>';
+	echo '	<td>'.$user["usermail"].'</td>';
 	echo '</tr>';
 
 	//Sprache
@@ -146,33 +178,43 @@
 	$results2=q("SELECT * FROM cms_languages ORDER BY ordering;", $dbweb, __FILE__, __LINE__);
 	while($row2=mysqli_fetch_array($results2))
 	{
-		if ($row2["id_language"]==$row["language_id"]) $selected=' selected="selected"'; else $selected='';
+		if ($row2["id_language"]==$user["language_id"]) $selected=' selected="selected"'; else $selected='';
 		echo '<option'.$selected.' value="'.$row2["id_language"].'">'.t($row2["language"], __FILE__, __LINE__).'</option>';
 	}
 	echo '		</select>';
 	echo '	</td>';
 	echo '</tr>';
 
-	//Kundentyp
-	echo '<tr>';
-	echo '	<td>'.t("Kundentyp", __FILE__, __LINE__).'</td>';
-	if ($gewerblich) $type=t("Gewerbskunde", __FILE__, __LINE__); else $type=t("Endverbraucher", __FILE__, __LINE__).'<a href="'.PATHLANG.'gewerberegistrierung/"> ('.t("Gewerbekunde werden").')</a>';
-	echo '	<td>'.$type.'</td>';
-	echo '</tr>';
+	if($b2b_reg==1)
+	{
+		//Kundentyp
+		echo '<tr>';
+		echo '	<td>'.t("Kundentyp", __FILE__, __LINE__).'</td>';
+		if ($gewerblich) $type=t("Gewerbskunde", __FILE__, __LINE__); 
+		else 
+		{
+			$type=t("Endverbraucher", __FILE__, __LINE__).'<a href="'.PATHLANG.tl(675, "alias").'" title="'.tl(675, "description").'"> ('.t(tl(675, "title")).')</a>';
+		}
+		echo '	<td>'.$type.'</td>';
+		echo '</tr>';
 
-	//Preisliste
-	echo '<tr>';
-	echo '	<td>'.t("Preisliste", __FILE__, __LINE__).'</td>';
-	echo '	<td>'.$pl[$preisgr].'</td>';
-	echo '</tr>';
+		//Preisliste
+		echo '<tr>';
+		echo '	<td>'.t("Preisliste", __FILE__, __LINE__).'</td>';
+		echo '	<td>'.$pl[$preisgr].'</td>';
+		echo '</tr>';
+	}
 	
-	//Newsletter Anmeldung
-	if ($row["newsletter"]>0) $checked='checked="checked"';
-	else $checked='';
-	echo '<tr>';
-	echo '	<td>'.t("Newsletter", __FILE__, __LINE__).'</td>';
-	echo '	<td><input type="checkbox" name="receive_news" value="1" '.$checked.' /> '.t("Ja ich möchte den MAPCO-Newsletter empfangen", __FILE__, __LINE__).'!</td>';
-	echo '</tr>';
+	if($news_reg==1)
+	{
+		//Newsletter Anmeldung
+		if ($user["newsletter"]>0) $checked='checked="checked"';
+		else $checked='';
+		echo '<tr>';
+		echo '	<td>'.t("Newsletter", __FILE__, __LINE__).'</td>';
+		echo '	<td><input type="checkbox" name="receive_news" value="1" '.$checked.' /> '.t("Ja ich möchte den MAPCO-Newsletter empfangen", __FILE__, __LINE__).'!</td>';
+		echo '</tr>';
+	}
 	
 	//Herbstaktion 2013
 //	if(!$gewerblich and time()>=1382306400 and time()<=1385333999)
@@ -198,7 +240,7 @@
 	//Preisanzeige
 	if ($gewerblich) 
 	{
-		if ($row["hide_price"]==1) $checked='checked="checked"';
+		if ($user["hide_price"]==1) $checked='checked="checked"';
 		else $checked='';
 		echo '<tr>';
 		echo '	<td>'.t("Preisanzeige", __FILE__, __LINE__).'</td>';

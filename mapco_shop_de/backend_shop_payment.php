@@ -25,13 +25,13 @@
 			id_country=country_id;
 			id_payment=payment_id;
 			id_shipping=shipping_id;
-			response=ajax("modules/backend_shop_payment_view.php?id_country="+id_country+"&id_payment="+id_payment+"&id_shipping="+id_shipping, false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_view.php?id_country="+id_country+"&id_payment="+id_payment+"&id_shipping="+id_shipping, false);
 			document.getElementById("view").innerHTML=response;
 		}
 		
 		function country_order(country_id, direction)
 		{
-			response=ajax("modules/backend_shop_payment_country.php?country_id="+country_id+"&direction="+direction, false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_country.php?country_id="+country_id+"&direction="+direction, false);
 			if (response!="") show_status(response);
 			else
 			{
@@ -42,7 +42,7 @@
 		function country_add()
 		{
 			var country = document.getElementById("country_add_country").value;
-			response=ajax("modules/backend_shop_payment_country.php?action=add&country="+encodeURIComponent(country), false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_country.php?action=add&country="+encodeURIComponent(country), false);
 			if (response!="") show_status(response);
 			else
 			{
@@ -56,7 +56,7 @@
 		function country_edit()
 		{
 			var country = document.getElementById("country_edit_country").value;
-			response=ajax("modules/backend_shop_payment_country.php?action=edit&id_country="+country_edit_id+"&country="+encodeURIComponent(country), false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_country.php?action=edit&id_country="+country_edit_id+"&country="+encodeURIComponent(country), false);
 			if (response!="") show_status(response);
 			else
 			{
@@ -68,7 +68,7 @@
 		
 		function country_remove()
 		{
-			response=ajax("modules/backend_shop_payment_country.php?action=remove&id_country="+country_remove_id, false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_country.php?action=remove&id_country="+country_remove_id, false);
 			if (response!="") show_status(response);
 			else
 			{
@@ -108,7 +108,7 @@
 
 		function payment_order(payment_id, direction)
 		{
-			response=ajax("modules/backend_shop_payment_payment.php?payment_id="+payment_id+"&direction="+direction+"&id_country="+id_country, false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_payment.php?payment_id="+payment_id+"&direction="+direction+"&id_country="+id_country, false);
 			if (response!="") show_status(response);
 			else
 			{
@@ -122,7 +122,7 @@
 			var payment_memo = document.getElementById("payment_add_payment_memo").value;
 			var paymenttype_id = document.getElementById("payment_add_paymenttype_id").value;
 			var country_id = document.getElementById("payment_add_country_id").value;
-			response=ajax("modules/backend_shop_payment_payment.php?action=add&payment="+encodeURIComponent(payment)+"&payment_memo="+encodeURIComponent(payment_memo)+"&paymenttype_id="+paymenttype_id+"&id_country="+country_id, false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_payment.php?action=add&payment="+encodeURIComponent(payment)+"&payment_memo="+encodeURIComponent(payment_memo)+"&paymenttype_id="+paymenttype_id+"&id_country="+country_id, false);
 			if (response!="") show_status(response);
 			else
 			{
@@ -140,7 +140,7 @@
 			var payment_memo = document.getElementById("payment_edit_payment_memo").value;
 			var paymenttype_id = document.getElementById("payment_edit_paymenttype_id").value;
 			var country_id = document.getElementById("payment_edit_country_id").value;
-			response=ajax("modules/backend_shop_payment_payment.php?action=edit&id_payment="+payment_edit_id+"&payment="+encodeURIComponent(payment)+"&payment_memo="+encodeURIComponent(payment_memo)+"&paymenttype_id="+paymenttype_id+"&id_country="+country_id, false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_payment.php?action=edit&id_payment="+payment_edit_id+"&payment="+encodeURIComponent(payment)+"&payment_memo="+encodeURIComponent(payment_memo)+"&paymenttype_id="+paymenttype_id+"&id_country="+country_id, false);
 			if (response!="") show_status(response);
 			else
 			{
@@ -152,7 +152,7 @@
 		
 		function payment_remove()
 		{
-			response=ajax("modules/backend_shop_payment_payment.php?action=remove&id_payment="+payment_remove_id, false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_payment.php?action=remove&id_payment="+payment_remove_id, false);
 			if (response!="") show_status(response);
 			else
 			{
@@ -176,7 +176,7 @@
 
 		function shipping_order(shipping_id, direction)
 		{
-			response=ajax("modules/backend_shop_payment_shipping.php?shipping_id="+shipping_id+"&direction="+direction+"&id_payment="+id_payment, false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_shipping.php?shipping_id="+shipping_id+"&direction="+direction+"&id_payment="+id_payment, false);
 			if (response!="") show_status(response);
 			else
 			{
@@ -190,7 +190,7 @@
 			var shipping_memo = document.getElementById("shipping_add_shipping_memo").value;
 			var price = document.getElementById("shipping_add_price").value;
 			var id_shippingtype = document.getElementById("shipping_add_shippingtype_id").value;
-			response=ajax("modules/backend_shop_payment_shipping.php?action=add&shipping="+encodeURIComponent(shipping)+"&shipping_memo="+encodeURIComponent(shipping_memo)+"&price="+encodeURIComponent(price)+"&id_shippingtype="+id_shippingtype+"&id_payment="+id_payment, false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_shipping.php?action=add&shipping="+encodeURIComponent(shipping)+"&shipping_memo="+encodeURIComponent(shipping_memo)+"&price="+encodeURIComponent(price)+"&id_shippingtype="+id_shippingtype+"&id_payment="+id_payment, false);
 			if (response!="") show_status(response);
 			else
 			{
@@ -209,7 +209,7 @@
 			var shipping_memo = document.getElementById("shipping_edit_shipping_memo").value;
 			var price = document.getElementById("shipping_edit_price").value;
 			var shippingtype_id = document.getElementById("shipping_edit_shippingtype_id").value;
-			response=ajax("modules/backend_shop_payment_shipping.php?action=edit&id_shipping="+shipping_edit_id+"&shipping="+encodeURIComponent(shipping)+"&shipping_memo="+encodeURIComponent(shipping_memo)+"&price="+encodeURIComponent(price)+"&shippingtype_id="+shippingtype_id, false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_shipping.php?action=edit&id_shipping="+shipping_edit_id+"&shipping="+encodeURIComponent(shipping)+"&shipping_memo="+encodeURIComponent(shipping_memo)+"&price="+encodeURIComponent(price)+"&shippingtype_id="+shippingtype_id, false);
 			if (response!="") show_status(response);
 			else
 			{
@@ -221,7 +221,7 @@
 		
 		function shipping_remove()
 		{
-			response=ajax("modules/backend_shop_payment_shipping.php?action=remove&id_shipping="+shipping_remove_id, false);
+			response=ajax("<?php echo PATH; ?>modules/backend_shop_payment_shipping.php?action=remove&id_shipping="+shipping_remove_id, false);
 			if (response!="") show_status(response);
 			else
 			{
@@ -252,8 +252,8 @@
 	
 	//HEADLINE
 //	echo '<h1>Zahlungs- und Versandmöglichkeiten';
-//	echo '<img style="margin:0px 5px 0px 0px; border:0; padding:0; cursor:pointer; float:right;" src="images/icons/24x24/calculator_add.png" alt="Neue Zahlungsmöglichkeit anlegen" title="Neue Zahlungsmöglichkeit anlegen" onclick="popup(\'modules/backend_shop_payment_editor.php\', 500, 250);" />';
-//	if (isset($_GET["id_payment"])) echo '<img style="margin:0px 5px 0px 0px; border:0; padding:0; cursor:pointer; float:right;" src="images/icons/24x24/mail_add.png" alt="Neue Versandmöglichkeit anlegen" title="Neue Versandmöglichkeit anlegen" onclick="popup(\'modules/backend_shop_shipping_editor.php?id_payment='.$_GET["id_payment"].'\', 520, 290);" />';
+//	echo '<img style="margin:0px 5px 0px 0px; border:0; padding:0; cursor:pointer; float:right;" src="'.PATH.'images/icons/24x24/calculator_add.png" alt="Neue Zahlungsmöglichkeit anlegen" title="Neue Zahlungsmöglichkeit anlegen" onclick="popup(\'modules/backend_shop_payment_editor.php\', 500, 250);" />';
+//	if (isset($_GET["id_payment"])) echo '<img style="margin:0px 5px 0px 0px; border:0; padding:0; cursor:pointer; float:right;" src="'.PATH.'images/icons/24x24/mail_add.png" alt="Neue Versandmöglichkeit anlegen" title="Neue Versandmöglichkeit anlegen" onclick="popup(\'modules/backend_shop_shipping_editor.php?id_payment='.$_GET["id_payment"].'\', 520, 290);" />';
 //	echo '</h1>';
 
 
@@ -364,7 +364,7 @@
 	echo '	<tr>';
 	echo '		<th colspan="2">';
 	echo '			<span style="display:inline; float:left;">Land hinzufügen</span>';
-	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="images/icons/16x16/remove.png" onclick="country_cancel();" alt="Schließen" title="Schließen" />';
+	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="'.PATH.'images/icons/16x16/remove.png" onclick="country_cancel();" alt="Schließen" title="Schließen" />';
 	echo '		</th>';
 	echo '	</tr>';
 	echo '	<tr>';
@@ -388,7 +388,7 @@
 	echo '	<tr>';
 	echo '		<th colspan="2">';
 	echo '			<span style="display:inline; float:left;">Land bearbeiten</span>';
-	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="images/icons/16x16/remove.png" onclick="country_cancel();" alt="Schließen" title="Schließen" />';
+	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="'.PATH.'images/icons/16x16/remove.png" onclick="country_cancel();" alt="Schließen" title="Schließen" />';
 	echo '		</th>';
 	echo '	</tr>';
 	echo '	<tr>';
@@ -412,7 +412,7 @@
 	echo '	<tr>';
 	echo '		<th colspan="2">';
 	echo '			<span style="display:inline; float:left;">Land wirklich löschen?</span>';
-	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="images/icons/16x16/remove.png" onclick="country_cancel();" alt="Schließen" title="Schließen" />';
+	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="'.PATH.'images/icons/16x16/remove.png" onclick="country_cancel();" alt="Schließen" title="Schließen" />';
 	echo '		</th>';
 	echo '	</tr>';
 	echo '	<tr>';
@@ -433,7 +433,7 @@
 	echo '	<tr>';
 	echo '		<th colspan="2">';
 	echo '			<span style="display:inline; float:left;">Zahlungsmöglichkeit hinzufügen</span>';
-	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="images/icons/16x16/remove.png" onclick="payment_cancel();" alt="Schließen" title="Schließen" />';
+	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="'.PATH.'images/icons/16x16/remove.png" onclick="payment_cancel();" alt="Schließen" title="Schließen" />';
 	echo '		</th>';
 	echo '	</tr>';
 	echo '	<tr>';
@@ -487,7 +487,7 @@
 	echo '	<tr>';
 	echo '		<th colspan="2">';
 	echo '			<span style="display:inline; float:left;">Zahlungsmöglichkeit bearbeiten</span>';
-	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="images/icons/16x16/remove.png" onclick="payment_cancel();" alt="Schließen" title="Schließen" />';
+	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="'.PATH.'images/icons/16x16/remove.png" onclick="payment_cancel();" alt="Schließen" title="Schließen" />';
 	echo '		</th>';
 	echo '	</tr>';
 	echo '	<tr>';
@@ -541,7 +541,7 @@
 	echo '	<tr>';
 	echo '		<th colspan="2">';
 	echo '			<span style="display:inline; float:left;">Zahlungsmöglichkeit wirklich löschen?</span>';
-	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="images/icons/16x16/remove.png" onclick="payment_cancel();" alt="Schließen" title="Schließen" />';
+	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="'.PATH.'images/icons/16x16/remove.png" onclick="payment_cancel();" alt="Schließen" title="Schließen" />';
 	echo '		</th>';
 	echo '	</tr>';
 	echo '	<tr>';
@@ -562,7 +562,7 @@
 	echo '	<tr>';
 	echo '		<th colspan="2">';
 	echo '			<span style="display:inline; float:left;">Versandart hinzufügen</span>';
-	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="images/icons/16x16/remove.png" onclick="shipping_cancel();" alt="Schließen" title="Schließen" />';
+	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="'.PATH.'images/icons/16x16/remove.png" onclick="shipping_cancel();" alt="Schließen" title="Schließen" />';
 	echo '		</th>';
 	echo '	</tr>';
 	echo '	<tr>';
@@ -610,7 +610,7 @@
 	echo '	<tr>';
 	echo '		<th colspan="2">';
 	echo '			<span style="display:inline; float:left;">Versandart bearbeiten</span>';
-	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="images/icons/16x16/remove.png" onclick="shipping_cancel();" alt="Schließen" title="Schließen" />';
+	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="'.PATH.'images/icons/16x16/remove.png" onclick="shipping_cancel();" alt="Schließen" title="Schließen" />';
 	echo '		</th>';
 	echo '	</tr>';
 	echo '	<tr>';
@@ -658,7 +658,7 @@
 	echo '	<tr>';
 	echo '		<th colspan="2">';
 	echo '			<span style="display:inline; float:left;">Versandart wirklich löschen?</span>';
-	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="images/icons/16x16/remove.png" onclick="shipping_cancel();" alt="Schließen" title="Schließen" />';
+	echo '			<img style="margin:0; border:0; padding:0; cursor:pointer; display:inline; float:right;" src="'.PATH.'images/icons/16x16/remove.png" onclick="shipping_cancel();" alt="Schließen" title="Schließen" />';
 	echo '		</th>';
 	echo '	</tr>';
 	echo '	<tr>';

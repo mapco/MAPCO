@@ -1,4 +1,5 @@
 <?php
+	exit;
 	include("config.php");
 	session_start();
 	set_time_limit(3600);

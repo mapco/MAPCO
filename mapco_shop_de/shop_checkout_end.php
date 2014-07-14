@@ -16,6 +16,8 @@
 	
 	//unset session-varables set by shop_cart.php
 	unset( $_SESSION["checkout_order_id"] );
+	unset( $_SESSION["checkout_guest"]);
+	unset( $_SESSION["checkout_user_id"]);
 	unset( $_SESSION["checkout"] );
 	
 	/*

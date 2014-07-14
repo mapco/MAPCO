@@ -193,6 +193,8 @@
 	$xmldata.="	<id_order>".$order[0]["id_order"]."</id_order>\n";
 	$xmldata.="	<shop_id>".$order[0]["shop_id"]."</shop_id>\n";
 	$xmldata.="	<status_id>".$order[0]["status_id"]."</status_id>\n";
+	$xmldata.="	<ordertype_id>".$order[0]["ordertype_id"]."</ordertype_id>\n";
+	
 	$xmldata.="	<foreign_OrderID>".$order[0]["foreign_OrderID"]."</foreign_OrderID>\n";
 	$xmldata.="	<VAT>".$order[0]["VAT"]."</VAT>\n";
 	$xmldata.="	<customer_id>".$order[0]["customer_id"]."</customer_id>\n";
@@ -332,6 +334,8 @@
 	while ($row_order_items=mysqli_fetch_array($res_order_items))
 	{
 		$orderitems[]=$row_order_items["id"];
+		
+		
 		//ITEM DESCRIPTION
 		$res_items_desc=q("SELECT * FROM shop_items_de WHERE id_item = ".$row_order_items["item_id"].";", $dbshop, __FILE__, __LINE__);
 		$row_items_desc=mysqli_fetch_array($res_items_desc);
@@ -339,6 +343,27 @@
 		//MPN, COS
 		$res_items_MPN=q("SELECT MPN, COS FROM shop_items WHERE id_item = ".$row_order_items["item_id"].";", $dbshop, __FILE__, __LINE__);
 		$row_items_MPN=mysqli_fetch_array($res_items_MPN);
+
+		//GET STOCKAMOUNT
+		if ( $order[0]['shop_id'] == 22 )
+		{
+			$res_stockamount = q("SELECT * FROM lagerrc WHERE RCNR = 41 AND ARTNR = '".$row_items_MPN['MPN']."'", $dbshop, __FILE__, __LINE__);
+			if ( mysqli_num_rows( $res_stockamount ) == 0 )
+			{
+				$stockamount = 0;
+			}
+			else
+			{
+				$row_stockamount = mysqli_fetch_assoc( $res_stockamount );
+				$stockamount = $row_stockamount['ISTBESTAND'];	
+			}
+			
+		}
+		else
+		{
+			$stockamount;
+		}
+
 		
 		//ITEMVEHICLE
 		if ($row_order_items["customer_vehicle_id"]!=0)
@@ -476,9 +501,11 @@
 		$xmldata.="			<OrderItemDesc><![CDATA[".$row_items_desc["title"]."]]></OrderItemDesc>\n";
 		$xmldata.="			<OrderItemAmount>".$row_order_items["amount"]."</OrderItemAmount>\n";
 		$xmldata.="			<OrderItemCurrency_Code>".$row_order_items["Currency_Code"]."</OrderItemCurrency_Code>\n";
-		
 		$xmldata.="			<OrderItemExchangeRateToEUR>".$row_order_items["exchange_rate_to_EUR"]."</OrderItemExchangeRateToEUR>\n";
 		
+		//LAGERBESTAND
+		$xmldata.="			<OrderItemStockAmount>".$stockamount."</OrderItemStockAmount>\n";
+
 		//ARTIKEL EINZELPREIS
 		$xmldata.="			<orderItemPriceGrossFC>".number_format($orderItemPriceGrossFC, 2,",",".")."</orderItemPriceGrossFC>\n";
 		$xmldata.="			<orderItemPriceGross>".number_format($orderItemPriceGross, 2,",",".")."</orderItemPriceGross>\n";

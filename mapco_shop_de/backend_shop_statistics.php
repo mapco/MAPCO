@@ -5,42 +5,42 @@
 
 
 <script type="text/javascript">
-	$.datepicker.regional['de'] = {clearText: 			'löschen',
-								   clearStatus: 		'aktuelles Datum löschen',
-								   closeText: 			'schließen', 
-								   closeStatus: 		'ohne Änderungen schließen',
-								   prevText:			'zurück', 
-								   prevStatus: 			'letzten Monat zeigen',
-								   nextText: 			'vor', 
-								   nextStatus: 			'nächsten Monat zeigen',
-								   currentText: 		'heute', 
-								   currentStatus: 		'',
-								   monthNames: 			['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
-								   monthNamesShort: 	['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],
-								   monthStatus: 		'anderen Monat anzeigen',
-								   yearStatus: 			'anderes Jahr anzeigen',
-								   weekHeader: 			'Wo', 
-								   weekStatus: 			'Woche des Monats',
-								   dayNames: 			['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
-								   dayNamesShort: 		['So','Mo','Di','Mi','Do','Fr','Sa'],
-								   dayNamesMin: 		['So','Mo','Di','Mi','Do','Fr','Sa'],
-								   dayStatus: 			'Setze DD als ersten Wochentag', 
-								   dateStatus: 			'Wähle D, M d',
-								   dateFormat: 			'dd.mm.yy', 
-								   firstDay: 			1, 
-								   initStatus:			'Wähle ein Datum', 
-								   isRTL: 				false,
-								   changeMonth: 		true,
-								   changeYear: 			true,
-								   showOtherMonths:		true,
-								   selectOtherMonths:	true};
+	$.datepicker.regional['de'] = { clearText: 			'löschen',
+								    clearStatus: 		'aktuelles Datum löschen',
+								    closeText: 			'schließen', 
+								    closeStatus: 		'ohne Änderungen schließen',
+								    prevText:			'zurück', 
+								    prevStatus: 		'letzten Monat zeigen',
+								    nextText: 			'vor', 
+								    nextStatus: 		'nächsten Monat zeigen',
+								    currentText: 		'heute', 
+								    currentStatus: 		'',
+								    monthNames: 		['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
+								    monthNamesShort: 	['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],
+								    monthStatus: 		'anderen Monat anzeigen',
+								    yearStatus: 		'anderes Jahr anzeigen',
+								    weekHeader: 		'Wo', 
+								    weekStatus: 		'Woche des Monats',
+								    dayNames: 			['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+								    dayNamesShort: 		['So','Mo','Di','Mi','Do','Fr','Sa'],
+								    dayNamesMin: 		['So','Mo','Di','Mi','Do','Fr','Sa'],
+								    dayStatus: 			'Setze DD als ersten Wochentag', 
+								    dateStatus: 		'Wähle D, M d',
+								    dateFormat: 		'dd.mm.yy', 
+								    firstDay: 			1, 
+								    initStatus:			'Wähle ein Datum', 
+								    isRTL: 				false,
+								    changeMonth: 		true,
+								    changeYear: 		true,
+								    showOtherMonths:	true,
+								    selectOtherMonths:	true };
 	
-	function carriage_table_show(shop_data, shop_item_data, shops_selected, mode, shopcnt, item_id_array, time_type, date_from, date_to, date_comp_from, date_comp_to, shop_countries)
+	function carriage_table_show( shop_data, shop_item_data, shops_selected, mode, shopcnt, item_id_array, time_type, date_from, date_to, date_comp_from, date_comp_to, shop_countries )
 	{
 		//Übersicht anzeigen
 		//$("#statistics_show").empty();
 		wait_dialog_show();
-		$.post("<?php echo PATH; ?>soa2/", {API: "shop", APIRequest: "StatisticShippingNetGet",
+		$.post( "<?php echo PATH; ?>soa2/", {API: "shop", APIRequest: "StatisticShippingNetGet",
 																		mode:				mode,
 																		time_type:			time_type,
 																		date_from:			date_from,
@@ -48,46 +48,46 @@
 																		date_comp_from:		date_comp_from,
 																		date_comp_to:		date_comp_to,
 																		'shops_selected[]':	shops_selected,
-																		'shop_countries[]': shop_countries}, function ($data){
+																		'shop_countries[]': shop_countries}, function ( $data ) {
 		
 			//show_status2($data);
 			
-			try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); wait_dialog_hide(); return; }
-			if ( $xml.find("Ack").text()!="Success" ) {show_status2($data); wait_dialog_hide(); return; }
+			try { $xml = $( $.parseXML( $data ) ); } catch ( $err ) { show_status2( $err.message ); wait_dialog_hide(); return; }
+			if ( $xml.find( "Ack" ).text() != "Success" ) { show_status2( $data ); wait_dialog_hide(); return; }
 			
 			//shipping cost array
-			var shipping = new Array();
+			var shipping = 		new Array();
 			var shipping_comp = new Array()
-			$xml.find("shop").each(function(){
+			$xml.find("shop").each( function() {
 				shipping[$(this).find("shop_id").text()] = $(this).find("shop_shipping_net").text();
-			});
-			$xml.find("shop_comp").each(function(){
+			} );
+			$xml.find("shop_comp").each( function() {
 				shipping_comp[$(this).find("shop_id").text()] = $(this).find("shop_shipping_net").text();
-			});
+			} );
 			
 			//shipping_cost table
-			var shipping_all = 0;
+			var shipping_all = 		0;
 			var shipping_all_comp = 0;
-			var netto_all = 0;
-			var netto_all_comp = 0;
+			var netto_all = 		0;
+			var netto_all_comp = 	0;
 			
-			var table = $('<table class="hover" style="margin: 0px; width: 100%"></table>');
+			var table = $( '<table class="hover" style="margin: 0px; width: 100%"></table>' );
 			
-			if(mode=="single")
-				var caption = $('<caption style="text-align: left; font-weight: bold"><p style="background-color: #CCCCCC; display: inline">Zeitraum: ' + $("#date_from").val() + ' - ' + $("#date_to").val() + '</p><p style="background-color: #99FF99; display: inline"></p></caption>');
+			if ( mode == "single" )
+				var caption = $( '<caption style="text-align: left; font-weight: bold"><p style="background-color: #CCCCCC; display: inline">Zeitraum: ' + $( "#date_from" ).val() + ' - ' + $( "#date_to" ).val() + '</p><p style="background-color: #99FF99; display: inline"></p></caption>' );
 			else
-				var caption = $('<caption style="text-align: left; font-weight: bold"><p style="background-color: #CCCCCC; display: inline">Zeitraum: ' + $("#date_from").val() + ' - ' + $("#date_to").val() + '</p><p style="background-color: #99FF99; display: inline">Vergleichszeitraum: ' + $("#date_comp_from").val() + ' - ' + $("#date_comp_to").val() + '</p></caption>');
-			table.append(caption);
+				var caption = $( '<caption style="text-align: left; font-weight: bold"><p style="background-color: #CCCCCC; display: inline">Zeitraum: ' + $( "#date_from" ).val() + ' - ' + $( "#date_to" ).val() + '</p><p style="background-color: #99FF99; display: inline">Vergleichszeitraum: ' + $( "#date_comp_from" ).val() + ' - ' + $( "#date_comp_to" ).val() + '</p></caption>' );
+			table.append( caption );
 			
-			var thead = $('<thead></thead>');
-			var tr = $('<tr></tr>');
-			var th = $('<th>Shop</th>');
-			tr.append(th);
-			th = $('<th>Gesamt Netto</th>');
-			tr.append(th);
-			th = $('<th>Gesamt Frachtkosten</th>');
-			tr.append(th);
-			th = $('<th>Gesamt Netto incl. Frachtkosten</th>');
+			var thead = $( '<thead></thead>' );
+			var tr = $( '<tr></tr>' );
+			var th = $( '<th>Shop</th>' );
+			tr.append( th );
+			th = $( '<th>Gesamt Netto</th>' );
+			tr.append( th );
+			th = $( '<th>Gesamt Frachtkosten</th>' );
+			tr.append( th );
+			th = $( '<th>Gesamt Netto incl. Frachtkosten</th>' );
 			tr.append(th);
 			if(mode=="comp")
 			{
@@ -214,9 +214,359 @@
 		$("#date_comp_to_min").val(null);
 	}
 	
-	function country_table_show(country_data, mode)
+	function country_carriage_show( country_data, country_data_sums, shop_data, shop_item_data, shops_selected, mode, shopcnt, item_id_array, time_type, date_from, date_to, date_comp_from, date_comp_to, shop_countries, country_num_orders_single, country_num_orders_comp )
 	{
-		show_status2(print_r(country_data));
+		$( '#carriage_button' ).hide();
+		
+		wait_dialog_show();
+		$.post( "<?php echo PATH; ?>soa2/", { API: "shop", APIRequest: "StatisticShippingNetGet",
+																		mode:				mode,
+																		time_type:			time_type,
+																		date_from:			date_from,
+																		date_to:			date_to,
+																		date_comp_from:		date_comp_from,
+																		date_comp_to:		date_comp_to,
+																		'shops_selected[]':	shops_selected,
+																		'shop_countries[]': shop_countries }, function ( $data ) {
+																		
+//			show_status2($data);
+			
+			try { $xml = $( $.parseXML( $data ) ); } catch ( $err ) { show_status2( $err.message ); wait_dialog_hide(); return; }
+			if ( $xml.find( "Ack" ).text() != "Success" ) { show_status2( $data ); wait_dialog_hide(); return; }
+			
+			//country_data array erweitern
+			var country_carriage = new Array();
+			$xml.find( 'country' ).each(function () {
+				if ( typeof country_carriage[ $(this).find( 'country_id' ).text() ] == 'undefined' ) {
+					country_carriage[ $( this ).find( 'country_id' ).text() ] = new Array();
+					country_carriage[ $( this ).find( 'country_id' ).text() ][ 'country_shipping_net' ] = 		0;
+					country_carriage[ $( this ).find( 'country_id' ).text() ][ 'country_shipping_net_comp' ] = 	0;
+				}
+				if ( $( this ).find( 'country_shipping_net' ).text() == '' ) {
+					country_carriage[ $( this ).find( 'country_id' ).text() ][ 'country_shipping_net_comp' ] = 	$( this ).find( 'country_shipping_net_comp' ).text();
+				} else {
+					country_carriage[ $( this ).find( 'country_id' ).text() ][ 'country_shipping_net' ] = 		$( this ).find( 'country_shipping_net' ).text();
+				}
+			});
+			
+			for ( a in country_data ) {
+				if ( typeof country_carriage[ country_data[ a ][ 'country_id' ] ] != 'undefined' ) {
+					if ( country_carriage[ country_data[ a ][ 'country_id' ] ][ 'country_shipping_net' ] > 0 ) {
+						country_data[ a ][ 'shipping_net' ] = country_carriage[ country_data[ a ][ 'country_id' ]][ 'country_shipping_net' ];
+					}
+					if ( country_carriage[ country_data[ a ][ 'country_id' ] ][ 'country_shipping_net_comp' ] > 0 ) {
+						country_data[ a ][ 'shipping_net_comp' ] = country_carriage[ country_data[ a ][ 'country_id' ]][ 'country_shipping_net_comp' ];
+					}
+				}
+			}
+			for ( b in country_data ) {
+				country_data[ b ][ 'single_all' ] = ( ( Math.round( ( parseFloat( country_data[ b ][ 'netto' ] ) + parseFloat( country_data[ b ][ 'shipping_net' ] ) ) * 100 ) ) / 100 ).toFixed( 2 );
+				country_data[ b ][ 'comp_all' ] = 	( ( Math.round( ( parseFloat( country_data[ b ][ 'netto_comp' ] ) + parseFloat( country_data[ b ][ 'shipping_net_comp' ] ) ) *100 ) ) / 100 ).toFixed( 2 );  
+			}
+			
+			//show_status2( print_r( country_data ) );
+																				
+			//Tabellen bauen
+			$( '#statistics_show' ).empty();
+			var single_div = $( '<div id="country_rank_single" style="float: left;"></div>' );
+			$( '#statistics_show' ).append( single_div );
+			
+			var table = $( '<table class="hover"></table>' );
+			single_div.append( table );
+			
+			var caption = $( '<caption style="text-align: left; font-weight: bold"><p style="background-color: #CCCCCC; display: inline">Zeitraum: ' + $( "#date_from" ).val() + ' - ' + $( "#date_to" ).val() + '</p><p style="background-color: #99FF99; display: inline"></p></caption>' );
+			table.append( caption );
+			
+			var thead = $( '<thead></thead>' );
+			table.append( thead );
+			var tbody = $( '<tbody></tbody>' );
+			table.append( tbody );
+			var tfoot = $( '<tfoot></tfoot>' );
+			table.append( tfoot );
+			
+			var tr = $( '<tr></tr>' );
+			thead.append( tr );
+			var th = $( '<th>Rang</th>' );
+			tr.append ( th );
+			th = $( '<th style="min-width: 170px;">Land</th>' );
+			tr.append ( th );
+			th = $( '<th colspan="2" style="min-width: 100px">Gesamt Netto</th>' );
+			tr.append ( th );
+			
+			th = $( '<th colspan="2">Netto Fracht</th>' );
+			tr.append ( th );
+			th = $( '<th colspan="2">Ges. Netto incl. Fracht</th>' );
+			tr.append ( th );
+			
+			country_data.sort( createNumberSorterDesc( 'single_all' ) );
+			var td;
+			var carriage_all = 	0;
+			var all_all = 		0;
+			for ( a in country_data ) {
+				if ( parseFloat( country_data[a]['netto'] ) == 0 ) {
+					continue;
+				}
+				tr = $( '<tr></tr>' );
+				tbody.append( tr );
+				td = $( '<td style="text-align: right;">' + ( parseInt( a ) + 1 ) + '.</td>' );
+				tr.append( td );
+				td = $( '<td>' + country_data[a]['country'] + '</td>' );
+				tr.append( td );
+				td = $( '<td style="border-right: none; text-align: right;">' + country_data[a]['netto'] + '</td><td style="border-left: none; text-align: left; width: 10px;">€</td>' );
+				tr.append( td );
+				
+				td = $( '<td style="border-right: none; text-align: right;">' + ( country_data[ a ][ 'shipping_net' ] * 1 ).toFixed( 2 ) + '</td><td style="border-left: none; text-align: left; width: 10px;">€</td>' );
+				tr.append( td );
+				td = $( '<td style="border-right: none; font-weight: bold; text-align: right;">' + country_data[ a ][ 'single_all' ] + '</td><td style="border-left: none; font-weight: bold; text-align: left; width: 10px;">€</td>' );
+				tr.append( td );
+				
+				carriage_all += parseFloat( country_data[ a ][ 'shipping_net' ] );
+				all_all += 		parseFloat( country_data[ a ][ 'single_all' ] );
+			}
+			
+			carriage_all = 	( Math.round( carriage_all * 100 ) / 100 ).toFixed( 2 );
+			all_all = 		( Math.round( all_all * 100 ) / 100 ).toFixed( 2 );
+			
+			tr = $( '<tr></tr>' );
+			tfoot.append( tr );
+			td = $( '<td  colspan="2" style="border: none; text-align: right;"></td>' );
+			tr.append( td );
+			td = $( '<td style="background-color: #EBEBEB; border-right: none; font-weight: bold; text-align: right;">' + country_data_sums['netto_all'] + '</td><td style="background-color: #EBEBEB; border-left: none; font-weight: bold; text-align: left; width: 10px;">€</td>' );
+			tr.append( td );
+			
+			td = $( '<td style="background-color: #EBEBEB; border-right: none; font-weight: bold; text-align: right;">' + carriage_all + '</td><td style="background-color: #EBEBEB; border-left: none; font-weight: bold; text-align: left; width: 10px;">€</td>' );
+			tr.append( td );
+			td = $( '<td style="background-color: #EBEBEB; border-right: none; font-weight: bold; text-align: right;">' + all_all + '</td><td style="background-color: #EBEBEB; border-left: none; font-weight: bold; text-align: left; width: 10px;">€</td>' );
+			tr.append( td );		
+			
+			// Vergleichszeitraum
+			if ( mode == 'comp' ) {
+				var comp_div = $( '<div id="country_rank_comp" style="float: left;"></div>' );
+				$( '#statistics_show' ).append( comp_div );
+				
+				var table = $( '<table class="hover"></table>' );
+				comp_div.append( table );
+				
+				var caption = $( '<caption style="text-align: left; font-weight: bold"><p style="background-color: #99FF99; display: inline">Zeitraum: ' + $( "#date_comp_from" ).val() + ' - ' + $( "#date_comp_to" ).val() + '</p><p style="background-color: #99FF99; display: inline"></p></caption>' );
+				table.append( caption );
+				
+				var thead = $( '<thead></thead>' );
+				table.append( thead );
+				var tbody = $( '<tbody></tbody>' );
+				table.append( tbody );
+				var tfoot = $( '<tfoot></tfoot>' );
+				table.append( tfoot );
+				
+				var tr = $( '<tr></tr>' );
+				thead.append( tr );
+				var th = $( '<th style="background-color: #99FF99; border-color: #99FF99;">Rang</th>' );
+				tr.append ( th );
+				th = $( '<th style="background-color: #99FF99; border-color: #99FF99; min-width: 170px;">Land</th>' );
+				tr.append ( th );
+				th = $( '<th colspan="2" style="background-color: #99FF99; border-color: #99FF99; min-width: 100px;">Gesamt Netto</th>' );
+				tr.append ( th );
+				
+				th = $( '<th colspan="2" style="background-color: #99FF99; border-color: #99FF99;">Netto Fracht</th>' );
+				tr.append ( th );
+				th = $( '<th colspan="2" style="background-color: #99FF99; border-color: #99FF99;">Ges. Netto incl. Fracht</th>' );
+				tr.append ( th );
+				
+				country_data.sort( createNumberSorterDesc( 'comp_all' ) );
+				var td;
+				var carriage_all_comp = 0;
+				var all_all_comp = 		0;
+				
+				for ( a in country_data ) {
+					if ( parseFloat( country_data[a]['netto_comp'] ) == 0 ) {
+						continue;
+					}
+					tr = $( '<tr></tr>' );
+					tbody.append( tr );
+					td = $( '<td style="text-align: right;">' + ( parseInt( a ) + 1 ) + '.</td>' );
+					tr.append( td );
+					td = $( '<td>' + country_data[a]['country'] + '</td>' );
+					tr.append( td );
+					td = $( '<td style="border-right: none; text-align: right;">' + country_data[a]['netto_comp'] + '</td><td style="border-left: none; text-align: left; width: 10px;">€</td>' );
+					tr.append( td );
+					
+					td = $( '<td style="border-right: none; text-align: right;">' + ( country_data[ a ][ 'shipping_net_comp' ]  * 1 ).toFixed( 2 ) + '</td><td style="border-left: none; text-align: left; width: 10px;">€</td>' );
+					tr.append( td );
+					td = $( '<td style="border-right: none; font-weight: bold; text-align: right;">' + country_data[ a ][ 'comp_all' ] + '</td><td style="border-left: none; font-weight: bold; text-align: left; width: 10px;">€</td>' );
+					tr.append( td );
+					
+					carriage_all_comp += 	parseFloat( country_data[ a ][ 'shipping_net_comp' ] );
+					all_all_comp += 		parseFloat( country_data[ a ][ 'comp_all' ] );
+				}
+				
+				carriage_all_comp = ( Math.round( carriage_all_comp * 100 ) / 100 ).toFixed( 2 );
+				all_all_comp =		( Math.round( all_all_comp * 100 ) / 100 ).toFixed( 2 );
+				
+				tr = $( '<tr></tr>' );
+				tfoot.append( tr );
+				td = $( '<td  colspan="2" style="border: none; text-align: right;"></td>' );
+				tr.append( td );
+				td = $( '<td style="background-color: #EBEBEB; border-right: none; font-weight: bold; text-align: right;">' + country_data_sums['netto_comp_all'] + '</td><td style="background-color: #EBEBEB; border-left: none; font-weight: bold; text-align: left; width: 10px;">€</td>' );
+				tr.append( td );
+				
+				td = $( '<td style="background-color: #EBEBEB; border-right: none; font-weight: bold; text-align: right;">' + carriage_all_comp + '</td><td style="background-color: #EBEBEB; border-left: none; font-weight: bold; text-align: left; width: 10px;">€</td>' );
+				tr.append( td );
+				td = $( '<td style="background-color: #EBEBEB; border-right: none; font-weight: bold; text-align: right;">' + all_all_comp + '</td><td style="background-color: #EBEBEB; border-left: none; font-weight: bold; text-align: left; width: 10px;">€</td>' );
+				tr.append( td );
+
+			}
+			wait_dialog_hide();
+		});
+	}
+	
+	function country_table_show( country_data, country_data_sums, shop_data, shop_item_data, shops_selected, mode, shopcnt, item_id_array, time_type, date_from, date_to, date_comp_from, date_comp_to, shop_countries, country_num_orders_single, country_num_orders_comp )
+	{
+/*		
+		if ( <?php echo $_SESSION[ "id_user" ];?> == 49352 ) {
+			show_status2( print_r( country_num_orders_comp ) );
+		}
+*/		
+		var single_div = $( '<div id="country_rank_single" style="float: left;"></div>' );
+		$( '#statistics_show' ).empty().append( single_div );
+		
+		var table = $( '<table class="hover"></table>' );
+		single_div.append( table );
+		
+		var caption = $( '<caption style="text-align: left; font-weight: bold;"><p style="background-color: #CCCCCC; display: inline">Zeitraum: ' + $( "#date_from" ).val() + ' - ' + $( "#date_to" ).val() + '</p><p style="background-color: #99FF99; display: inline"></p></caption>' );
+		table.append( caption );
+		
+		var thead = $( '<thead></thead>' );
+		table.append( thead );
+		var tbody = $( '<tbody></tbody>' );
+		table.append( tbody );
+		var tfoot = $( '<tfoot></tfoot>' );
+		table.append( tfoot );
+		
+		var tr = $( '<tr></tr>' );
+		thead.append( tr );
+		var th = $( '<th>Rang</th>' );
+		tr.append ( th );
+		th = $( '<th style="min-width: 170px;">Land</th>' );
+		tr.append ( th );
+		th = $( '<th style="min-width: 80px;">Anz. Best.</th>' );
+		tr.append ( th );
+		th = $( '<th colspan="2" style="min-width: 100px">Gesamt Netto</th>' );
+		tr.append ( th );
+		
+		country_data.sort( createNumberSorterDesc( 'netto' ) );
+		var td;
+		var num_orders_single = 0;
+		for ( a in country_data ) {
+			if ( parseFloat( country_data[a]['netto'] ) == 0 ) {
+				continue;
+			}
+			tr = $( '<tr></tr>' );
+			tbody.append( tr );
+			td = $( '<td style="text-align: right;">' + ( parseInt( a ) + 1 ) + '.</td>' );
+			tr.append( td );
+			td = $( '<td>' + country_data[a]['country'] + '</td>' );
+			tr.append( td );
+			td = $( '<td style="text-align: right;">' + country_num_orders_single[ 'country_id_' + country_data[a]['country_id'] ] + '</td>' );
+			tr.append( td );
+			num_orders_single += parseInt( country_num_orders_single[ 'country_id_' + country_data[a]['country_id'] ] );
+			td = $( '<td style="border-right: none; text-align: right;">' + country_data[a]['netto'] + '</td><td style="border-left: none; text-align: left; width: 10px;">€</td>' );
+			tr.append( td );
+		}
+		
+		tr = $( '<tr></tr>' );
+		tfoot.append( tr );
+		td = $( '<td  colspan="2" style="border: none; text-align: right;"></td>' );
+		tr.append( td );
+		td = $( '<td style="background-color: #EBEBEB; border-right: none; font-weight: bold; text-align: right;">' + num_orders_single + '</td>' );
+		tr.append( td );
+		td = $( '<td style="background-color: #EBEBEB; border-right: none; font-weight: bold; text-align: right;">' + country_data_sums['netto_all'] + '</td><td style="background-color: #EBEBEB; border-left: none; font-weight: bold; text-align: left; width: 10px;">€</td>' );
+		tr.append( td );	
+		
+		// Vergleichszeitraum
+		if ( mode == 'comp' ) {
+			var comp_div = $( '<div id="country_rank_comp" style="float: left;"></div>' );
+			$( '#statistics_show' ).append( comp_div );
+			
+			var table = $( '<table class="hover"></table>' );
+			comp_div.append( table );
+			
+			var caption = $( '<caption style="text-align: left; font-weight: bold"><p style="background-color: #99FF99; display: inline">Zeitraum: ' + $( "#date_comp_from" ).val() + ' - ' + $( "#date_comp_to" ).val() + '</p><p style="background-color: #99FF99; display: inline"></p></caption>' );
+			table.append( caption );
+			
+			var thead = $( '<thead></thead>' );
+			table.append( thead );
+			var tbody = $( '<tbody></tbody>' );
+			table.append( tbody );
+			var tfoot = $( '<tfoot></tfoot>' );
+			table.append( tfoot );
+			
+			var tr = $( '<tr></tr>' );
+			thead.append( tr );
+			var th = $( '<th style="background-color: #99FF99; border-color: #99FF99;">Rang</th>' );
+			tr.append ( th );
+			th = $( '<th style="background-color: #99FF99; border-color: #99FF99; min-width: 170px;">Land</th>' );
+			tr.append ( th );
+			th = $( '<th style="background-color: #99FF99; border-color: #99FF99; min-width: 80px;">Anz. Best.</th>' );
+			tr.append ( th );
+			th = $( '<th colspan="2" style="background-color: #99FF99; border-color: #99FF99; min-width: 100px;">Gesamt Netto</th>' );
+			tr.append ( th );
+			
+			country_data.sort( createNumberSorterDesc( 'netto_comp' ) );
+			var td;
+			var num_orders_comp = 0;
+			for ( a in country_data ) {
+				if ( parseFloat( country_data[a]['netto_comp'] ) == 0 ) {
+					continue;
+				}
+				tr = $( '<tr></tr>' );
+				tbody.append( tr );
+				td = $( '<td style="text-align: right;">' + ( parseInt( a ) + 1 ) + '.</td>' );
+				tr.append( td );
+				td = $( '<td>' + country_data[a]['country'] + '</td>' );
+				tr.append( td );
+				td = $( '<td style="text-align: right;">' + country_num_orders_comp[ 'country_id_' + country_data[a]['country_id'] ] + '</td>' );
+				tr.append( td );
+				num_orders_comp += parseInt( country_num_orders_comp[ 'country_id_' + country_data[a]['country_id'] ] );
+				td = $( '<td style="border-right: none; text-align: right;">' + country_data[a]['netto_comp'] + '</td><td style="border-left: none; text-align: left; width: 10px;">€</td>' );
+				tr.append( td );
+			}
+			
+			tr = $( '<tr></tr>' );
+			tfoot.append( tr );
+			td = $( '<td  colspan="2" style="border: none; text-align: right;"></td>' );
+			tr.append( td );
+			td = $( '<td style="background-color: #EBEBEB; border-right: none; font-weight: bold; text-align: right;">' + num_orders_comp + '</td>' );
+			tr.append( td );
+			td = $( '<td style="background-color: #EBEBEB; border-right: none; font-weight: bold; text-align: right;">' + country_data_sums['netto_comp_all'] + '</td><td style="background-color: #EBEBEB; border-left: none; font-weight: bold; text-align: left; width: 10px;">€</td>' );
+			tr.append( td );
+		}
+		
+		text = $( '<div id="carriage_button_div" style="float: left;"></div>' );
+		$( '#statistics_show' ).append( text );
+		
+		text = $( '<input id="carriage_button" type="button" value="Frachtkosten anzeigen" style="cursor: pointer; float: left; margin-top: 19px;">' );
+		$( '#carriage_button_div' ).append( text );
+			
+		if ( <?php echo $_SESSION["id_user"];?> == 49352 ) {	
+			$( '#carriage_button' ).click(function () {
+				country_carriage_show( country_data, country_data_sums, shop_data, shop_item_data, shops_selected, mode, shopcnt, item_id_array, time_type, date_from, date_to, date_comp_from, date_comp_to, shop_countries, country_num_orders_single, country_num_orders_comp );
+			});
+		}
+	}
+	
+	function  createNumberSorter( propName ) 
+	{
+		return function ( a,b ) {
+			var aVal = parseFloat( a[ propName ] ), bVal = parseFloat( b[ propName ] ) ;
+			return aVal > bVal ? 1 : ( aVal < bVal ?  - 1 : 0 );
+		};
+	}
+	
+	function  createNumberSorterDesc(propName) 
+	{
+		return function (a,b) {
+			var aVal = parseFloat(a[propName]), bVal = parseFloat(b[propName]) ;
+			return aVal > bVal ? -1 : (aVal < bVal ?  1 : 0);
+		};
 	}
 	
 	function  createSorter(propName) 
@@ -1264,7 +1614,7 @@
 		html += '		<option value="item_group">Artikelgruppen</option>';
 		html += '		<option value="user_list">nach Listen</option>';
 		html += '		<option value="customer">Kunden</option>';
-		html += '		<option value="countries">Länder-Rangliste (under construction)</option>';
+		html += '		<option value="countries">Länder-Rangliste</option>';
 		html += '	</select>';
 /*		
 		html += '	<input type="radio" name="list_select_radiobutton" onclick="list_select_radiobutton_clicked()" style="margin-top: 5px; margin-left: 5px" value="item_list" checked> Artikelliste<br />';
@@ -1660,7 +2010,7 @@
 						}
 					);
 					gart_data.sort(createSorter('keyword'));
-					//show_status2(print_r(item_data));
+					//show_status2(print_r( gart_data ));
 					/*if(mode=="comp")
 					{
 						show_status2(print_r(item_data));
@@ -1804,6 +2154,8 @@
 							tr.append(th);
 							th = $('<th style="background-color: #99FF99; border-color: #99FF99">Gesamt Netto</th>');
 							tr.append(th);
+							th = $('<th style="background-color: #99FF99; border-color: #99FF99">Wachstum</th>');
+							tr.append(th);
 						}
 						thead.append(tr);
 						table.append(thead);
@@ -1835,6 +2187,13 @@
 											tr.append(td);
 											td = $('<td style="text-align: right">' + shop_item_data["shops"][a]["netto_comp_shop"] + ' €</td>');
 											tr.append(td);
+											var $growth=shop_item_data["shops"][a]["netto_shop"]/shop_item_data["shops"][a]["netto_comp_shop"]-1;
+											if( isNaN($growth) ) $growth=0;
+											var $growth=Math.round($growth*10000)/100;
+											if( $growth>0 ) $growth='<span style="color:#00ff00; font-weight:bold;">+'+$growth+'</span>';
+											else $growth='<span style="color:#ff0000; font-weight:bold;">'+$growth+'</span>';
+											td = $('<td style="text-align: right">' + $growth + ' %</td>');
+											tr.append(td);
 										}
 										tbody.append(tr);
 									}
@@ -1865,6 +2224,13 @@
 												tr.append(td);
 												td = $('<td style="text-align: right">' + shop_item_data["shops"][b]["netto_comp_shop"] + ' €</td>');
 												tr.append(td);
+												var $growth=shop_item_data["shops"][b]["netto_shop"]/shop_item_data["shops"][b]["netto_comp_shop"]-1;
+												if( isNaN($growth) ) $growth=0;
+												var $growth=Math.round($growth*10000)/100;
+												if( $growth>0 ) $growth='<span style="color:#00ff00; font-weight:bold;">+'+$growth+'</span>';
+												else $growth='<span style="color:#ff0000; font-weight:bold;">'+$growth+'</span>';
+												td = $('<td style="text-align: right">' + $growth + ' %</td>');
+												tr.append(td);
 											}
 											tbody.append(tr);
 										}
@@ -1891,6 +2257,14 @@
 							td = $('<td style="text-align: right; background-color: #E6E6E6; font-weight: bold; border-top: solid; border-top-width: 2px; border-top-color: black">' + order_sums["all_comp"] + '</td>');
 							tr.append(td);
 							td = $('<td style="text-align: right; background-color: #E6E6E6; font-weight: bold; border-top: solid; border-top-width: 2px; border-top-color: black">' + shop_item_data["netto_comp_all"] + ' €</td>');
+							tr.append(td);
+							//growth
+							var $growth=shop_item_data["netto_all"]/shop_item_data["netto_comp_all"]-1;
+							if( isNaN($growth) ) $growth=0;
+							var $growth=Math.round($growth*10000)/100;
+							if( $growth>0 ) $growth='<span style="color:#00ff00; font-weight:bold;">+'+$growth+'</span>';
+							else $growth='<span style="color:#ff0000; font-weight:bold;">'+$growth+'</span>';
+							td = $('<td style="text-align: right; background-color: #E6E6E6; font-weight: bold; border-top: solid; border-top-width: 2px; border-top-color: black">' + $growth + ' %</td>');
 							tr.append(td);
 						}
 						tfoot.append(tr);
@@ -2045,7 +2419,7 @@
 								netto = (Math.round((item_data[a]["netto"]/item_data[a]["exchange_rate_to_EUR"])*100)/100).toFixed(2);
 							}
 							//alert(print_r(item_data[a]));
-							
+							//show_status2(print_r(shop_group_data));
 							if(item_data[a]["menuitem_id"]!=0)
 							{
 								var sub_group = shop_group_data["main_groups"][item_data[a]["main_group"]]["sub_groups"][item_data[a]["menuitem_id"]];
@@ -2623,9 +2997,15 @@
 								});
 								
 								//country-sum array
-								var country_data = new Array();
-								country_data['netto_all'] = 0;
-								country_data['netto_comp_all'] = 0;
+								var country_data = 						new Array();
+								var country_data_sums = 				new Array();
+								var country_num_orders_single =			new Array();	// Anzahl Bestellungen pro Land
+								var country_num_orders_comp =			new Array();	// Anzahl Bestellungen pro Land
+								var country_orders_single = 			new Array();	// Schon registrierte Bestellungen
+								var country_orders_comp = 				new Array();	// Schon registrierte Bestellungen
+								
+								country_data_sums['netto_all'] = 		0;
+								country_data_sums['netto_comp_all'] = 	0;
 								
 								for(var a = 0; a<item_data.length; a++)
 								{
@@ -2639,27 +3019,53 @@
 									{
 										netto = (Math.round((item_data[a]["netto"]/item_data[a]["exchange_rate_to_EUR"])*100)/100);
 									}
+									
+									if ( item_data[ a ][ 'time_range' ] == 'single' ) {
+										if ( typeof country_orders_single[ 'order_id_' + item_data[ a ][ 'order_id' ] ] == 'undefined' ) {
+											country_orders_single[ 'order_id_' + item_data[ a ][ 'order_id' ] ] = 0;										
+											if ( typeof country_num_orders_single[ 'country_id_' + item_data[ a ][ 'country_id' ] ] == 'undefined' ) {
+												country_num_orders_single[ 'country_id_' + item_data[ a ][ 'country_id' ] ] = 1;
+											} else {
+												country_num_orders_single[ 'country_id_' + item_data[ a ][ 'country_id' ] ]++;
+											}
+										}
+									} else if ( item_data[ a ][ 'time_range' ] == 'comp' ) {
+										if ( typeof country_orders_comp[ 'order_id_' + item_data[ a ][ 'order_id' ] ] == 'undefined' ) {
+											country_orders_comp[ 'order_id_' + item_data[ a ][ 'order_id' ] ] = 0;
+											if ( typeof country_num_orders_comp[ 'country_id_' + item_data[ a ][ 'country_id' ] ] == 'undefined' ) {
+												country_num_orders_comp[ 'country_id_' + item_data[ a ][ 'country_id' ] ] = 1;
+											} else {
+												country_num_orders_comp[ 'country_id_' + item_data[ a ][ 'country_id' ] ]++;
+											}
+										}
+									}
+									
 									if(typeof country_data[item_data[a]["country_id"]] == 'undefined')
 									{
-										country_data[item_data[a]["country_id"]] = 				 new Array();
-										country_data[item_data[a]["country_id"]]["country"] = 	 shop_countries_all[item_data[a]["country_id"]];
-										country_data[item_data[a]["country_id"]]["netto"] = 	 0;
-										country_data[item_data[a]["country_id"]]["netto_comp"] = 0;
+										country_data[item_data[a]["country_id"]] = 				 		new Array();
+										country_data[item_data[a]["country_id"]]["country_id"] = 		item_data[a]["country_id"];
+										country_data[item_data[a]["country_id"]]["country"] = 	 		shop_countries_all[item_data[a]["country_id"]];
+										country_data[item_data[a]["country_id"]]["netto"] = 	 		0;
+										country_data[item_data[a]["country_id"]]["netto_comp"] = 		0;
+										country_data[item_data[a]["country_id"]]["shipping_net"] = 	 	0;
+										country_data[item_data[a]["country_id"]]["shipping_net_comp"] = 0;
+										country_data[item_data[a]["country_id"]]["single_all"] = 		0;
+										country_data[item_data[a]["country_id"]]["comp_all"] = 			0;
 									}
 									if(item_data[a]["time_range"] == "single")
 									{
 										country_data[item_data[a]["country_id"]]["netto"] = (Math.round((country_data[item_data[a]["country_id"]]["netto"]*1 + item_data[a]["amount"]*1*netto)*100)/100).toFixed(2);
-										country_data['netto_all'] = (Math.round((country_data['netto_all']*1 + item_data[a]["amount"]*1*netto)*100)/100).toFixed(2);	
+										country_data_sums['netto_all'] = (Math.round((country_data_sums['netto_all']*1 + item_data[a]["amount"]*1*netto)*100)/100).toFixed(2);	
 									}
 									else if(item_data[a]["time_range"] == "comp")
 									{
 										country_data[item_data[a]["country_id"]]["netto_comp"] = (Math.round((country_data[item_data[a]["country_id"]]["netto_comp"]*1 + item_data[a]["amount"]*1*netto)*100)/100).toFixed(2);
-										country_data['netto_comp_all'] = (Math.round((country_data['netto_comp_all']*1 + item_data[a]["amount"]*1*netto)*100)/100).toFixed(2);
+										country_data_sums['netto_comp_all'] = (Math.round((country_data_sums['netto_comp_all']*1 + item_data[a]["amount"]*1*netto)*100)/100).toFixed(2);
 									}
 								}
 								
-								if(<?php echo $_SESSION["id_user"];?> == 49352)
-									country_table_show(country_data, mode);
+								//if(<?php echo $_SESSION["id_user"];?> == 49352)
+									country_table_show( country_data, country_data_sums, shop_data, shop_item_data, shops_selected, mode, shopcnt, item_id_array, time_type, date_from, date_to, date_comp_from, date_comp_to, shop_countries, country_num_orders_single, country_num_orders_comp );
 								wait_dialog_hide();
 							}
 						});
@@ -2677,7 +3083,7 @@
 		html += '<h1>Statistiken</h1>';
 		
 		html += '<div id="statistics_settings" style="width: 350px; float: left"></div>';
-		html += '<div id="statistics_show" style="float: left; overflow: auto; max-width: 78%; max-height: 700px; margin-left: 5px"></div>';
+		html += '<div id="statistics_show" style="float: left; overflow: auto; max-width: 78%; min-width: 1200px; max-height: 700px; margin-left: 5px"></div>';
 		//html += '<div id="statistics_show" style="float: left; overflow: auto; max-width: 1500px; max-height: 700px; margin-left: 5px"></div>';
 		
 		$("#content").html(html);
@@ -2694,7 +3100,7 @@
 			if($('.item' + sg).css('display')=="table-row")
 				$('.item' + sg).toggle("fade", 500);
 		}
-		$("."+c).toggle("fade", 500);
+		$( "." + c ).toggle( "fade", 500 );
 	}
 	
 	statistics_main();
@@ -2702,5 +3108,5 @@
 </script>
 
 <?php	
-	include("templates/".TEMPLATE_BACKEND."/footer.php");
+	include( "templates/" . TEMPLATE_BACKEND . "/footer.php" );
 ?>

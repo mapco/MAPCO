@@ -131,15 +131,18 @@
 		$fits=false;
 		$parts=array();
 		$results=q("SELECT * FROM vehicles_de WHERE KTypNr=".$_SESSION["ktypnr"].";", $dbshop, __FILE__, __LINE__);
-		$row=mysqli_fetch_array($results);
-		$id_vehicle=$row["id_vehicle"];
-		$results=q("SELECT * FROM shop_items_vehicles WHERE language_id=1 AND vehicle_id=".$row["id_vehicle"].";", $dbshop, __FILE__, __LINE__);
-		while( $row=mysqli_fetch_array($results) )
+		if( mysqli_num_rows($results)>0 )
 		{
-			$parts[$row["item_id"]]=$row;
-			if( $row["item_id"]==$_GET["id_item"] )
+			$row=mysqli_fetch_array($results);
+			$id_vehicle=$row["id_vehicle"];
+			$results=q("SELECT * FROM shop_items_vehicles WHERE language_id=1 AND vehicle_id=".$row["id_vehicle"].";", $dbshop, __FILE__, __LINE__);
+			while( $row=mysqli_fetch_array($results) )
 			{
-				$fits=true;
+				$parts[$row["item_id"]]=$row;
+				if( $row["item_id"]==$_GET["id_item"] )
+				{
+					$fits=true;
+				}
 			}
 		}
 	}

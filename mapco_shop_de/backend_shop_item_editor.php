@@ -3,6 +3,67 @@
 	include("templates/".TEMPLATE_BACKEND."/header.php");
 ?>
 	<script type="text/javascript">
+		var $auction_id=new Array();
+		var $auction_call=new Array();
+		var $auction_ItemID=new Array();
+		
+		function auctions_submit($id_item, $id_accountsite)
+		{
+			$.post("<?php echo PATH; ?>soa/", { API:"ebay", Action:"AuctionsGet", id_accountsite:$id_accountsite, id_item:$id_item }, function($data)
+			{
+				try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
+				$ack = $xml.find("Ack");
+				if ( $ack.text()!="Success" ) { show_status2($data); return; }
+
+				$auction_id=new Array();
+				$auction_call=new Array();
+				$auction_ItemID=new Array();
+				var $i=0;
+				$xml.find("Auction").each(function()
+				{
+					$auction_id[$i]=$(this).find("id_auction").text();
+					$auction_call[$i]=$(this).find("Call").text();
+					$auction_ItemID[$i]=$(this).find("ItemID").text();
+					$i++;
+				});
+				
+				auctions_submit_auction(0);
+			});			
+		}
+
+
+		function auctions_submit_auction($i)
+		{
+			if( $i==$auction_id.length )
+			{
+				view_auctions();
+				show_status("Alle Auktionen erfolgreich an eBay gesendet.");
+				return;
+			}
+			
+			$percent=Math.floor($i/$auction_id.length*100);
+			wait_dialog_show("Aktualisiere Auktion "+($i+1)+" von "+$auction_id.length, $percent);
+
+			if( $auction_call[$i]=="AddItem" && $auction_ItemID[$i]>0 )
+			{
+				auctions_submit_auction($i+1);
+				return;
+			}
+
+			$.post("<?php echo PATH; ?>soa/", { API:"ebay", Action:$auction_call[$i], id_auction:$auction_id[$i] },
+				function($data)
+				{
+					try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
+					$ack = $xml.find("Ack");
+					if ( $ack.text()!="Success" ) { show_status2($data); return; }
+
+					auctions_submit_auction($i+1);
+					return;
+				}
+			);
+		}
+		
+
 		function auction_submit($Action, $id_auction)
 		{
 			wait_dialog_show();
@@ -46,10 +107,10 @@
 			);
 		}
 		
-		function get_ebay_details($id_account, $ItemID)
+		function get_ebay_details($id_accountsite, $ItemID)
 		{
 			wait_dialog_show();
-			$.post("<?php echo PATH; ?>soa/", { API:"ebay", Action:"GetEbayDetails", id_account:$id_account },
+			$.post("<?php echo PATH; ?>soa/", { API:"ebay", Action:"GetEbayDetails", id_accountsite:$id_accountsite },
 				function($data)
 				{
 					show_status2($data);
@@ -118,6 +179,9 @@
 				function(data)
 				{
 					$("#view").html(data);
+					$("#list_edit_tabs1").tabs();
+					$("#list_edit_tabs2").tabs();
+					$("#list_edit_tabs8").tabs();
 					wait_dialog_hide();
 				}
 			);

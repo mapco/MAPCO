@@ -1,6 +1,5 @@
 <?php
 	include("config.php");
-	$title='Qualität von MAPCO';
 	include("templates/".TEMPLATE."/header.php");
 	include("templates/".TEMPLATE."/cms_leftcolumn.php");
 	include("functions/cms_show_article.php");

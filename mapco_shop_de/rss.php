@@ -2,6 +2,9 @@
 	include("config.php");
 	include("functions/cms_url_encode.php");
 
+
+
+
 	//XML Entity Replacer
 		function xmlentities($string)
 		{
@@ -78,4 +81,5 @@
 	//close channel and feed
 		echo "	</channel>\n";
 		echo "</rss>";
+
 ?>

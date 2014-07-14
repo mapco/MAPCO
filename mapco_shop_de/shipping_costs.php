@@ -1,6 +1,5 @@
 <?php
 	include("config.php");
-	$title='Günstige Versandkosten in unserem Online-Shop';
 	include("templates/".TEMPLATE."/header.php");
 	include("functions/mapco_gewerblich.php");
 	include("templates/".TEMPLATE."/cms_leftcolumn.php");

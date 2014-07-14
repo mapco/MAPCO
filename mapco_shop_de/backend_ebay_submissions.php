@@ -280,11 +280,12 @@
 					$joblist += '	<th>percentComplete</th>';
 					$joblist += '	<th>fileReferenceId</th>';
 					$joblist += '	<th>inputFileReferenceId</th>';
+					$joblist += '	<th>EvalCounter</th>';
 					$joblist += '	<th>startTime</th>';
 					$joblist += '	<th>Optionen</th>';
 					$joblist += '</tr>';
 					$joblist += '<tr>';
-					$joblist += '	<th colspan="14">';
+					$joblist += '	<th colspan="15">';
 					$joblist += '		<img src="<?php echo PATH; ?>images/icons/24x24/info.png" title="Wiederkehrende Jobs abrufen" onclick="get_recurring_jobs();" style="cursor:pointer; float:right;" />';
 					$joblist += '		<img src="<?php echo PATH; ?>images/icons/24x24/add.png" title="Wiederkehrenden Job hinzufügen" onclick="job_add_dialog();" style="cursor:pointer; float:right;" />';
 					$joblist += '	</th>';
@@ -326,8 +327,14 @@
 							$joblist += '	<td>'+$(this).find("processed_lines").text()+'</td>';
 							$joblist += '	<td>'+$(this).find("startTime").text()+'</td>';
 							$joblist += '	<td>';
-							$joblist += '		<img src="<?php echo PATH; ?>images/icons/24x24/info.png" title="Jobstatus abrufen" onclick="job_status('+$(this).find("id_job").text()+');" style="cursor:pointer;" />';
-							$joblist += '		<img src="<?php echo PATH; ?>images/icons/24x24/repeat.png" title="Job evaluieren" onclick="response_evaluate(\''+$(this).find("jobType").text()+'\', '+$(this).find("id_job").text()+');" style="cursor:pointer;" />';
+							if( $jobStatus!="Completed" && $jobStatus!="Aborted" && $jobStatus!="Failed" )
+							{
+								$joblist += '		<img src="<?php echo PATH; ?>images/icons/24x24/info.png" title="Jobstatus abrufen" onclick="job_status('+$(this).find("id_job").text()+');" style="cursor:pointer;" />';
+							}
+							if( $(this).find("evaluated").text()!=1 )
+							{
+								$joblist += '		<img src="<?php echo PATH; ?>images/icons/24x24/repeat.png" title="Job evaluieren" onclick="response_evaluate(\''+$(this).find("jobType").text()+'\', '+$(this).find("id_job").text()+');" style="cursor:pointer;" />';
+							}
 							if( $jobType=="SoldReport" || $jobType=="ActiveInventoryReport" )
 							{
 							}

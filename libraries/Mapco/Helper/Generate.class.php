@@ -2,19 +2,19 @@
 	/**************************************************
 	***	Class: MGenerate							***
 	***	Namespace: Mapco.Helper.Generate			***
-	*** Author: C.Haendler <chaendler(at)mapco.de> 	***
+	*** Author: C.Haendler <chaendler(at)mapco.de> 	*** 
 	***	Version: 1.0  		01/07/14/ 				***
 	***	Last mod: 01/07/14							***
 	***************************************************/
-
+	
 	class MGenerate {
-
+	
 		/*
 		*	Generate a unique user id
 		*
 		*/
-
-		public static function UUID()
+		
+		public static function UUID() 
 		{
 			$UUID = sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
 			mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
@@ -23,67 +23,67 @@
 			mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ) );
 			return $UUID;
 		}
-
+	
 		/*
 		*	Generate a new password
 		*
 		*/
-
-		public static function Password ($lenght)
+	
+		public static function Password ($lenght) 
 		{
-			if (empty($lenght))
+			if (empty($lenght)) 
 			{
 				$cod_l = 8;
-			}
-			else
+			} 
+			else 
 			{
 				$cod_1 = $lenght;
 			}
-			$zeichen = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,@,!,?,_,-,#,+,=";
-			$array_b = explode(",",$zeichen);
+			$zeichen = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,@,!,?,_,-,#,+,="; 
+			$array_b = explode(",",$zeichen); 
 			$key = "";
-			for($i=0;$i<$cod_l;$i++)
-			{
-				srand((double)microtime()*1000000);
-				$z = rand(0,35);
-				$key .= "".$array_b[$z]."";
+			for($i=0;$i<$cod_l;$i++) 
+			{ 
+				srand((double)microtime()*1000000); 
+				$z = rand(0,35); 
+				$key .= "".$array_b[$z].""; 
 			}
 			return $key;
 		}
-
+		
 		/*
 		*	Generate a new key
 		*
 		*/
-
-		public static function Key($lenght)
+			
+		public static function Key($lenght) 
 		{
-			if (empty($lenght))
+			if (empty($lenght)) 
 			{
 				$cod_l = 10;
-			}
-			else
+			} 
+			else 
 			{
 				$cod_1 = $lenght;
 			}
-			$zeichen = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,0,1,2,3,4,5,6,7,8,9";
-			$array_b = explode(",",$zeichen);
+			$zeichen = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,0,1,2,3,4,5,6,7,8,9"; 
+			$array_b = explode(",",$zeichen); 
 			$key = "";
-			for($i=0;$i<$cod_l;$i++)
-			{
-				srand((double)microtime()*1000000);
-				$z = rand(0,35);
-				$key .= "".$array_b[$z]."";
+			for($i=0;$i<$cod_l;$i++) 
+			{ 
+				srand((double)microtime()*1000000); 
+				$z = rand(0,35); 
+				$key .= "".$array_b[$z].""; 
 			}
 			return $key;
 		}
-
+		
 		/*
 		*	Generate a new token
 		*
 		*/
-
-		public static function Token($length = 32)
+			
+		public static function Token($lenght = 32) 
 		{
 			static $chars = '0123456789abcdef';
 			$max = strlen($chars) - 1;
@@ -95,5 +95,6 @@
 			}
 			return md5($token . $name);
 		}
-
+		
 	}
+?>

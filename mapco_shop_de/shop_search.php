@@ -5,6 +5,15 @@
 	include("functions/shop_itemstatus.php");
 	include("functions/cms_t.php");
 
+	$i=2;
+	while ( isset($_GET["getvars".$i]) and $_GET["getvars".$i]!="" )
+	{
+		if( $_GET["getvars1"]!="" ) $_GET["getvars1"].="/";
+		$_GET["getvars1"].=$_GET["getvars".$i];
+		$i++;
+	}
+	if ( isset($_GET["getvars1"]) ) $_POST["search"]=$_GET["getvars1"];
+
 	//undefined index debug
 	if ( !isset($_POST["search"]) ) $_POST["search"]="";
 
@@ -16,7 +25,7 @@
 		if ( mysqli_num_rows($results)==1 )
 		{
 			$row=mysqli_fetch_array($results);
-			$results2=q("SELECT * FROM shop_items_".$_GET["lang"]." WHERE id_item=".$row["id_item"].";", $dbshop, __FILE__, __LINE__);
+			$results2=q("SELECT * FROM shop_items_".$_SESSION["lang"]." WHERE id_item=".$row["id_item"].";", $dbshop, __FILE__, __LINE__);
 			$row2=mysqli_fetch_array($results2);
 			header( 'Location: '.PATHLANG.'online-shop/autoteile/'.$row["id_item"].'/'.str_replace("%2F", "%20", rawurlencode($row2["title"])) );
 			exit();
@@ -33,7 +42,7 @@
 	echo '<a style="font-size:20px;" href="'.PATHLANG.'oe-nummern-suche/'.$_POST["search"].'/">Nach OE-Nummer \''.$_POST["search"].'\' suchen.</a>';
 
 	//Shop-Suche
-	$results=q("SELECT * FROM shop_items_".$_GET["lang"]." WHERE title LIKE '%".$_POST["search"]."%' LIMIT 20;", $dbshop, __FILE__, __LINE__);
+	$results=q("SELECT * FROM shop_items_".$_SESSION["lang"]." WHERE title LIKE '%".$_POST["search"]."%' LIMIT 20;", $dbshop, __FILE__, __LINE__);
 	echo '<p>Die Shop-Suche liefert '.mysqli_num_rows($results).' Suchergebnisse für den Begriff \''.$_POST["search"].'\'.</p>';
 	while( $row=mysqli_fetch_array($results) )
 	{
@@ -83,7 +92,7 @@
 				{
 					while($row=mysqli_fetch_array($results))
 					{
-						$results2=q("SELECT * FROM shop_items_".$_GET["lang"]." WHERE id_item=".$row["id_item"].";", $dbshop, __FILE__, __LINE__);
+						$results2=q("SELECT * FROM shop_items_".$_SESSION["lang"]." WHERE id_item=".$row["id_item"].";", $dbshop, __FILE__, __LINE__);
 						$row2=mysqli_fetch_array($results2);
 						show_item($row["id_item"], $row["MPN"], $row2["title"], $row2["short_description"], $oenr);
 					}

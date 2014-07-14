@@ -113,19 +113,32 @@
 				$userrights[$row["script"]]=$row["script"];
 			}
 			//read menu
+			if ($idtag=="shopmenu")	
+			{
+				$results2=q("SELECT * FROM cms_menuitems WHERE menu_id=".$row["id_menu"]." AND menuitem_id>0;", $dbweb, __FILE__, __LINE__);
+				while($row2=mysqli_fetch_array($results2))
+				{
+					$not_empty[$row2["menuitem_id"]]=$row2["menuitem_id"];
+				}
+			}
 			$results=q("SELECT * FROM cms_menus WHERE idtag='".$idtag."';", $dbweb, __FILE__, __LINE__);
 			$row=mysqli_fetch_array($results);
 			$results=q("SELECT * FROM cms_menuitems WHERE menu_id=".$row["id_menu"]." ORDER BY ordering;", $dbweb, __FILE__, __LINE__);
 			$i=0;
 			while($row=mysqli_fetch_array($results))
 			{
-				$menu["id_menuitem"][$i]=$row["id_menuitem"];
-				$menu["icon"][$i]=$row["icon"];
-				$menu["description"][$i]=$row["description"];
-				$menu["title"][$i]=$row["title"];
-				$menu["menuitem_id"][$i]=$row["menuitem_id"];
-				$menu["link"][$i]="shop.php";
-				$i++;
+				if ($idtag!="shopmenu" or $row["menuitem_id"]>0 or isset($not_empty[$row["id_menuitem"]]))	
+				{
+					$menu["id_menuitem"][$i]=$row["id_menuitem"];
+					$menu["icon"][$i]=$row["icon"];
+					$menu["description"][$i]=$row["description"];
+					$menu["title"][$i]=$row["title"];
+					$menu["menuitem_id"][$i]=$row["menuitem_id"];
+					$menu["link"][$i]="shop.php";
+					$i++;
+				}
+
+				
 			}
 			//show menu
 			if ($idtag=="shopmenu")	echo '<ul id="'.$idtag.'">';

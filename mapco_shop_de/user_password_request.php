@@ -22,7 +22,7 @@ function password_request()
 
 		if($xml.find("mail_send").text()=='0')
 		{
-			show_message_dialog('<?php echo t("Dieser Benutzername/Diese Emailadresse ist auf dieser Seite nicht registriert. Befinden Sie sich vielleicht im falschen MAPCO-Shop?");?>');
+			show_message_dialog('<?php echo t("Dieser Benutzername/Diese Emailadresse ist auf dieser Seite nicht registriert. Befinden Sie sich vielleicht im falschen Shop?");?>');
 			return;
 		}
 
@@ -30,7 +30,7 @@ function password_request()
 		$("#message").dialog
 		({	buttons:
 			[
-				{ text: "<?php echo t("Ok"); ?>", click: function() {location.href = "<?php echo PATH;?>aktuelles/"; $(this).dialog("close");} }
+				{ text: "<?php echo t("Ok"); ?>", click: function() {location.href = "<?php echo PATH;?>"; $(this).dialog("close");} }
 			],
 			closeText:"<?php echo t("Fenster schließen"); ?>",
 			hide: { effect: 'drop', direction: "up" },

@@ -4,10 +4,11 @@
 	
 	check_man_params(array(
 						"msg_num"	=> "numericNN",
-						"account"	=> "numericNN"
+						"account"	=> "numericNN",
+						"folder"	=> "numericNN"
 						)
 					);
-	$mbox = mail_connect($_POST['account']);
+	$mbox = mail_connect($_POST['account'], $_POST['folder']);
 
 	lock_mail ( $_POST['msg_num'], $_POST['account'] );
 

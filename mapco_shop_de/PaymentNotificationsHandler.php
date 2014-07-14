@@ -435,7 +435,7 @@ if (isset($Userdata))
 	
 	$postfields["API"]="payments";
 	$postfields["APIRequest"]="PaymentsNotificationSet_PayPal";
-	$postfields["usertoken"]="merci2664";
+	$postfields["usertoken"]="YoeBdHw035a9Ai0KkKDtHBaPorF5rGTquEGXPZ4GU7gqAaCcsM";
 	//$postfields["ipn_track_id"]=$ipn_track_id;
 	$postfields["id"]=$id;
 //	$response=soa2($postfields);

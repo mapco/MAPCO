@@ -22,7 +22,20 @@ RewriteCond %{HTTP_USER_AGENT} Googlebot
 RewriteRule ^(.*[^/])?/?PHPSESSID/[^/]+$ http://%{HTTP_HOST}/$1 [L,R=301]
 
 #cms_connections_blacklist
-Deny from 89.215.144.40
-Deny from 87.49.182.242
-Deny from 141.8.147.10
-Deny from 62.158.79.137
+Deny from 87.193.155.209
+Deny from 62.219.8.227
+Deny from 85.178.125.84
+Deny from 199.195.129.110
+Deny from 63.223.126.202
+Deny from 199.19.73.168
+Deny from 199.195.129.43
+Deny from 173.208.97.80
+Deny from 108.62.59.181
+Deny from 89.204.155.146
+Deny from 79.240.232.116
+Deny from 95.209.47.77
+Deny from 37.187.44.90
+Deny from 37.187.44.90
+Deny from 84.173.22.44
+Deny from 88.70.147.54
+Deny from 93.218.11.141

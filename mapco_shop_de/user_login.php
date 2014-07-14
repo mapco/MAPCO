@@ -1,6 +1,7 @@
 <?php
 
 	include("config.php");
+	include("functions/cms_tl.php");
 	$title='Anmeldung';
 	
 	if (isset($_SESSION["id_user"])) {
@@ -63,7 +64,7 @@
 			if ($art_show==1) {
 				session_start();
 				$_SESSION["in_path"] = PATHLANG.$_POST["url"];
-				header("Location: " . PATHLANG . "interne-news/");
+				header("Location: " . PATHLANG . tl(736, "alias"));
 				exit;
 			}
 			$temp_path = $_POST["url"];
@@ -73,7 +74,7 @@
 			if ($art_show == 1) {
 				session_start();
 				$_SESSION["in_path"] = $response->site_link[0] . $_POST["url"];
-				header("Location: " . PATHLANG . "interne-news/");
+				header("Location: " . PATHLANG . tl(736, "alias")); //interne news
 				exit;
 			}
 			$temp_path=$_POST["url"];
@@ -193,12 +194,14 @@
 	echo '		<label for="password"><p style="display: inline; font-weight: bold;">'.t("Passwort").':</p></label><br />';
 	echo '		<input type="password" name="password" id="password" autocomplete="on"><br /><br />';
 	
-	if (isset($dbshop)) {
+	if (isset($dbshop))
+	{
 		$results = q("
 			SELECT * 
 			FROM shop_carts 
-			WHERE session_id = '" . session_id() . "' AND shop_id = " . $_SESSION["id_shop"] . ";", $dbshop, __FILE__, __LINE__);
-		if (mysqli_num_rows($results)>0) {
+			WHERE session_id = '" . session_id() . "' AND shop_id = " . $_SESSION["id_shop"] . " AND user_id=0;", $dbshop, __FILE__, __LINE__);
+		if ( mysqli_num_rows( $results ) > 0 ) 
+		{
 			echo '<input checked="checked" type="checkbox" name="cart_merge" />'.t("Warenkorb übernehmen").'<br /><br />';
 		}
 	}
@@ -212,10 +215,15 @@
 		echo '	<br /><br /><br /><br /><a href="http://www.mapco.de/online-shop/" style="border:3px solid red; padding:10px; cursor: pointer; font-size: 14px">'.t("Als Privatkunde können Sie unter www.mapco.de bestellen!").'</a>';
 	}
 	*/
-	echo '	<br /><br /><br /><br /><a href="'.PATHLANG.'passwort-anfrage/" style="cursor: pointer; font-size: 12px">'.t("Haben Sie Ihr Passwort vergessen? Wir schicken Ihnen gerne ein neues.").'</a>';
-	//echo '	<br /><br /><a href="'.PATHLANG.'registrieren/" style="cursor: pointer; font-size: 12px">'.t("Hier können Sie sich registrieren.").'</a>';
-	echo '	<br /><br /><a href="'.PATHLANG.'registrierung/" style="color: red;cursor: pointer; font-size: 15px; font-weight: bold;">'.t("Hier können Sie sich registrieren.").'</a>';
-
+	//echo '	<br /><br /><br /><br /><a href="'.PATHLANG.'passwort-anfrage/" style="cursor: pointer; font-size: 12px">'.t("Haben Sie Ihr Passwort vergessen? Wir schicken Ihnen gerne ein neues.").'</a>';
+	echo '	<br /><br /><br /><br /><a href="' . PATHLANG . tl(658, "alias") . '" style="cursor: pointer; font-size: 12px">'.t("Haben Sie Ihr Passwort vergessen? Wir schicken Ihnen gerne ein neues.").'</a>';
+//	echo '	<br /><br /><a href="'.PATHLANG.'registrierung/" style="color: red;cursor: pointer; font-size: 15px; font-weight: bold;">'.t("Hier können Sie sich registrieren.").'</a>';
+	
+	if( $_SESSION['id_site'] != 17 )
+	{	
+		echo '	<br /><br /><a href="' . PATHLANG . tl(662, "alias") .'" style="color: red;cursor: pointer; font-size: 15px; font-weight: bold;">'.t("Hier können Sie sich registrieren.").'</a>';
+	}
+	
 	echo '</div>';
 
 	include("templates/".TEMPLATE."/footer.php");

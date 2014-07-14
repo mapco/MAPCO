@@ -1,5 +1,6 @@
 <?php
 	include("../../config.php");
+	include("../../functions/cms_t.php");
 	header('Content-type: text/javascript');
 	
 	//make dreamweaver highlight javascript
@@ -15,6 +16,8 @@
 	var $file_upload_cancel=false;
 	var $files="";
 	var $filecontent="";
+	
+	$upload_end = function(){};
 
 	function file_upload()
 	{
@@ -38,21 +41,21 @@
 		document.getElementById('file_upload_file').addEventListener('change', file_upload_filehandler_close, false);
 		if (window.File && window.FileReader && window.FileList && window.Blob)
 		{
-			$("#file_upload_dialog_status2").html("Bitte wählen die Datei aus, die Sie hochladen möchten.");
+			$("#file_upload_dialog_status2").html("<?php echo t("Bitte wählen die Datei aus, die Sie hochladen möchten.")?>");
 		}
 		else
 		{
-			$("#file_upload_dialog_status2").html("Die Datei-APIs werden in diesem Browser nicht unterstützt. Bitte benutzen Sie Chrome oder Firefox.");
+			$("#file_upload_dialog_status2").html("<?php echo t("Die Datei-APIs werden in diesem Browser nicht unterstützt. Bitte benutzen Sie Chrome oder Firefox.")?>");
 		}
 		$("#file_upload_dialog").dialog
 		({	buttons:
 			[
-				{ text: "Schließen", click: function() { $(this).dialog("close"); } }
+				{ text: "<?php echo t("Schließen")?>", click: function() { $(this).dialog("close"); } }
 			],
-			closeText:"Fenster schließen",
+			closeText:"<?php echo t("Fenster schließen")?>",
 			modal:true,
 			resizable:false,
-			title:"Datei hochladen",
+			title:"<?php echo t("Datei hochladen")?>",
 			height:225,
 			width:400
 		});
@@ -66,14 +69,19 @@
 	
 	function file_upload_cancel_completed()
 	{
-		$("#file_upload_dialog").html("Hochladen der Datei erfolgreich abgebrochen.");
-		$('#file_upload_dialog').dialog('option', 'buttons', [ { text: "Schließen", click: function() { $(this).dialog("close");} } ] );
+		$("#file_upload_dialog").html("<?php echo t("Hochladen der Datei erfolgreich abgebrochen.")?>");
+		$('#file_upload_dialog').dialog('option', 'buttons', [ { text: "<?php echo t("Schließen")?>", click: function() { $(this).dialog("close");} } ] );
 	}
 	
 	function file_upload_file($filenr, $pos)
 	{
 		if( $file_upload_cancel == true )
 		{
+			$filename='';
+			$filename_temp='';
+			$filesize='';
+			$fileext='';
+			$tempfile="";
 			file_upload_cancel_completed();
 			return;
 		}
@@ -86,8 +94,11 @@
 			] );
 			$file_upload_progressbar2.progressbar("value", 100);
 			$("#file_upload_dialog_status").hide();
-			$("#file_upload_dialog_status4").html("Datei erfolgreich hochgeladen.");
+			$("#file_upload_dialog_status4").html("<?php echo t("Datei erfolgreich hochgeladen.")?>");
 			$tempfile='';
+			
+			window.$upload_end();
+			
 			return;
 		}
 
@@ -118,7 +129,7 @@
 				$filename=$files[$filenr].name;
 				$filesize=$files[$filenr].size;
 	
-				$("#file_upload_dialog_status2").html("0% hochgeladen.");
+				$("#file_upload_dialog_status2").html("0% <?php echo t("hochgeladen")?>.");
 				file_upload_file($filenr, 0);
 			});
 			return;
@@ -138,7 +149,7 @@
 				$.post("<?php echo PATH; ?>soa/", { API:"cms", Action:"TempFileUpdate", Filename:$tempfile, Data:$Data }, function($data)
 				{
 					var $percent=Math.floor($stop / $files[$filenr].size * 100);
-					$("#file_upload_dialog_status2").html('Datei '+($filenr+1)+' von '+$files.length+': '+ $percent+'% hochgeladen. ('+$stop+' / '+$files[$filenr].size+') <br /><br />'+$data);
+					$("#file_upload_dialog_status2").html('<?php echo t("Datei")?> '+($filenr+1)+' <?php echo t("von")?> '+$files.length+': '+ $percent+'% <?php echo t("hochgeladen")?>. ('+$stop+' / '+$files[$filenr].size+') <br /><br />'+$data);
 					$file_upload_progressbar.progressbar("value", $percent);
 					file_upload_file($filenr, $pos+$chunksize);
 				});
@@ -155,11 +166,11 @@
 	{
 		wait_dialog_show();
 		$files = evt.target.files; // FileList object
-		$("#file_upload_dialog_status2").html($files.length+" Datei(en) ausgewählt.");
+		$("#file_upload_dialog_status2").html($files.length+" <?php echo t("Datei(en) ausgewählt.")?>");
 		$('#file_upload_dialog').dialog('option', 'buttons', 
 		[
-			{ text: "Hochladen", click: function() { file_upload_start(); } },
-			{ text: "Schließen", click: function() { $(this).dialog("close"); } }
+			{ text: "<?php echo t("Hochladen")?>", click: function() { file_upload_start(); } },
+			{ text: "<?php echo t("Schließen")?>", click: function() { $(this).dialog("close"); } }
 		] );
 		wait_dialog_hide();
 	}
@@ -167,27 +178,27 @@
 
   	function file_upload_filehandler_open()
 	{
-		$("#file_upload_dialog_status2").html("Datei wird eingelesen.");
+		$("#file_upload_dialog_status2").html("<?php echo t("Datei wird eingelesen.")?>");
 	}
 	
 	function file_upload_start()
 	{
 		if( typeof $files == "undefined" || $files.length==0 )
 		{
-			alert("Datei nicht gefunden.");
+			alert("<?php echo t("Datei nicht gefunden.")?>");
 			return;
 		}
 
 		$('#file_upload_dialog').dialog('option', 'buttons', 
 		[
-			{ text: "Abbrechen", click: function() { file_upload_cancel(); } }
+			{ text: "<?php echo t("Abbrechen")?>", click: function() { file_upload_cancel(); } }
 		] );
 
 		//reset dialog
 		$("#file_upload_files").hide();
 		$file_upload_progressbar=$("#file_upload_dialog_status").progressbar({ value: false });
 		$file_upload_progressbar2=$("#file_upload_dialog_status3").progressbar({ value: 0 });
-		$("#file_upload_dialog_status4").html("0 von "+$files.length+" Dateien fertig.");
+		$("#file_upload_dialog_status4").html("0 von "+$files.length+" <?php echo t("Dateien fertig.")?>");
 
 		//start upload of first file
 		$file_upload_cancel=false;

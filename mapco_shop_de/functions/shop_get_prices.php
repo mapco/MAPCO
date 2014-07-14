@@ -44,7 +44,8 @@
 				if( mysqli_num_rows($results)>0 )
 				{
 					$row=mysqli_fetch_array($results);
-					if ($row["GEWERBE"]>0) $gewerblich=true;
+					$gewerblich=true;
+					//if ($row["GEWERBE"]>0) $gewerblich=true;
 					if ($row["PL1"]<4) $row["PL1"]=4;
 					$kun_id=$row["IDIMS_ID"];
 				}

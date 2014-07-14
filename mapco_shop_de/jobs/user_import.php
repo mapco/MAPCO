@@ -1,12 +1,12 @@
 <?php
 	include("../config.php");
-
+/*
 	$anz=0;
-	q("DELETE FROM kunde WHERE KUND_NR<>'MA34661' AND IDIMS_ID in (16815, 17285, 18465, 18466, 18211, 17292, 9753, 18467, 18469, 18209, 18471, 14110, 18463, 18472, 18213, 18473);", $dbshop, __FILE__, __LINE__); 
+	q("DELETE FROM kunde WHERE IDIMS_ID in (16815, 17285, 18465, 18466, 18211, 17292, 9753, 18467, 18469, 18209, 18471, 14110, 18463, 18472, 18213, 18473);", $dbshop, __FILE__, __LINE__); 
 	q("DELETE FROM fa_user_login WHERE kunid in (16815, 17285, 18465, 18466, 18211, 17292, 9753, 18467, 18469, 18209, 18471, 14110, 18463, 18472, 18213, 18473);", $dbshop, __FILE__, __LINE__); 
 	$results=q("SELECT * FROM fa_user_login WHERE kunid in (16815, 17285, 18465, 18466, 18211, 17292, 9753, 18467, 18469, 18209, 18471, 14110, 18463, 18472, 18213, 18473);", $dbshop, __FILE__, __LINE__);
 	$anz=$anz+mysqli_num_rows($results);
-	$results=q("SELECT * FROM kunde WHERE KUND_NR<>'MA34661' AND IDIMS_ID in (16815, 17285, 18465, 18466, 18211, 17292, 9753, 18467, 18469, 18209, 18471, 14110, 18463, 18472, 18213, 18473);", $dbshop, __FILE__, __LINE__);
+	$results=q("SELECT * FROM kunde WHERE IDIMS_ID in (16815, 17285, 18465, 18466, 18211, 17292, 9753, 18467, 18469, 18209, 18471, 14110, 18463, 18472, 18213, 18473);", $dbshop, __FILE__, __LINE__);
 	$anz=$anz+mysqli_num_rows($results);
 	
 	if($anz==0)	echo 'Alle Ebay Zugaenge geloescht<br /><hr />';
@@ -56,5 +56,5 @@
 		}
 	}
 	echo $i.' Benutzerprofile wurden aktualisiert.';
-	
+*/	
 ?>

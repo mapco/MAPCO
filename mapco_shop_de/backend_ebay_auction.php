@@ -44,6 +44,9 @@
 					show_status2(err.message);
 					return;
 				}
+				show_status2($data);
+				return;
+				var $id_accountsite=$account.find("id_accountsite").text();
 				var $ReturnsAccepted=$account.find("ReturnsAcceptedOption").text();
 				var $ReturnsWithin=$account.find("ReturnsWithinOption").text();
 				var $ShippingCostPaidBy=$account.find("ShippingCostPaidByOption").text();
@@ -52,7 +55,7 @@
 
 				show_status("Lese mögliche Einstellungen bei eBay aus...");
 				$("#account_settings_id_account").val($id_account);
-				$.post("<?php echo PATH; ?>soa/", { API:"ebay", Action:"GetEbayDetails", id_account:$id_account }, function($data)
+				$.post("<?php echo PATH; ?>soa/", { API:"ebay", Action:"GetEbayDetails", id_accountsite:$id_accountsite }, function($data)
 				{
 					try
 					{
@@ -231,15 +234,24 @@
 				var $html='<table class="hover">';
 				$html += '<tr>';
 				$html += '	<th>Nr.</th>';
-				$html += '	<th>Seite</th>';
+				$html += '	<th>Aktiv</th>';
+				$html += '	<th>Titel</th>';
+				$html += '	<th>SiteID</th>';
+				$html += '	<th>Zahlungsmethoden</th>';
 				$html += '	<th>';
 				$html += '		<img alt="Seite hinzufügen" src="<?php echo PATH; ?>images/icons/24x24/add.png" style="cursor:pointer;" title="Seite hinzufügen" />';
 				$html += '	</th>';
 				$html += '</tr>';
-				$xml.find("Site").each(function()
+				var $i=0;
+				$xml.find("AccountSite").each(function()
 				{
+					$i++;
 					$html += '<tr>';
+					$html += '	<td>'+$i+'</td>';
+					$html += '	<td>'+$(this).find("active").text()+'</td>';
+					$html += '	<td>'+$(this).find("title").text()+'<br /><i>'+$(this).find("description").text()+'</i></td>';
 					$html += '	<td>'+$(this).find("SiteID").text()+'</td>';
+					$html += '	<td>'+$(this).find("PaymentMethods").text()+'</td>';
 					$html += '	<td>';
 					$html += '		<img alt="Seite bearbeiten" src="images/icons/24x24/edit.png" title="Seite bearbeiten" />';
 					$html += '	</td>';

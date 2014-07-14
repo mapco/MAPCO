@@ -7,7 +7,7 @@
 <script language="javascript">
 	function view(editlang, lang)
 	{
-		var response=ajax('modules/backend_cms_translations_view.php?editlang='+editlang+'&lang='+lang, false);
+		var response=ajax('<?php echo PATH; ?>modules/backend_cms_translations_view.php?editlang='+editlang+'&lang='+lang, false);
 		document.getElementById("results").innerHTML=response;
 	}
 	function update(id_translation, translation, editlang, lang, e)
@@ -15,7 +15,7 @@
 		if (!e) var e=window.event;
 		if (e.keyCode == 13)
 		{
-			var response=ajax('modules/backend_cms_translations_update.php?id_translation='+id_translation+'&translation='+encodeURIComponent(translation)+'&editlang='+encodeURIComponent(editlang), false);
+			var response=ajax('<?php echo PATH; ?>modules/backend_cms_translations_update.php?id_translation='+id_translation+'&translation='+encodeURIComponent(translation)+'&editlang='+encodeURIComponent(editlang), false);
 			view(editlang, lang);
 		}
 	}
@@ -23,7 +23,7 @@
 	{
 		if (confirm("Übersetzung wirklich löschen"))
 		{
-			var response=ajax('modules/backend_cms_translations_remove.php?id_translation='+id_translation, false);
+			var response=ajax('<?php echo PATH; ?>modules/backend_cms_translations_remove.php?id_translation='+id_translation, false);
 			view(editlang, lang);
 		}
 	}

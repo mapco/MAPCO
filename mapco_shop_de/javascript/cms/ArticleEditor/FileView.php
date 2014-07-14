@@ -83,7 +83,7 @@ function load_view_files()
 			{
 				wait_dialog_show('Sortiere Einträge', 0);
 				var list = $('#filelist').sortable('toArray');
-				$.post("<?php echo PATH; ?>soa2/", { API:"cms", APIRequest:"ArticleFileSort", list:list, type:'file' }, function($data){ 
+				$.post("<?php echo PATH; ?>soa2/", { API:"cms", APIRequest:"TableDataSort", list:list, table:'cms_articles_files', label:'art_file_', column:'id', db:'dbweb' }, function($data){ 
 					//show_status2($data); return;
 					try{$xml = $($.parseXML($data))} catch($err){show_status2($err.message);return;}
 					if($xml.find('Ack').text()!='Success'){show_status2($data);return;}

@@ -40,7 +40,7 @@
 		}
 		$freitextsuche=true;
 
-		if ( sizeof($qry_string) > 1 )
+	/*	if ( sizeof($qry_string) > 1 )
 		{
 			$search_field = 'IN (';
 			foreach($qury_string as $qury)
@@ -59,6 +59,7 @@
 		}
 		
 		$qury_where2 = " AND company ".$search_field." OR name ".$search_field." OR street1 ".$search_field." OR street2 ".$search_field." OR city ".$search_field." OR zip ".$search_field." OR phone ".$search_field." OR mobile ".$search_field." OR fax ".$search_field." OR mail ".$search_field;
+		*/
 	}
 	else {$freitextsuche=false;}
 	
@@ -66,7 +67,7 @@
 	$row=mysqli_fetch_assoc($res);
 	$country = $row['country'];
 
-	if ( isset($_POST["zip_search"]) && $_POST['zip_search'] == 0 )
+	if ( $freitextsuche === true && isset($_POST["zip_search"]) && $_POST['zip_search'] == 0 )
 	{
 		$qury_where = $qury_Where. 'country="'.$country.'"'.$qury_where2;
 		$sql = "SELECT id_crm_customer FROM crm_customers WHERE ".$qury_where.";";

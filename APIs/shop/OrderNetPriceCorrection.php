@@ -66,6 +66,10 @@
 				if ($order["shop_id"] == 4 || $order["shop_id"] == 2 || $order["shop_id"] == 6)
 				{
 					$VAT = 19;
+					if ( $order["bill_country_code"] == 'AT' )
+					{
+						$VAT = 20;
+					}
 				}
 				
 				if ($VAT == 0)

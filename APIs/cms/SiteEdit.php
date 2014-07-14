@@ -16,16 +16,14 @@
 	
 	check_man_params($required);
 
-	$where = "id_site=".$_POST['id_site'];
+	$where = "WHERE `id_site`='".$_POST['id_site']."' LIMIT 1";
+	
 	$data['title'] = $_POST['title'];
 	$data['description'] = $_POST['description'];
 	$data['domain'] = $_POST['domain'];
 	$data['template'] = $_POST['template'];
 	$data['google_analytics'] = $_POST['google_analytics'];
 
-	$xml = '';
-	
 	q_update('cms_sites', $data, $where, $dbweb, __FILE__, __LINE__);
 
-	print $xml;
 ?>

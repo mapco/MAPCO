@@ -8,13 +8,13 @@
 	
 	//PATH
 	echo '<p>';
-	echo '<a href="'.PATHLANG.'online-shop/mein-konto/">'.t("Mein Konto").'</a>';
+	echo '<a href="'.PATHLANG.tl(301, "alias").'" title="'.tl(301, "description").'">'.tl(301, "title").'</a>';
 	echo ' >';
 	echo '</p>';
 
-
-	echo '<h1>Mein Konto</h1>';
-	
+	echo '<h1>'.t("Mein Konto").'</h1>';
+	show_tree(301);
+/*	
 	echo '	<a href="'.PATHLANG.'online-shop/mein-konto/benutzerkonto/" class="cp_icon">';
 	echo '		<img src="'.PATH.'images/icons/128x128/user.png" alt="'.t("Benutzerkonto").'" title="'.t("Benutzerkonto").'" />';
 	echo '		<br />'.t("Benutzerkonto");

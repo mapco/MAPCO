@@ -22,6 +22,7 @@
 -->
 <script type="text/javascript" src="<?php echo PATH; ?>javascript/cms/ImageUpload.php"></script>
 <script type="text/javascript" src="<?php echo PATH; ?>javascript/shop/Lists.php"></script>
+<script type="text/javascript" src="<?php echo PATH; ?>javascript/shop/PriceResearch.php"></script>
 <script language="javascript">
 	var id_account=0;
 	var id_imageformat=0;
@@ -1040,8 +1041,12 @@
 						$ack = $xml.find("Ack");
 						if ( $ack.text()!="Success" )
 						{
+							if ( $ack.text()=="Unfinished" )
+							{
+								item_update(i);
+								return;
+							}
 							show_status2(data);
-							item_update(i);
 							return;
 						}
 					}
@@ -1141,6 +1146,7 @@
 	
 				var $id_field="";
 				var $id_value="";
+				var $id_language="";
 				$xml.find("shop_lists_fields").each(
 					function()
 					{
@@ -1148,9 +1154,11 @@
 						{
 							$id_field+=", ";
 							$id_value+=", ";
+							$id_language+=", ";
 						}
 						$id_field+=$(this).find("field_id").text();
 						$id_value+=$(this).find("value_id").text();
+						$id_language+=$(this).find("language_id").text();
 					}
 				);
 				
@@ -1159,6 +1167,7 @@
 				$postdata["Action"]="ItemDetailsGet";
 				$postdata["id_field"]=$id_field;
 				$postdata["id_value"]=$id_value;
+				$postdata["id_language"]=$id_language;
 				$postdata["id_item"]=$id_item;
 				$.post("<?php echo PATH; ?>soa/", $postdata, function($data)
 				{
@@ -1777,224 +1786,6 @@
 	}
 
 
-	function price_research(id_item, title)
-	{
-		wait_dialog_show();
-		$.post("modules/backend_shop_items_actions.php", { action:"price_research_view", id_item:id_item },
-			function(data)
-			{
-				$("#price_research_dialog").html(data);
-				$("#price_research_dialog").dialog
-				({	closeText:"Fenster schließen",
-					modal:true,
-					resizable:false,
-					title:"Preisrecherche für "+title,
-					width:1250
-				});
-				wait_dialog_hide();
-			}
-		);
-	}
-
-
-	function price_research_add()
-	{
-		var id_item=$("#price_research_add_id_item").val();
-		var price=$("#price_research_add_price").val();
-		var shipping=$("#price_research_add_shipping").val();
-		var seller=$("#price_research_add_seller").val();
-		var EbayID=$("#price_research_add_EbayID").val();
-		var comment=$("#price_research_add_comment").val();
-		$.post("modules/backend_shop_items_actions.php", { action:"price_research_add", id_item:id_item, price:price, shipping:shipping, seller:seller, EbayID:EbayID, comment:comment },
-			function(data)
-			{
-				if (data!="") show_status(data);
-				else
-				{
-					price_research_view(id_item);
-				}
-			}
-		);
-	}
-
-
-	function price_research_ebay()
-	{
-		var ItemID=$("#price_research_add_EbayID").val();
-		if ( !(ItemID>0) ) alert("Die Auktionsnummer ist ungültig.");
-		else
-		{
-			wait_dialog_show();
-			$.post("<?php echo PATH; ?>soa/", { API:"ebay", Action:"GetItem", id_account:1, ItemID:ItemID },
-				function(data)
-				{
-					try
-					{
-						$xml = $($.parseXML(data));
-					}
-					catch (err)
-					{
-						show_status(err.message);
-						return;
-					}
-					$ack = $xml.find("Ack");
-					if ( $ack.text()!="Success" )
-					{
-						show_status2(data);
-						wait_dialog_hide();
-						return;
-					}
-
-					var price=$xml.find("ConvertedStartPrice").text();
-					var i=0;
-					$xml.find("ShippingServiceOptions").each(
-						function()
-						{
-							$ShippingServiceCost=parseFloat($(this).find("ShippingServiceCost").text());
-							$ShippingService=$(this).find("ShippingService").text();
-							if ( $ShippingService!="DE_Pickup" ) //skip pickup
-							{
-								if ( i==0 ) shipping=$ShippingServiceCost;
-								else if ( shipping>$ShippingServiceCost )
-								{
-									shipping=$ShippingServiceCost;
-								}
-								i++;
-							}
-						}
-					);
-					var seller=$xml.find("UserID").text();
-					$("#price_research_add_price").val(price);
-					$("#price_research_add_shipping").val(shipping);
-					$("#price_research_add_seller").val(seller);
-					wait_dialog_hide();
-				}
-			);
-		}
-	}
-
-
-	function price_research_remove(id)
-	{
-		$("#price_research_remove_dialog").dialog
-		({	buttons:
-			[
-				{ text: "Löschen", click: function() { price_research_remove_accept(id); } },
-				{ text: "Abbrechen", click: function() { $(this).dialog("close"); } }
-			],
-			closeText:"Fenster schließen",
-			hide: { effect: 'drop', direction: "up" },
-			modal:true,
-			resizable:false,
-			show: { effect: 'drop', direction: "up" },
-			title:"Preisrecherche",
-			width:700
-		});
-	}
-
-
-	function price_research_remove_accept(id)
-	{
-		var id_item=$("#price_research_add_id_item").val();
-		$.post("modules/backend_shop_items_actions.php", { action:"price_research_remove", id:id },
-			function(data)
-			{
-				if (data!="") show_status(data);
-				else
-				{
-					price_research_view(id_item);
-					$("#price_research_remove_dialog").dialog("close");
-				}
-			}
-		);
-	}
-
-
-	function price_research_stats()
-	{
-		$.post("<?php echo PATH; ?>soa/", { API:"shop", Action:"PriceResearchStats" },
-			function(data)
-			{
-				$("#price_research_stats_dialog").html(data);
-				$("#price_research_stats_dialog").dialog
-				({	closeText:"Fenster schließen",
-					hide: { effect: 'drop', direction: "up" },
-					modal:true,
-					resizable:false,
-					show: { effect: 'drop', direction: "up" },
-					title:"Statistiken Preisrecherche",
-					width:400
-				});
-			}
-		);
-	}
-
-
-	function price_research_view(id_item)
-	{
-		$.post("modules/backend_shop_items_actions.php", { action:"price_research_view", id_item:id_item },
-			function(data)
-			{
-				$("#price_research_dialog").html(data);
-			}
-		);
-	}
-
-
-	function price_suggestion_add()
-	{
-		var id_item=$("#price_research_add_id_item").val();
-		var price=$("#price_research_suggest_price").val();
-		var $yellow=$("#price_research_yellow_price").val();
-		
-		if( price > (2*$yellow) )
-		{
-			var $confirm=confirm("Der Preis übersteigt den gelben Preis um mehr als das doppelte. Wollen Sie diesen Preis wirklich eintragen?");
-			if( !$confirm ) return;
-		}
-
-		wait_dialog_show("Speichere Preisvorschlag...");
-		$.post("<?php echo PATH; ?>soa/", { API:"shop", Action:"PriceSuggestionAdd", id_item:id_item, price:price }, function($data)
-		{
-			wait_dialog_hide();
-			try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
-			$ack = $xml.find("Ack");
-			if ( $ack.text()!="Success" ) { show_status2($data); return; }
-
-			var $status=Number($xml.find("status").text());
-			if( $status==1 )
-			{
-				var $id_pricesuggestion=Number($xml.find("id_pricesuggestion").text());
-				price_suggestion_idims($id_pricesuggestion);
-				return;
-			}
-			else
-			{
-				show_status("Preis zur Prüfung gespeichert.");
-				price_research_view(id_item);
-				return;
-			}
-		});
-	}
-
-
-	function price_suggestion_idims($id_pricesuggestion)
-	{
-		var $id_item=$("#price_research_add_id_item").val();
-
-		wait_dialog_show("Sende Preis an IDIMS...");
-		$.post("<?php echo PATH; ?>soa/", { API:"idims", Action:"PriceUpdate", id_pricesuggestion:$id_pricesuggestion }, function($data)
-		{
-			wait_dialog_hide();
-			try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
-			$ack = $xml.find("Ack");
-			if ( $ack.text()!="Success" ) { show_status2($data); return; }
-			
-			show_status("Preis erfolgreich übernommen.");
-			price_research_view($id_item);
-			return;
-		});
-	}
 
 
 	function promotion_item_update(i)
@@ -2125,6 +1916,7 @@
 
 		var $id_field="";
 		var $id_value="";
+		var $id_language="";
 		var $title="";
 		for($i=0; $i<$shop_lists_fields.length; $i++)
 		{
@@ -2132,10 +1924,12 @@
 			{
 				$id_field+=", ";
 				$id_value+=", ";
+				$id_language+=", ";
 				$title+=", ";
 			}
 			$id_field+=$shop_lists_fields[$i]["field_id"];
 			$id_value+=$shop_lists_fields[$i]["value_id"];
+			$id_language+=$shop_lists_fields[$i]["language_id"];
 			$title+=$shop_lists_fields[$i]["title"];
 		}
 
@@ -2144,6 +1938,7 @@
 		$postdata["Action"]="ItemDetailsGet";
 		$postdata["id_field"]=$id_field;
 		$postdata["id_value"]=$id_value;
+		$postdata["id_language"]=$id_language;
 		$postdata["title"]=$title;
 		$postdata["id_item"]=$id_item;
 		$postdata["NextItem"]=$NextItem;
@@ -2459,7 +2254,7 @@
 						$listhtml+='<th>';
 						$listhtml+='	<a href="javascript:view_list(\''+$name+'\', '+$descendant+');">';
 						$listhtml+=$(this).text();
-						if( $src!="" ) $listhtml+='<img src="'+$src+'" alt="'+$alt+'" title="'+$alt+'" />';
+						if( $src!="" ) $listhtml+='<img src="<?php echo PATH; ?>'+$src+'" alt="'+$alt+'" title="'+$alt+'" />';
 						$listhtml+='	</a>';
 						$listhtml+='</th>';
 					}
@@ -2538,7 +2333,7 @@
 				{
 					if( $listheader[$j]["name"]=="SKU" )
 					{
-						$row+='<td><a href="http://www.mapco.de/de/online-shop/autoteile/'+$list[$i]["id_item"]+'/" target="_blank">'+$list[$i][$j]+'</a></td>';
+						$row+='<td><a href="<?php echo PATHLANG; ?>online-shop/autoteile/'+$list[$i]["id_item"]+'/" target="_blank">'+$list[$i][$j]+'</a></td>';
 					}
 					else if( $listheader[$j]["name"]=="ImagePreview" )
 					{
@@ -2591,16 +2386,16 @@
 	if( $_SESSION["userrole_id"]==1 or $_SESSION["userrole_id"]==3 or $_SESSION["userrole_id"]==4 or $_SESSION["userrole_id"]==15 )
 	{
 		//price research stats
-		echo '<img style="margin:0px 5px 0px 0px; border:0; padding:0; cursor:pointer; float:right;" src="images/icons/24x24/chart.png" alt="Statistiken Preisrecherche" title="Statistiken Preisrecherche" onclick="price_research_stats();" />'."\n";
+		echo '<img style="margin:0px 5px 0px 0px; border:0; padding:0; cursor:pointer; float:right;" src="'.PATH.'images/icons/24x24/chart.png" alt="Statistiken Preisrecherche" title="Statistiken Preisrecherche" onclick="price_research_stats();" />'."\n";
 	}
 	if( $_SESSION["userrole_id"]==1 or $_SESSION["userrole_id"]==3 or $_SESSION["userrole_id"]==15 )
 	{
 		//image mass upload
-		echo '<img style="margin:0px 5px 0px 0px; border:0; padding:0; cursor:pointer; float:right;" src="images/icons/24x24/image_up.png" alt="Foto-Massenupload" title="Foto-Massenupload" onclick="images_upload();" />'."\n";
+		echo '<img style="margin:0px 5px 0px 0px; border:0; padding:0; cursor:pointer; float:right;" src="'.PATH.'images/icons/24x24/image_up.png" alt="Foto-Massenupload" title="Foto-Massenupload" onclick="images_upload();" />'."\n";
 		//image mass download
-		echo '<img style="margin:0px 5px 0px 0px; border:0; padding:0; cursor:pointer; float:right;" src="images/icons/24x24/image_down.png" alt="Foto-Massenupload" title="Foto-Massendownload" onclick="image_mass_download_options();" />'."\n";
+		echo '<img style="margin:0px 5px 0px 0px; border:0; padding:0; cursor:pointer; float:right;" src="'.PATH.'images/icons/24x24/image_down.png" alt="Foto-Massenupload" title="Foto-Massendownload" onclick="image_mass_download_options();" />'."\n";
 		//item jump
-		echo '<img style="margin:0px 5px 0px 0px; border:0; padding:0; cursor:pointer; float:right;" src="images/icons/24x24/next.png" alt="Zu Shopartikel springen" title="Zu Shopartikel springen" onclick="artnr_jump();" />'."\n";
+		echo '<img style="margin:0px 5px 0px 0px; border:0; padding:0; cursor:pointer; float:right;" src="'.PATH.'images/icons/24x24/next.png" alt="Zu Shopartikel springen" title="Zu Shopartikel springen" onclick="artnr_jump();" />'."\n";
 	}
 	echo '</h1>'."\n";
 
@@ -2922,21 +2717,6 @@
 	echo '	</table>';
 	echo '</div>';
 
-
-	//PRICE RESEARCH DIALOG
-	echo '<div id="price_research_dialog" style="display:none;">';
-	echo '</div>';
-
-
-	//PRICE RESEARCH STATS DIALOG
-	echo '<div id="price_research_stats_dialog" style="display:none;">';
-	echo '</div>';
-
-
-	//PRICE RESEARCH REMOVE DIALOG
-	echo '<div id="price_research_remove_dialog" style="display:none;">';
-	echo '	Sind Sie sicher, dass Sie die Preisrecherche löschen möchten?';
-	echo '</div>';
 
 	//VIEW
 	echo '<div id="view">';

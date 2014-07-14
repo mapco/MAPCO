@@ -27,10 +27,10 @@
 	{
 		$query="SELECT * FROM cms_users WHERE id_user=".$_SESSION["id_user"].";";
 		$results=q($query, $dbweb, __FILE__, __LINE__);
-		$row=mysql_fetch_array($results);
-		$query="SELECT * FROM kunde WHERE KUND_NR='".$row["username"]."';";
+		$row=mysqli_fetch_array($results);
+		$query="SELECT * FROM kunde WHERE ADR_ID='".$row["idims_adr_id"]."';";
 		$results=q($query, $dbshop, __FILE__, __LINE__);
-		if (mysql_num_rows($results)>0) $gewerblich=true;
+		if (mysqli_num_rows($results)>0) $gewerblich=true;
 	}
 	*/
 	
@@ -43,7 +43,7 @@
 	else
 		$query="SELECT * FROM shop_carts WHERE session_id='".session_id()."';";
 	$results=q($query, $dbshop, __FILE__, __LINE__);
-	while($row=mysql_fetch_array($results))
+	while($row=mysqli_fetch_array($results))
 	{
 		$price=get_prices($row["item_id"], $row["amount"]);
 		$amount+=$row["amount"];
@@ -51,7 +51,7 @@
 	}
 	echo '<a href="'.str_replace("http:", "https:", PATHLANG).'online-shop/kasse/" style="margin:25px 0px 0px 57px; display:inline; float:left;">'.$amount.' '.t("Artikel").' <br /> '.number_format($total, 2).' €</a>';
 	echo '<a class="button" style="margin:5px 0px 0px 5px; float:left;" href="'.str_replace("http:", "https:", PATHLANG).'online-shop/kasse/">'.t("Weiter zur Kasse").'</a>';
-	if (mysql_num_rows($results)>0)
+	if (mysqli_num_rows($results)>0)
 	{
 		echo '<ul><li>';
 		echo '<table class="hover">';
@@ -67,7 +67,7 @@
 		$total=0;
 		$price2=array();
 		$results=q($query, $dbshop, __FILE__, __LINE__);
-		while($row=mysql_fetch_array($results))
+		while($row=mysqli_fetch_array($results))
 		{
 			$price2=get_prices($row["id_item"], $row["amount"]);
 			echo '<tr>';

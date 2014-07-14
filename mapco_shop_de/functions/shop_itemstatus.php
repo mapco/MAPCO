@@ -88,10 +88,9 @@
 				$results=q("SELECT * FROM lagerrc WHERE RCNR=40 AND ARTNR='".$artnr."';", $dbshop, __FILE__, __LINE__);
 				if( mysqli_num_rows($results)==0 )
 				{
-					$row["RCBEZ"]="DEPOT Baratta Italien";
 					$row["ISTBESTAND"]=0;
 					$status .= '	<tr>';
-					$status .= '		<td>MAPCO '.str_replace("_", " ", $row["RCBEZ"]).'</td>';
+					$status .= '		<td>MAPCO '.str_replace("_", " ", "DEPOT Baratta Italien").'</td>';
 					if ($row["ISTBESTAND"]>10) $color='#008000';
 					elseif ($row["ISTBESTAND"]>0) $color='#000080';
 					else $color='#b30000';
@@ -104,7 +103,7 @@
 				while($row=mysqli_fetch_array($results))
 				{
 					$status .= '	<tr>';
-					$status .= '		<td>MAPCO '.str_replace("_", " ", $row["RCBEZ"]).'</td>';
+					$status .= '		<td>MAPCO '.str_replace("_", " ", "DEPOT Baratta Italien").'</td>';
 					if ($row["ISTBESTAND"]>10) $color='#008000';
 					elseif ($row["ISTBESTAND"]>0) $color='#000080';
 					else $color='#b30000';
@@ -122,10 +121,9 @@
 				$results=q("SELECT * FROM lagerrc WHERE RCNR=39 AND ARTNR='".$artnr."';", $dbshop, __FILE__, __LINE__);
 				if( mysqli_num_rows($results)==0 )
 				{
-					$row["RCBEZ"]="DEPOT Chassieu France";
 					$row["ISTBESTAND"]=0;
 					$status .= '	<tr>';
-					$status .= '		<td>MAPCO '.str_replace("_", " ", $row["RCBEZ"]).'</td>';
+					$status .= '		<td>MAPCO '.str_replace("_", " ", "DEPOT Chassieu France").'</td>';
 					if ($row["ISTBESTAND"]>10) $color='#008000';
 					elseif ($row["ISTBESTAND"]>0) $color='#000080';
 					else $color='#b30000';
@@ -138,7 +136,7 @@
 				while($row=mysqli_fetch_array($results))
 				{
 					$status .= '	<tr>';
-					$status .= '		<td>MAPCO '.str_replace("_", " ", $row["RCBEZ"]).'</td>';
+					$status .= '		<td>MAPCO '.str_replace("_", " ", "DEPOT Chassieu France").'</td>';
 					if ($row["ISTBESTAND"]>10) $color='#008000';
 					elseif ($row["ISTBESTAND"]>0) $color='#000080';
 					else $color='#b30000';
@@ -157,7 +155,7 @@
 				while($row=mysqli_fetch_array($results))
 				{
 					$status .= '	<tr>';
-					$status .= '		<td>MAPCO RegionalCENTER '.str_replace("_", " ", $row["RCBEZ"]).'</td>';
+					$status .= '		<td>'.str_replace("_", " ", $shop["title"]).'</td>';
 					if ($row["ISTBESTAND"]>10) $color='#008000';
 					elseif ($row["ISTBESTAND"]>0) $color='#000080';
 					else $color='#b30000';
@@ -182,8 +180,11 @@
 		function itemstatus_rc($id_item, $mail=0, $amount=1)
 		{
 			global $dbshop;
-			
-			$results=q("SELECT * FROM lagerrc AS a, shop_items AS b WHERE b.id_item='".$id_item."' AND b.MPN=a.ARTNR AND a.RCNR='".$_SESSION["rcid"]."' LIMIT 1;", $dbshop, __FILE__, __LINE__);
+
+				
+			$results=q("SELECT * FROM shop_shops WHERE id_shop=".$_SESSION["id_shop"].";", $dbshop, __FILE__, __LINE__);
+			$shop=mysqli_fetch_array($results);
+			$results=q("SELECT * FROM lagerrc AS a, shop_items AS b WHERE b.id_item='".$id_item."' AND b.MPN=a.ARTNR AND a.RCNR='".$shop["RCNR"]."' LIMIT 1;", $dbshop, __FILE__, __LINE__);
 			$row=mysqli_fetch_array($results);
 			
 			$status  = '<div id="itemstatus">';
@@ -207,27 +208,33 @@
 				if ($row["BESTAND"]==1 or $row["BESTAND"]==2 or $row["BESTAND"]==3)
 				{
 					$color='#008000';
-					$best=t("in").' '.$_SESSION["rcbez"].' '.t("vorrätig");
+					$best=t("in").' '.$shop["title"].' '.t("vorrätig");
 				}
 				else
 				{
-					$results2=q("SELECT * FROM lager AS a, shop_items AS b WHERE b.id_item=".$id_item." AND b.MPN=a.ArtNr LIMIT 1;", $dbshop, __FILE__, __LINE__);
-					$row2=mysqli_fetch_array($results2);
-					if ($row2["Bestand"]==1)
-					{
-						$color='#DE9800';
-						$best=t("in der Zentrale vorrätig");
-					}
-					else 
-					{
-						$color='#000080';
-						$best=t("Liefertermin auf Anfrage");
-					}
+					$color='#a80000';
+					$best=t("in").' '.$shop["title"].' '.t("nicht vorrätig");
 				}
+
+				$results2=q("SELECT * FROM lager AS a, shop_items AS b WHERE b.id_item=".$id_item." AND b.MPN=a.ArtNr LIMIT 1;", $dbshop, __FILE__, __LINE__);
+				$row2=mysqli_fetch_array($results2);
+				if ($row2["Bestand"]==1)
+				{
+					$color_z='#DE9800';
+					$best_z=t("in der Zentrale vorrätig");
+				}
+				else 
+				{
+					$color_z='#a80000';
+					$best_z=t("in der Zentrale nicht vorrätig");
+				}
+
 
 //				$status .= '<a href="'.PATHLANG.'online-shop/status/'.$id_item.'/'.$artnr.'" style="color:'.$color.';">'.$best.'</a>';
 	
-				$status .= '<span style="color:'.$color.';">'.$best.'</span>';
+				$status .= '<span style="color:'.$color.';">- '.$best.'</span>';
+				$status .= '<br />';
+				$status .= '<span style="color:'.$color_z.';">- '.$best_z.'</span>';
 				$status .= '<ul><li>';
 				$status .= '<table class="hover" style="width:400px;">';
 				$status .= '	<tr>';
@@ -252,7 +259,7 @@
 		
 				//RegionalCenter
 				$status .= '	<tr>';
-				$status .= '		<td>MAPCO RegionalCENTER '.$_SESSION["rcbez"].'</td>';
+				$status .= '		<td>'.$shop["title"].'</td>';
 				if ($row["BESTAND"]==0) $color='#000080';
 				elseif ($row["BESTAND"]==3) $color='#DE9800';
 				elseif ($row["BESTAND"]==2) $color='#008000';
@@ -324,7 +331,7 @@
 				while($row=mysqli_fetch_array($results))
 				{
 					$status .= '	<tr>';
-					$status .= '		<td>MAPCO RegionalCENTER '.str_replace("_", " ", $row["RCBEZ"]).'</td>';
+					$status .= '		<td>'.str_replace("_", " ", $shop["title"]).'</td>';
 					if ($row["BESTAND"]==0) $color='#b30000';
 					elseif ($row["BESTAND"]==3) $color='#000080';
 					elseif ($row["BESTAND"]==2) $color='#000080';

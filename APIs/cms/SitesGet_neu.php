@@ -5,14 +5,22 @@
 	***** Author Sven E. *****
 	*** Lastmod 28.03.2014 ***
 	*************************/
+
+	//define("TBL_CMS_SITES_LANGUAGES", "cms_sites_languages_dev");	// dev
+	define("TBL_CMS_SITES_LANGUAGES", "cms_sites_languages");	// prod
+	
+	define("TBL_CMS_LANGUAGES", "cms_languages");	
+	
+	define("TBL_CMS_SITES", "cms_sites");		
+	
 		
-	$results=q("SELECT id_language, language FROM cms_languages;", $dbweb, __FILE__, __LINE__);
+	$results=q("SELECT id_language, language FROM ".TBL_CMS_LANGUAGES.";", $dbweb, __FILE__, __LINE__);
 	while($row=mysqli_fetch_array($results))
 	{
 		$languages[$row['id_language']] = $row['language'];
 	}
 		
-	$results=q("SELECT id_site, title, description, domain, template, google_analytics FROM cms_sites;", $dbweb, __FILE__, __LINE__);
+	$results=q("SELECT id_site, title, description, domain, template, google_analytics FROM ".TBL_CMS_SITES.";", $dbweb, __FILE__, __LINE__);
 	while($row=mysqli_fetch_array($results))
 	{
 		$sites[$row['id_site']]['site_title'] = $row['title'];
@@ -25,7 +33,7 @@
 	}
 	
 	$site_ids = implode(",", $site_ids);
-	$results=q("SELECT site_id, language_id, fallback_language_id FROM cms_sites_languages WHERE site_id IN (".$site_ids.");", $dbweb, __FILE__, __LINE__);
+	$results=q("SELECT site_id, language_id, fallback_language_id FROM ".TBL_CMS_SITES_LANGUAGES." WHERE site_id IN (".$site_ids.") ORDER BY `ordering` ASC;", $dbweb, __FILE__, __LINE__);
 	while($row=mysqli_fetch_array($results))
 	{
 		$sites[$row['site_id']]['languages'][$row['language_id']]['language'] = $languages[$row['language_id']];

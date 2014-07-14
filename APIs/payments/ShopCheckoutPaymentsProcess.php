@@ -241,7 +241,7 @@
 				
 				//$paypal_checkout_response = $response->Response[0];
 				$paypal_checkout_response = $response;
-				if ( (string)$paypal_checkout_response->Ack[0] == "Failure" || (string)$paypal_checkout_response->Ack[0] == "FailureWithWarning" )				{
+				if ( (string)$paypal_checkout_response->ACK[0] == "Failure" || (string)$paypal_checkout_response->ACK[0] == "FailureWithWarning" )				{
 					$paypal_errorcode = (int)$paypal_checkout_response->L_ERRORCODE0[0];
 					$paypal_errorshort = (string)$paypal_checkout_response->L_SHORTMESSAGE0[0];
 					$paypal_errorlong = (string)$paypal_checkout_response->L_LONGMESSAGE0[0];
@@ -302,12 +302,15 @@
 				$postfield["APIRequest"] = "OrderUpdate";
 				$postfield["mode"] = "shop";
 				$postfield["SELECTOR_id_order"] = $order_id;
-				//$postfield["status_id"] = $status_id;
-				//$postfield["status_date"] = time();
+				$postfield["status_id"] = $status_id;
+				$postfield["status_date"] = time();
 				$postfield["Payments_TransactionID"] = $txn_id;
 				$postfield["Payments_TransactionState"] = $payment_state;
 				$postfield["PayPal_PendingReason"] = $pending_reason;
 				$postfield["Payments_TransactionStateDate"] = time();
+				$postfield["firstmod"] = time();
+				$postfield["firstmod_user"] = $_SESSION["checkout_user_id"];
+
 				if ( $buyernote != "")
 				{
 					$postfield["PayPal_BuyerNote"] = $buyernote;
@@ -357,12 +360,15 @@
 					$errorID	 = (int)$response->xpath($error_type.'/ErrorID');
 					$errortext = "Service-Fehler. ErrorID: ".$errorID[0]." ErrorCode: ".$error_code[0]." SESSION-Variablen: ".print_r($_SESSION, true)." GET-Variablen: ".print_r($_GET, true);
 			
+				/*
+				ab hier keinen fehler mehr ausgeben, da ZAHLUNG schon durch	
 					//FRONEND FEHLERAUSGABE	
 					$error = show_error(11357, 12, __FILE__, __LINE__, $errortext, true);
 					//ÜBERGABE AN SESSION FÜR AUSGABE IN CHECKOUT PROCESS
 					$_SESSION["checkout"]["error_code"] = $error[$error["Ack"]]["Code"];
 					$_SESSION["checkout"]["error_id"] 	= $error[$error["Ack"]]["ErrorID"];
-					service_exit();
+				*/
+				//	service_exit();
 				}
 				
 				//SET EVENT ID
@@ -387,12 +393,15 @@
 					$error_code  = $response->xpath($error_type.'/Code');
 					$errorID	 = $response->xpath($error_type.'/ErrorID');
 					$errortext = "Service-Fehler. ErrorType: ".$error_type."/". (string)$response->Ack[0]."  ErrorID: ".(int)$errorID[0]." ErrorCode: ".(int)$error_code[0]." SESSION-Variablen: ".print_r($_SESSION, true)." GET-Variablen: ".print_r($_GET, true);
-			
+					/*
+				ab hier keinen fehler mehr ausgeben, da order schon geschrieben	
+		
 					//FRONEND FEHLERAUSGABE	
 					$error = show_error(11357, 12, __FILE__, __LINE__, $errortext, true);
 					//ÜBERGABE AN SESSION FÜR AUSGABE IN CHECKOUT PROCESS
 					$_SESSION["checkout"]["error_code"] = $error[$error["Ack"]]["Code"];
 					$_SESSION["checkout"]["error_id"] 	= $error[$error["Ack"]]["ErrorID"];
+					*/
 					service_exit();
 				}
 				
@@ -407,7 +416,7 @@
 					{
 						$status_id = 1;	
 					}
-
+/*
 				//UPDATE ORDER
 				$postfield = array();
 				$postfield["API"] = "shop";
@@ -433,7 +442,7 @@
 					$_SESSION["checkout"]["error_id"] 	= $error[$error["Ack"]]["ErrorID"];
 					service_exit();
 				}
-				
+	*/			
 			}
 			
 			elseif ( $getvars2 == "cancel" ) 
@@ -442,7 +451,7 @@
 				$errortext = "SESSION-Variablen: ".print_r($_SESSION, true)." GET-Variablen: ".print_r($_GET, true);
 				
 				//FRONEND FEHLERAUSGABE
-				$error = show_error(11358, 1, __FILE__, __LINE__, $errortext, true);
+				$error = show_error(11358, 12, __FILE__, __LINE__, $errortext, true);
 				//ÜBERGABE AN SESSION FÜR AUSGABE IN CHECKOUT PROCESS
 				$_SESSION["checkout"]["error_code"] = $error[$error["Ack"]]["Code"];
 				$_SESSION["checkout"]["error_id"] 	= $error[$error["Ack"]]["ErrorID"];
@@ -453,7 +462,7 @@
 			$errortext = "SESSION-Variablen: ".print_r($_SESSION, true)." GET-Variablen: ".print_r($_GET, true);
 			
 			//FRONEND FEHLERAUSGABE
-			$error = show_error(11358, 1, __FILE__, __LINE__, $errortext, true);
+			$error = show_error(11358, 12, __FILE__, __LINE__, $errortext, true);
 			//ÜBERGABE AN SESSION FÜR AUSGABE IN CHECKOUT PROCESS
 			$_SESSION["checkout"]["error_code"] = $error[$error["Ack"]]["Code"];
 			$_SESSION["checkout"]["error_id"] 	= $error[$error["Ack"]]["ErrorID"];
@@ -472,7 +481,8 @@
 			$postfield["APIRequest"] 	= "PayPalExpressCheckoutSet";
 			$postfield["order_id"] 		= $order_id;
 			
-			$response = soa3($postfield, __FILE__, __LINE__, "obj");
+		 	$response = soa3($postfield, __FILE__, __LINE__, "obj");
+
 
 			//SERVICE RESPONSE CHECK
 			if ( (string)$response->Ack[0] != "Success" )
@@ -503,7 +513,7 @@
 
 			//PAYPAL RESPONSE CHECK
 			$paypal_checkout_response = $response;
-			if ( (string)$paypal_checkout_response->Ack[0] == "Failure" || (string)$paypal_checkout_response->Ack[0] == "FailureWithWarning" )
+			if ( (string)$paypal_checkout_response->ACK[0] == "Failure" || (string)$paypal_checkout_response->ACK[0] == "FailureWithWarning" )
 			{
 				$paypal_errorcode = (int)$paypal_checkout_response->L_ERRORCODE0[0];
 				$paypal_errorshort = (string)$paypal_checkout_response->L_SHORTMESSAGE0[0];
@@ -533,6 +543,11 @@
 				$error = show_error($paypal_errorcode, 13, __FILE__, __LINE__, $errortext, false);
 			}
 			
+	/*		
+			echo "orderid:".$_SESSION['checkout_order_id']."<br />";
+			print_r($paypal_checkout_response);
+			exit;
+		*/	
 			$token = (string)$paypal_checkout_response->TOKEN[0];
 			$paypal_url = (string)$paypal_checkout_response->paypal_url[0];
 			
@@ -683,6 +698,8 @@
 		$postfield["SELECTOR_id_order"] = $order_id;
 		$postfield["status_id"] = $status_id;
 		$postfield["status_date"] = time();
+		$postfield["firstmod"] = time();
+		$postfield["firstmod_user"] = $_SESSION["checkout_user_id"];
 		
 		$response = soa3($postfield, __FILE__, __LINE__, "obj");
 		if ( (string)$response->Ack[0] != "Success" )

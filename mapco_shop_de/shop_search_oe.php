@@ -5,13 +5,24 @@
 	include("functions/shop_itemstatus.php");
 	include("functions/cms_t.php");
 
+	$i=2;
+	while ( isset($_GET["getvars".$i]) and $_GET["getvars".$i]!="" )
+	{
+		if( $_GET["getvars1"]!="" ) $_GET["getvars1"].="/";
+		$_GET["getvars1"].=$_GET["getvars".$i];
+		$i++;
+	}
+	if ( isset($_GET["getvars1"]) ) $_POST["search"]=$_GET["getvars1"];
+
 	//undefined index debug
 	if ( !isset($_POST["search"]) ) $_POST["search"]="";
 
 	//redirect to item if unique
 	if ( $_POST["search"]!="" and strlen($_POST["search"]>3) )
 	{
-		$results=q("SELECT * FROM shop_items WHERE MPN='".mysqli_real_escape_string($dbshop, $_POST["search"])."';", $dbshop, __FILE__, __LINE__);
+		$results=q("SELECT * FROM shop_items WHERE MPN='".mysqli_real_escape_string($dbshop, $_POST["search"])."' and active=1
+				    UNION
+					SELECT * FROM shop_items WHERE EAN='".mysqli_real_escape_string($dbshop, $_POST["search"])."' and active=1;", $dbshop, __FILE__, __LINE__);
 		if ( mysqli_num_rows($results)==1 )
 		{
 			$row=mysqli_fetch_array($results);
@@ -55,7 +66,7 @@
 			while( $row3=mysqli_fetch_array($results3) )
 			{
 				$oenr=$row3["OENr"];
-				$results=q("SELECT * FROM shop_items WHERE MPN='".$row3["ArtNr"]."';", $dbshop, __FILE__, __LINE__);
+				$results=q("SELECT * FROM shop_items WHERE MPN='".$row3["ArtNr"]."'and active=1;", $dbshop, __FILE__, __LINE__);
 				if ( mysqli_num_rows($results)>0 )
 				{
 					while($row=mysqli_fetch_array($results))

@@ -23,7 +23,7 @@
 	echo '		<th>Lieferstatus</th>';
 	echo '	</tr>';
 	$results=q("SELECT * FROM lagerrc WHERE ARTNR='".$_GET["artnr"]."';", $dbshop, __FILE__, __LINE__);
-	while($row=mysql_fetch_array($results))
+	while($row=mysqli_fetch_array($results))
 	{
 		echo '	<tr>';
 		echo '		<td>MAPCO RegionalCENTER '.str_replace("_", " ", $row["RCBEZ"]).'</td>';

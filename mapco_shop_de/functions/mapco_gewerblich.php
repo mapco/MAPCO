@@ -16,6 +16,7 @@
 				if(mysqli_num_rows($results)>0) $gewerblich=true; 
 				//$row=mysqli_fetch_array($results);
 				//if ($row["GEWERBE"]>0 or $row["KUND_NR"]) $gewerblich=true;
+				//if ($row["GEWERBE"]>0) $gewerblich=true;
 			}
 			return($gewerblich);
 		}

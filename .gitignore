@@ -2,6 +2,7 @@
 /.idea/
 /1431/
 _notes/
+/vendor/
 /mapco_shop_de/.idea/
 /mapco_shop_de/.git/
 /mapco_shop_de/catalog/
@@ -24,3 +25,4 @@ _notes/
 *.dat
 *.pdf
 *.tmp
+*.DDD

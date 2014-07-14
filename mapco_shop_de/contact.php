@@ -91,6 +91,7 @@
 
 	echo '<div id="mid_column">';
 	
+	//mapco.de menu
 	if($_SESSION["id_site"]==1)
 	{
 		//link menu	
@@ -172,7 +173,127 @@
 	}
 
 
+	//RC Neubrandenburg
+	if($_SESSION["id_site"]==8)
+	{
+		show_department(18); //RegionalCENTER Neubrandenburg Innendienst
+		show_department(17); //RegionalCENTER Neubrandenburg Außendienst
+		show_department(4); //Vertrieb Deutschland - Verkaufsleitung
+		show_department(33); //Vertrieb Deutschland - Außendienst
+		show_department(14); //Vertrieb Deutschland - Innendienst
+	}
+
+
+	//RC Leipzig
+	if($_SESSION["id_site"]==9)
+	{
+		show_department(20); //RegionalCENTER Leipzig Innendienst
+		show_department(19); //RegionalCENTER Leipzig Außendienst
+		show_department(4); //Vertrieb Deutschland - Verkaufsleitung
+		show_department(33); //Vertrieb Deutschland - Außendienst
+		show_department(14); //Vertrieb Deutschland - Innendienst
+	}
+
+
+	//RC Sömmerda
+	if($_SESSION["id_site"]==10)
+	{
+		show_department(22); //RegionalCENTER Sömmerda
+		show_department(21); //RegionalCENTER Sömmerda Außendienst
+		show_department(4); //Vertrieb Deutschland - Verkaufsleitung
+		show_department(33); //Vertrieb Deutschland - Außendienst
+		show_department(14); //Vertrieb Deutschland - Innendienst
+	}
+
+
+	//RC Dresden
+	if($_SESSION["id_site"]==11)
+	{
+ 		show_department(24); //RegionalCENTER Dresden Innendienst
+ 		show_department(23); //RegionalCENTER Dresden Außendienst
+		show_department(4); //Vertrieb Deutschland - Verkaufsleitung
+		show_department(33); //Vertrieb Deutschland - Außendienst
+		show_department(14); //Vertrieb Deutschland - Innendienst
+	}
+
+
+	//RC Magdeburg
+	if($_SESSION["id_site"]==12)
+	{
+		show_department(26); //RegionalCENTER Magdeburg
+		show_department(25); //RegionalCENTER Magdeburg Außendienst
+		show_department(4); //Vertrieb Deutschland - Verkaufsleitung
+		show_department(33); //Vertrieb Deutschland - Außendienst
+		show_department(14); //Vertrieb Deutschland - Innendienst
+	}
+
+
+	//RC Frankfurt
+	if($_SESSION["id_site"]==13)
+	{
+		show_department(28); //RegionalCENTER Frankfurt/Main Innendienst
+		show_department(27); //RegionalCENTER Frankfurt/Main Außendienst
+		show_department(4); //Vertrieb Deutschland - Verkaufsleitung
+		show_department(33); //Vertrieb Deutschland - Außendienst
+		show_department(14); //Vertrieb Deutschland - Innendienst
+	}
+
+
+	//RC Berlin
+	if($_SESSION["id_site"]==14)
+	{
+		show_department(30); //RegionalCENTER Berlin Innendienst
+		show_department(29); //RegionalCENTER Berlin Außendienst
+		show_department(4); //Vertrieb Deutschland - Verkaufsleitung
+		show_department(33); //Vertrieb Deutschland - Außendienst
+		show_department(14); //Vertrieb Deutschland - Innendienst
+	}
+
+	//RC Essen
+	if($_SESSION["id_site"]==15)
+	{
+		show_department(32); //RegionalCENTER Essen Innendienst
+		show_department(31); //RegionalCENTER Essen Außendienst
+		show_department(4); //Vertrieb Deutschland - Verkaufsleitung
+		show_department(33); //Vertrieb Deutschland - Außendienst
+		show_department(14); //Vertrieb Deutschland - Innendienst
+	}
+
+	//RC Roma
+	if($_SESSION["id_site"]==16)
+	{
+		show_department(7); //Vertrieb Export - Innendienst
+		show_department(8); //Vertrieb Export - Außendienst
+	}
+
+	//mapco-handel.de
+	if($_SESSION["id_site"]==17)
+	{
+		show_department(4); //Vertrieb Deutschland - Verkaufsleitung
+		show_department(14); //Vertrieb Deutschland - Innendienst
+		show_department(33); //Vertrieb Deutschland - Außendienst
+		show_department(29); //RegionalCENTER Berlin Außendienst
+		show_department(30); //RegionalCENTER Berlin Innendienst
+ 		show_department(23); //RegionalCENTER Dresden Außendienst
+ 		show_department(24); //RegionalCENTER Dresden Innendienst
+		show_department(31); //RegionalCENTER Essen Außendienst
+		show_department(32); //RegionalCENTER Essen Innendienst
+		show_department(27); //RegionalCENTER Frankfurt/Main Außendienst
+		show_department(28); //RegionalCENTER Frankfurt/Main Innendienst
+		show_department(19); //RegionalCENTER Leipzig Außendienst
+		show_department(20); //RegionalCENTER Leipzig Innendienst
+		show_department(25); //RegionalCENTER Magdeburg Außendienst
+		show_department(26); //RegionalCENTER Magdeburg
+		show_department(17); //RegionalCENTER Neubrandenburg Außendienst
+		show_department(18); //RegionalCENTER Neubrandenburg Innendienst
+		show_department(21); //RegionalCENTER Sömmerda Außendienst
+		show_department(22); //RegionalCENTER Sömmerda
+		show_department(36); //MAPCO Shop Brück
+		show_department(2); //Product Management
+	}
+
 	echo '</div>';
+
 
 	include("templates/".TEMPLATE."/cms_rightcolumn.php");
 	include("templates/".TEMPLATE."/footer.php");

@@ -15,4 +15,5 @@
 <file name="AmazonOfferImportJob.php" server="www.mapco.de/public_html/" local="130492789866193047" remote="130492789800000000" Dst="2" />
 <file name="AmazonInventoryImportJob.php" server="www.mapco.de/public_html/" local="130482612997471059" remote="130482612600000000" Dst="2" />
 <file name="AmazonReportJob.php" server="www.mapco.de/public_html/" local="130482613314249177" remote="130482613200000000" Dst="2" />
+<file name="JOBHANDLER.php" server="www.mapco.de/public_html/" local="130462568400000000" remote="130462568400000000" Dst="2" />
 </dwsync>

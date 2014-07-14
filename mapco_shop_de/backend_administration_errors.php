@@ -80,6 +80,7 @@
 					if($xml.find('geloescht').length != 0)
 					{
 						show_dialog_delete_errors(id_errorcode);
+						change_view(1);
 					}
 				});
 			}

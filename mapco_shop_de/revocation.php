@@ -3,14 +3,17 @@
 //	exit;
 	include("config.php");
 
-	function startsWith($check, $startStr)
+	if (!function_exists("startsWith"))
 	{
-        if (!is_string($check) || !is_string($startStr) || strlen($check)<strlen($startStr)) {
-            return false;
-        }
-
-        return (substr($check, 0, strlen($startStr)) === $startStr);
-    }
+		function startsWith($check, $startStr)
+		{
+			if (!is_string($check) || !is_string($startStr) || strlen($check)<strlen($startStr)) {
+				return false;
+			}
+	
+			return (substr($check, 0, strlen($startStr)) === $startStr);
+		}
+	}
 
 	//redirect e8b4e947 / 2169bbd1 / a8a60b92
 	if ( ($_SERVER['REQUEST_URI']=="/e8b4e947" or $_SERVER['REQUEST_URI']=="/2169bbd1" or $_SERVER['REQUEST_URI']=="/a8a60b92") and $_SERVER["SERVER_NAME"]==LIVE)

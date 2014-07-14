@@ -3,7 +3,6 @@
 	include("templates/".TEMPLATE."/header.php");
 	include("functions/cms_url_encode.php");
 	
-
 	//left column
 	include("templates/".TEMPLATE."/cms_leftcolumn.php");
 	
@@ -25,14 +24,14 @@
 			{
 				$row4=mysqli_fetch_array($results4);
 				$filename='files/'.floor(bcdiv($row4["id_file"], 1000)).'/'.$row4["id_file"].'.'.$row4["extension"];
-				echo '<a href="'.PATHLANG.'presse/mapco-tv/'.$row["id_article"].'/'.url_encode($row["title"]).'" title="'.$row["title"].'">';
+				echo '<a href="'.PATHLANG.'news/'.$row["id_article"].'/'.url_encode($row["title"]).'" title="'.$row["title"].'">';
 				echo '	<img src="'.PATH.$filename.'" alt="'.$row["title"].'" title="'.$row["title"].'" />';
 				echo '</a>';
 				echo '<br /><br />';
 			}
 		}
 		echo '<p>'.$row["introduction"].'</p>';
-		echo '<p><a style="font-size:14px; float:right;" href="'.PATHLANG.'presse/mapco-tv/'.$row["id_article"].'/'.url_encode($row["title"]).'" title="'.$row["title"].'">'.t("ansehen").'</a></p>';
+		echo '<p><a style="font-size:14px; float:right;" href="'.PATHLANG.'news/'.$row["id_article"].'/'.url_encode($row["title"]).'" title="'.$row["title"].'">'.t("ansehen").'</a></p>';
 		echo '<br style="clear:both;" /><hr />';
 	}
 	echo '</div>';

@@ -13,8 +13,7 @@
 			//call only if limit is reached
 			$skip=false;
 			$skipreason="";
-//			if( $Call[$i]=="EndItem" ) $limit=10000; else $limit=400;
-			$limit=500;
+			if( $Call[$i]=="EndItem" ) $limit=10000; else $limit=400;
 			$ebay_auctions_results=q("SELECT COUNT(id_auction) FROM ebay_auctions WHERE upload=1 AND accountsite_id=".$accountsite[$i]." AND `Call`='".$Call[$i]."';", $dbshop, __FILE__, __LINE__);
 			$row=mysqli_fetch_array($ebay_auctions_results);
 			$payloadcount=$row["COUNT(id_auction)"];

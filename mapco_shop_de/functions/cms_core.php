@@ -3,6 +3,27 @@
 	//*     CMS CORE FUNCTIONS
 	//************************
 
+
+
+// cms core user function (userClass)
+
+/**
+ *	Set user data for insert
+ */
+function setInsertUserData($userID)
+{
+	$time = time();
+	($userID != null) ? $user = $userID : $user =  $_SESSION["id_user"];
+		
+	$data = array();
+	$data['firstmod'] = $time;
+	$data['firstmod_user'] = $user;
+	$data['lastmod'] = $time;
+	$data['lastmod_user'] = $user;
+	return $data;	
+}
+
+
 /**
  *	Amazon Submit
  *

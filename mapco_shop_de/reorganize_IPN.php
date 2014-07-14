@@ -180,7 +180,7 @@ $business=str_replace("%40","@",$business);
 		else 
 		{
 			$accountName="AUTOPARTNER_ONLINESHOP";
-			$varField["usertoken"]="merci2664";
+			$varField["usertoken"]="YoeBdHw035a9Ai0KkKDtHBaPorF5rGTquEGXPZ4GU7gqAaCcsM";
 			$varField["paymentTransactionID"]=$txn_id;
 	echo $txn_id.'<br />';
 			$varField["API"]="payments";

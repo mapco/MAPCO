@@ -11,9 +11,9 @@
 		{
 			$results=q("SELECT * FROM shop_carts WHERE item_id=".$_GET["id_item"]." AND session_id='".session_id()."';", $dbshop, __FILE__, __LINE__);
 		}
-		if (mysql_num_rows($results)>0)
+		if (mysqli_num_rows($results)>0)
 		{
-			$row=mysql_fetch_array($results);
+			$row=mysqli_fetch_array($results);
 			$results=q("UPDATE shop_carts SET amount='".($row["amount"]+$_GET["amount"])."' WHERE id_carts='".$row["id_carts"]."';", $dbshop, __FILE__, __LINE__);
 			echo 'Die Menge wurde erfolgreich aktualisiert..';
 		}

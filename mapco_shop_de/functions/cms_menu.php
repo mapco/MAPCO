@@ -6,17 +6,19 @@
 			if (sizeof($menu)>0) {
 				for($i=0; $i<sizeof($menu["title"]); $i++)
 				{
-					if ($menu["menuitem_id"][$i]==$id) {
+					if ($menu["menuitem_id"][$i]==$id)
+					{
 						$parse=parse_url($menu["link"][$i]);
 						$link=$parse["path"];
-						if (isset($userrights[$link])) {
+						if ( $menu["local"][$i]==1 or isset($userrights[$link])) {
 							if (isset($_GET["id_menuitem"]) and $menu["id_menuitem"][$i]==$_GET["id_menuitem"]) $selected=' class="selected"'; else $selected='';
 							echo '<li>';
-							if ( !empty($menu["alias"][$i]) ) $link = PATHLANG . $menu["alias"][$i];
+							if ( $menu["home"][$i]==1 ) $link = PATHLANG;
+							elseif ( !empty($menu["alias"][$i]) ) $link = PATHLANG . $menu["alias"][$i];
 							else $link=PATH.$menu["link"][$i].'?lang=' . $_GET["lang"] . '&id_menuitem=' . $menu["id_menuitem"][$i];
-							echo '<a'.$selected.' href="'.str_replace(" ", "%20", $link).'" title="'.t($menu["description"][$i]).'">';
-							if ($icons) echo '<img src="'.PATH.$menu["icon"][$i].'" alt="'.t($menu["description"][$i]).'" title="'.t($menu["description"][$i]).'" />';
-							echo t($menu["title"][$i]).'</a>';
+							echo '<a'.$selected.' href="'.str_replace(" ", "%20", $link).'" title="'.$menu["description"][$i].'">';
+							if ($icons) echo '<img src="'.PATH.$menu["icon"][$i].'" alt="'.$menu["description"][$i].'" title="'.$menu["description"][$i].'" />';
+							echo $menu["title"][$i].'</a>';
 							$children=0;
 							for($j=0; $j<sizeof($menu["title"]); $j++)
 							{
@@ -70,20 +72,30 @@
 			$i=0;
 			while($row=mysqli_fetch_array($results))
 			{
+				$results2=q("SELECT * FROM cms_menuitems_languages WHERE language_id=".$_SESSION["id_language"]." AND menuitem_id=".$row["id_menuitem"].";", $dbweb,__FILE__, __LINE__);
+				if( mysqli_num_rows($results2)>0 )
+				{
+					$cms_menuitems_languages=mysqli_fetch_array($results2);
+				}
+				else
+				{
+					$results2=q("SELECT * FROM cms_menuitems_languages WHERE language_id=1 AND menuitem_id=".$row["id_menuitem"].";", $dbweb,__FILE__, __LINE__);
+					$cms_menuitems_languages=mysqli_fetch_array($results2);
+				}
 				$menu["id_menuitem"][$i]=$row["id_menuitem"];
+				$menu["home"][$i]=$row["home"];
 				$menu["icon"][$i]=$row["icon"];
-				$menu["description"][$i]=$row["description"];
-				$menu["title"][$i]=$row["title"];
+				$menu["description"][$i]=$cms_menuitems_languages["description"];
+				$menu["title"][$i]=$cms_menuitems_languages["title"];
 				$menu["menuitem_id"][$i]=$row["menuitem_id"];
 				$menu["link"][$i]=$row["link"];
-				$menu["alias"][$i]=$row["alias"];
+				$menu["alias"][$i]=$cms_menuitems_languages["alias"];
 				$i++;
 			}
 			//show menu
 			menu2list($menu, $id_menuitem, $userrights, $icons);
 		}
 	}
-
 
 	if (!function_exists("show_menu"))
 	{
@@ -120,13 +132,25 @@
 			$menu = array();
 			while($row=mysqli_fetch_array($results))
 			{
+				$results2=q("SELECT * FROM cms_menuitems_languages WHERE language_id=".$_SESSION["id_language"]." AND menuitem_id=".$row["id_menuitem"].";", $dbweb,__FILE__, __LINE__);
+				if( mysqli_num_rows($results2)>0 )
+				{
+					$cms_menuitems_languages=mysqli_fetch_array($results2);
+				}
+				else
+				{
+					$results2=q("SELECT * FROM cms_menuitems_languages WHERE language_id=1 AND menuitem_id=".$row["id_menuitem"].";", $dbweb,__FILE__, __LINE__);
+					$cms_menuitems_languages=mysqli_fetch_array($results2);
+				}
 				$menu["id_menuitem"][$i]=$row["id_menuitem"];
+				$menu["home"][$i]=$row["home"];
+				$menu["local"][$i]=$row["local"];
 				$menu["icon"][$i]=$row["icon"];
-				$menu["description"][$i]=$row["description"];
-				$menu["title"][$i]=$row["title"];
+				$menu["description"][$i]=$cms_menuitems_languages["description"];
+				$menu["title"][$i]=$cms_menuitems_languages["title"];
 				$menu["menuitem_id"][$i]=$row["menuitem_id"];
 				$menu["link"][$i]=$row["link"];
-				$menu["alias"][$i]=$row["alias"];
+				$menu["alias"][$i]=$cms_menuitems_languages["alias"];
 				$i++;
 			}
 			//show menu

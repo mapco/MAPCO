@@ -1,10 +1,10 @@
 <?php
 	/**************************************************
-	***	Class: MObject				***
-	***	Namespace: Mapco.Object			***
+	***	Class: MObject								***
+	***	Namespace: Mapco.Object						***
 	*** Author: C.Haendler <chaendler(at)mapco.de> 	*** 
-	***	Version: 1.1  		01/07/14/ 	***
-	***	Last mod: 01/07/14			***
+	***	Version: 1.0  		01/07/14/ 				***
+	***	Last mod: 01/07/14							***
 	***************************************************/
 
 	class MObject 

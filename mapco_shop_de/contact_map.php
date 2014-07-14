@@ -23,36 +23,36 @@
 	{
 		document.getElementById("locations").style.display='none';
 	}
-	function show_region(id_employee, e)
+	function show_region(id_contact, e)
 	{
 		var person=Array();
 		<?php
-		$results=q("SELECT * FROM hr_employees WHERE department='Vertrieb Deutschland - Außendienst';", $dbweb, __FILE__, __LINE__);
+		$results=q("SELECT * FROM cms_contacts WHERE department_id=33;", $dbweb, __FILE__, __LINE__);
 		while($row=mysqli_fetch_array($results))
 		{
-			echo "person[".$row["id_employee"]."] = new Object();\n";
-			echo "person[".$row["id_employee"]."]['name']='".$row["firstname"]." ".$row["lastname"]."';\n";
-			echo "person[".$row["id_employee"]."]['mail']='".$row["mail"]."';\n";
-			echo "person[".$row["id_employee"]."]['phone']='".$row["phone"]."';\n";
-			echo "person[".$row["id_employee"]."]['fax']='".$row["fax"]."';\n";
-			echo "person[".$row["id_employee"]."]['mobile']='".$row["mobile"]."';\n";
-			echo "person[".$row["id_employee"]."]['image']='".substr($row["mail"], 0, strpos($row["mail"], "@"))."';\n";
+			echo "person[".$row["id_contact"]."] = new Object();\n";
+			echo "person[".$row["id_contact"]."]['name']='".$row["firstname"]." ".$row["lastname"]."';\n";
+			echo "person[".$row["id_contact"]."]['mail']='".$row["mail"]."';\n";
+			echo "person[".$row["id_contact"]."]['phone']='".$row["phone"]."';\n";
+			echo "person[".$row["id_contact"]."]['fax']='".$row["fax"]."';\n";
+			echo "person[".$row["id_contact"]."]['mobile']='".$row["mobile"]."';\n";
+			echo "person[".$row["id_contact"]."]['image']='".substr($row["mail"], 0, strpos($row["mail"], "@"))."';\n";
 		}
 		?>
 		if (!e) var e=window.event;
 		mx=e.clientX;
 		my=e.clientY;
-		if (person[id_employee]!=undefined)
+		if (person[id_contact]!=undefined)
 		{
 			document.getElementById("infobox").style.left=+(mx+20) + "px";
 			document.getElementById("infobox").style.top=+(my+20) + "px";
 			text="";
-			text = text + '<img style="margin:0px 5px 2px 0px; float:left;" src="<?php echo PATH; ?>images/employees/' + person[id_employee]["image"] + '.jpg" />';
-			text = text + '<b>' + person[id_employee]["name"] + '</b>';
-			if (person[id_employee]["phone"]!="") text = text + "<br /><br />Telefon: "+person[id_employee]["phone"];
-			if (person[id_employee]["fax"]!="") text = text + "<br />Telefax: "+person[id_employee]["fax"];
-			if (person[id_employee]["mobile"]!="") text = text + "<br />Mobil: "+person[id_employee]["mobile"];
-			if (person[id_employee]["mail"]!="") text = text + "<br />E-Mail: "+person[id_employee]["mail"];
+			text = text + '<img style="margin:0px 5px 2px 0px; float:left;" src="<?php echo PATH; ?>images/employees/' + person[id_contact]["image"] + '.jpg" />';
+			text = text + '<b>' + person[id_contact]["name"] + '</b>';
+			if (person[id_contact]["phone"]!="") text = text + "<br /><br />Telefon: "+person[id_contact]["phone"];
+			if (person[id_contact]["fax"]!="") text = text + "<br />Telefax: "+person[id_contact]["fax"];
+			if (person[id_contact]["mobile"]!="") text = text + "<br />Mobil: "+person[id_contact]["mobile"];
+			if (person[id_contact]["mail"]!="") text = text + "<br />E-Mail: "+person[id_contact]["mail"];
 			document.getElementById("infobox").innerHTML=text;
 			document.getElementById("infobox").style.display="block";
 		}
@@ -188,10 +188,10 @@
 	echo '
 	<img src="'.PATH.'images/maps/germany_by_region.jpg" border="0" usemap="#Map" />
 <map name="Map" id="Map">
-  <area shape="poly" coords="71,205,85,215,91,227,101,228,110,228,119,228,125,230,139,224,164,234,163,247,169,254,169,266,171,278,160,287,144,293,141,317,130,323,137,330,129,345,142,349,151,346,163,372,167,399,153,398,123,394,118,401,93,389,73,389,60,386,43,362,36,341,38,317,46,302,37,284,37,268,34,260,49,235,40,223,40,208,57,206" href="#west" onmouseover="this.style.cursor = \'default\'"  onmousemove="show_region(1234680, event);" onmouseout="hide_info();" />
-  <area shape="poly" coords="168,375,206,376,201,359,208,334,232,322,243,318,250,330,256,338,273,331,295,328,301,320,326,323,337,332,348,340,361,334,366,347,365,365,418,404,435,426,432,437,419,441,377,468,384,482,393,499,399,516,389,518,374,501,348,502,312,512,284,524,263,517,252,515,239,531,227,524,207,512,197,508,177,502,162,503,147,496,134,496,135,510,126,510,93,511,84,499,105,437,126,403,125,398,144,398,163,399" href="#sued" onmouseover="this.style.cursor = \'default\'" onmousemove="show_region(1234666, event);" onmouseout="hide_info();" />
-  <area shape="poly" coords="75,206,76,190,97,179,83,159,96,154,108,122,102,115,103,100,133,91,148,93,152,104,159,101,178,86,187,83,200,81,185,68,177,53,194,49,165,29,169,20,187,23,217,29,237,32,243,38,240,48,261,51,282,53,288,41,298,53,285,68,276,74,291,76,307,76,324,68,342,58,355,50,369,50,385,37,399,45,417,65,428,85,439,103,437,132,429,141,451,161,450,169,459,185,462,210,441,224,420,228,414,233,384,224,360,221,344,221,333,228,309,231,296,225,281,235,270,244,254,235,233,224,212,218,203,224,188,227,197,237,186,245,173,255,162,242,155,234,138,224,129,231,105,229,89,224" href="#nord" onmouseover="this.style.cursor = \'default\'" onmousemove="show_region(1234661, event);" onmouseout="hide_info();" />
-  <area shape="poly" coords="462,212,466,225,475,236,480,257,471,268,459,263,446,259,443,270,399,287,376,301,351,305,350,315,354,335,342,338,323,328,305,325,296,319,273,324,268,331,257,325,245,317,233,320,213,329,204,347,201,371,189,375,162,376,149,356,142,346,131,341,136,327,143,313,146,292,163,281,169,271,168,256,187,244,195,235,189,227,208,219,232,225,258,234,274,240,293,227,312,233,331,227,348,218,381,221,414,233,444,221" href="#ost" onmouseover="this.style.cursor = \'default\'" onmousemove="show_region(1234591, event);" onmouseout="hide_info();" />
+  <area shape="poly" coords="71,205,85,215,91,227,101,228,110,228,119,228,125,230,139,224,164,234,163,247,169,254,169,266,171,278,160,287,144,293,141,317,130,323,137,330,129,345,142,349,151,346,163,372,167,399,153,398,123,394,118,401,93,389,73,389,60,386,43,362,36,341,38,317,46,302,37,284,37,268,34,260,49,235,40,223,40,208,57,206" href="#west" onmouseover="this.style.cursor = \'default\'"  onmousemove="show_region(0, event);" onmouseout="hide_info();" />
+  <area shape="poly" coords="168,375,206,376,201,359,208,334,232,322,243,318,250,330,256,338,273,331,295,328,301,320,326,323,337,332,348,340,361,334,366,347,365,365,418,404,435,426,432,437,419,441,377,468,384,482,393,499,399,516,389,518,374,501,348,502,312,512,284,524,263,517,252,515,239,531,227,524,207,512,197,508,177,502,162,503,147,496,134,496,135,510,126,510,93,511,84,499,105,437,126,403,125,398,144,398,163,399" href="#sued" onmouseover="this.style.cursor = \'default\'" onmousemove="show_region(79, event);" onmouseout="hide_info();" />
+  <area shape="poly" coords="75,206,76,190,97,179,83,159,96,154,108,122,102,115,103,100,133,91,148,93,152,104,159,101,178,86,187,83,200,81,185,68,177,53,194,49,165,29,169,20,187,23,217,29,237,32,243,38,240,48,261,51,282,53,288,41,298,53,285,68,276,74,291,76,307,76,324,68,342,58,355,50,369,50,385,37,399,45,417,65,428,85,439,103,437,132,429,141,451,161,450,169,459,185,462,210,441,224,420,228,414,233,384,224,360,221,344,221,333,228,309,231,296,225,281,235,270,244,254,235,233,224,212,218,203,224,188,227,197,237,186,245,173,255,162,242,155,234,138,224,129,231,105,229,89,224" href="#nord" onmouseover="this.style.cursor = \'default\'" onmousemove="show_region(78, event);" onmouseout="hide_info();" />
+  <area shape="poly" coords="462,212,466,225,475,236,480,257,471,268,459,263,446,259,443,270,399,287,376,301,351,305,350,315,354,335,342,338,323,328,305,325,296,319,273,324,268,331,257,325,245,317,233,320,213,329,204,347,201,371,189,375,162,376,149,356,142,346,131,341,136,327,143,313,146,292,163,281,169,271,168,256,187,244,195,235,189,227,208,219,232,225,258,234,274,240,293,227,312,233,331,227,348,218,381,221,414,233,444,221" href="#ost" onmouseover="this.style.cursor = \'default\'" onmousemove="show_region(77, event);" onmouseout="hide_info();" />
 </map></div>
 ';
 

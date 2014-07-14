@@ -292,7 +292,10 @@
 			$MPN=$files[$filenr].name;
 			$MPN=$MPN.toLowerCase();
 			var $replacements=new Array(".jpg", "a", "b", "c", "d", "e", "f", "g");
-			for($i=0; $i<$replacements.length; $i++) $MPN=$MPN.replace($replacements[$i], "");
+			for($i=0; $i<$replacements.length; $i++)
+			{
+				$MPN=$MPN.replace($replacements[$i], "");
+			}
 			$MPN=$MPN.replace("_", "/");
 			$.post('<?php echo PATH; ?>soa/', { API:"shop", Action:"ItemGet", MPN:$MPN }, function($data)
 			{
@@ -313,7 +316,7 @@
 					if ( $ack.text()!="Success" ) { show_status2($data); return; }
 
 					$images_upload_id_original=$xml.find("id_file").text();
-					$images_upload_imageformats=new Array(8, 10, 9, 19);
+					$images_upload_imageformats=new Array(8, 10, 9, 25, 19);
 					images_upload_file_imageformats($filenr, 0);
 					return;
 				});
@@ -428,47 +431,40 @@
 
 	function images_upload_file_completed($filenr)
 	{
-		$.post("<?php echo PATH; ?>soa/", { API:"shop", Action:"ListAddItem", list_id:2938, item_id:$images_upload_id_item }, function($data)
+		$.post("<?php echo PATH; ?>soa/", { API:"shop", Action:"ListAddItem", list_id:194, item_id:$images_upload_id_item }, function($data)
 		{
 			try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
 			$ack = $xml.find("Ack");
 			if ( $ack.text()!="Success" ) { show_status2($data); return; }
 
-			$.post("<?php echo PATH; ?>soa/", { API:"shop", Action:"ListAddItem", list_id:194, item_id:$images_upload_id_item }, function($data)
+			$.post("<?php echo PATH; ?>soa/", { API:"shop", Action:"ListAddItem", list_id:$images_upload_id_list, item_id:$images_upload_id_item }, function($data)
 			{
 				try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
 				$ack = $xml.find("Ack");
 				if ( $ack.text()!="Success" ) { show_status2($data); return; }
 	
-				$.post("<?php echo PATH; ?>soa/", { API:"shop", Action:"ListAddItem", list_id:$images_upload_id_list, item_id:$images_upload_id_item }, function($data)
+				view();
+				$filenr++;
+				if( $filenr==$files.length )
 				{
-					try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
-					$ack = $xml.find("Ack");
-					if ( $ack.text()!="Success" ) { show_status2($data); return; }
-		
-					view();
-					$filenr++;
-					if( $filenr==$files.length )
-					{
-						$('#images_upload_dialog').dialog('option', 'buttons', 
-						[
-							{ text: "Schließen", click: function() { $(this).dialog("close"); } }
-						] );
-						$images_upload_progressbar2.progressbar("value", 100);
-						$("#images_upload_dialog_status").hide();
-						$("#images_upload_dialog_status4").html("Alle Dateien erfolgreich hochgeladen.");
-						return;
-					}
-					else
-					{
-						$tempfile="";
-						images_upload_file($filenr, 0);
-						var $percent=Math.floor($filenr/$files.length*100);
-						$images_upload_progressbar2.progressbar("value", $percent);
-						$("#images_upload_dialog_status4").html($filenr+" von "+$files.length+" Dateien fertig.");
-						return;
-					}
-				});
+					$('#images_upload_dialog').dialog('option', 'buttons', 
+					[
+						{ text: "Schließen", click: function() { $(this).dialog("close"); } }
+					] );
+					$images_upload_progressbar2.progressbar("value", 100);
+					$("#images_upload_dialog_status").hide();
+					$("#images_upload_dialog_status4").html("Alle Dateien erfolgreich hochgeladen.");
+					return;
+				}
+				else
+				{
+					$tempfile="";
+					images_upload_file($filenr, 0);
+					var $percent=Math.floor($filenr/$files.length*100);
+					$images_upload_progressbar2.progressbar("value", $percent);
+					$("#images_upload_dialog_status4").html($filenr+" von "+$files.length+" Dateien fertig.");
+					return;
+				}
 			});
 		});
 	}

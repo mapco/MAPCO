@@ -25,6 +25,10 @@
 	define("PN_Table", "payment_notifications");
 	define("Shop_Order", "shop_orders");
 
+	define('TABLE_SHOP_RETURNS', 'shop_returns2');
+	define('TABLE_SHOP_ORDERS_CREDITS', 'shop_orders_credits2');
+
+
 	$currencies=array();
 	$res_curr=q("SELECT * FROM shop_currencies", $dbshop, __FILE__, __LINE__);
 	while ($row_curr = mysqli_fetch_assoc($res_curr))
@@ -176,26 +180,6 @@
 			exit;
 		}
 	}
-	
-	function getLastOrderTotalEUR($orderid)
-	{
-		$postfields = array();
-		$postfields["API"] = "payments";
-		$postfields["APIRequest"] = "PaymentNotificationLastOrderTotalGet";
-		$postfields["orderid"]=$orderid;
-
-		$response = soa2($postfields);
-		if ($response->Ack[0]=="Success")
-		{
-			return (float)$response->ordertotalEUR[0];
-		}
-		else
-		{
-			show_error(9797, 8, __FILE__, __LINE__, "ServiceResponse".print_r($response, true).print_r($postfields, true));
-			exit;
-		}
-	}
-
 
 	function getLastOrderTotalID($orderid)
 	{
@@ -555,6 +539,7 @@ ORDER - OrderAdd
 			{
 				foreach ($order["orderitems"] as $itemid => $orderitem)
 				//for ($i=0; isset($response->Order[0]->OrderItems[0]->Item[$i]); $i++)
+
 				{
 					$foreignTranactionID = $orderitem->OrderItemforeign_transactionID[0];
 					//GET PAYMENTNOTIFICATION (payment) for TransactionID
@@ -755,17 +740,11 @@ ORDER - OrderAdd
 
 		$last_ordertotal=getLastOrderTotal($_POST["orderid"]);
 
-		$last_ordertotalEUR = getLastOrderTotalEUR($_POST["orderid"]);
 
-echo "LAST: ".$last_ordertotalEUR." ACT: ".$order["ordertotalEUR"];
-exit;
 		
 //CHECK IF SOMETHING HAS CHNAGED
-//		if ($last_ordertotal != $order["ordertotal"])
-		if ($last_ordertotalEUR != $order["ordertotalEUR"])
+		if ($last_ordertotal != $order["ordertotal"])
 		{
-
-
 
 			$act_ordertotalEUR=$order["ordertotalEUR"];
 			$act_ordertotal=$order["ordertotal"];
@@ -802,6 +781,24 @@ exit;
 			
 			update_PaymentStatus ($_POST["orderid"], $order["Payments_TransactionID"], $order["Payments_TransactionState"], $order["Payments_TransactionStateDate"], $order["payments_type_id"], $order_deposit);	
 
+			//CHECK IF ORDER IS EXCHANGE -> DO SWAP DEPOSIT
+			if ( $order['ordertype_id'] == 4 )
+			{
+				$res_check = q("SELECT a.id_shop_order_credit FROM ".TABLE_SHOP_ORDERS_CREDITS." as a, ".TABLE_SHOP_RETURNS." as b  WHERE b.exchange_order_id = ".$_POST['orderid']." AND a.return_id = b.id_return", $dbshop, __FILE__, __LINE__);
+				if ( mysqli_num_rows( $res_check ) == 0 )
+				{
+					//show_error;
+					exit;	
+				}
+				$row_check = mysqli_fetch_assoc( $res_check );
+				$postfields 				= array();
+				$postfields['API'] 			= 'payments';
+				$postfields['APIRequest'] 	= 'PaymentNotificationHandler_test';
+				$postfields['mode'] 		= 'OrderExchangeDepositSwap';
+				$postfields['creditid'] 	= $row_check['id_shop_order_credit'];
+
+			echo soa2($postfields, __FILE__, __LINE__, 'xml');
+			}
 		}
 		else
 		{
@@ -1070,6 +1067,215 @@ exit;
 			}
 		}
 	} // MODE EXCHANGE
+
+
+	if ($_POST["mode"]=="OrderExchangeDepositSwap")
+	{
+		//$required=array("creditid" =>"numericNN", "order_event_id" => "numericNN");
+		$required=array("creditid" =>"numericNN");
+		check_man_params($required);
+
+		$postfields["API"]			= "shop";
+		$postfields["APIRequest"]	= "OrderCreditGet";
+		$postfields["id_credit"]	= $_POST["creditid"];
+
+		$credit = soa2($postfields);
+		
+		if ( $credit->Ack[0] != "Success" )
+		{
+			show_error(9797, 8, __FILE__, __LINE__, "ServiceResponse".print_r($credit, true));
+			exit;
+		}
+
+		if ( $credit->credit[0]->type[0] != "exchange" )
+		{
+			//RETURN IST KEIN EXCHANGE
+			show_error(9799, 8, __FILE__, __LINE__, "Credit".$_POST["creditid"] );
+			exit;
+		}
+
+		//GET EXCHANGEORDERID
+		$index = 0;
+		$exchange_orderid = 0;
+		
+		while ( isset( $credit->credit[0]->creditpositions[0]->creditposition[$index] ))
+		{
+			if ( (int)$credit->credit[0]->creditpositions[0]->creditposition[$index]->reason_id[0] == 1 ) 
+			{
+				if ( (int)$credit->credit[0]->creditpositions[0]->creditposition[$index]->return[0]->exchange_order_id[0] != 0)
+				{
+					$exchange_orderid = (int)$credit->credit[0]->creditpositions[0]->creditposition[$index]->return[0]->exchange_order_id[0];
+					$return = $credit->credit[0]->creditpositions[0]->creditposition[$index]->return;
+				}
+			}
+			$index ++;
+		}
+		
+
+		if ($exchange_orderid == 0)
+		{
+			//FEHLER, EXCHANGEORDERID DARF NICHT 0 SEIN
+			show_error(9800, 7, __FILE__, __LINE__, "CreditID".$_POST["creditid"]);
+			exit;
+		}
+		
+		//CHECK EXHANGE ORDER VORHANDEN?
+		$res_check=q("SELECT * FROM shop_orders WHERE id_order = ".$exchange_orderid, $dbshop, __FILE__, __LINE__);
+		if (mysqli_num_rows($res_check)==0)
+		{
+			//EXCHANGEORDER NICHT VORHANDEN
+			show_error(9801, 7, __FILE__, __LINE__, "CreditID".$_POST["creditid"]." UmtauschOrderID: ".$exchange_orderid);
+			exit;
+		}
+	
+
+		
+		//GET TOTAL OF RETURNITEMS
+		$returntotal=array();
+		$returntotalEUR = array();
+		for ($i=0; isset($return->returnitems[0]->returnitem[$i]); $i++)		
+		{
+			$order_id = (int)$return->order_id[0];
+			if (!isset($returntotal[$order_id]))
+			{
+				$returntotal[$order_id]=0;
+				$returntotalEUR[$order_id]=0;	
+			}
+			
+			$returntotal[$order_id]+=(float)$return->returnitems[0]->returnitem[$i]->returnitem_price[0] * (int)$return->returnitems[0]->returnitem[$i]->amount[0];
+			$returntotalEUR[$order_id]+=(float)$return->returnitems[0]->returnitem[$i]->returnitem_price[0] * (int)$return->returnitems[0]->returnitem[$i]->amount[0] * (1/(float)$return->returnitems[0]->returnitem[$i]->returnitem_exchange_rate_to_EUR[0]);
+		}
+
+		$orderids=array();
+		
+		// get order_ids from returned items and sum of returns
+		$orderids = returnsOrderIdsGet( (int)$return->id_return[0] );		
+		
+		foreach ($orderids as $orderid)	
+		{
+			
+			$order=getOrderData($orderid,"single");
+
+			//GET LAST ORDERTOTAL FROM EXCHANGE
+			$last_ex_ordertotal = getLastOrderTotal($exchange_orderid);
+			
+			//GET LAST ORDERDEPOSIT FROM EXCHANGE
+			$last_ex_orderdeposit = getLastOrderDeposit($exchange_orderid);
+			
+			$last_ordertotalID=getLastOrderTotalID($orderid);
+			$act_ordertotal=$order["ordertotal"];
+	
+			
+			$last_orderdeposit=getLastOrderDeposit($orderid);
+			
+			echo "LAST ORDERDEPOSIT: ".$last_orderdeposit;
+			
+			$last_userdeposit=getLastUserDeposit($order["user_id"]);
+
+echo "LAST USERDEPOSIT: ".$last_userdeposit;
+
+			if ($last_ex_orderdeposit < 0 )
+			{
+				//GET SUM OF SWAPS OF ORDERID for Returnid
+				$swap_sum=0;
+				$res = q("SELECT * FROM ".PN_Table." WHERE notification_type = 5 AND reason = 'ExchangeSwapOrderDeposit' AND reason_detail = '".(int)$return->id_return[0]."' AND order_id = ".$orderid, $dbshop, __FILE__, __LINE__);
+				while ($row=mysqli_fetch_assoc($res))
+				{
+					$swap_sum+=$row["accounting_EUR"];
+				}
+				$swap_sum*=-1;
+	
+				//es darf nicht mehr als der wert des zurückkommenden Artikel verschoben werden, aber auch nicht mehr als der Wert des Austauschartikels wert ist
+				$to_account = $swap_sum-$returntotalEUR[$orderid];
+				// last_ex_orderdeposit && to_account are negative
+				if ( $last_ex_orderdeposit >= $to_account )
+				{
+					$accounting = $last_ex_orderdeposit;
+				}
+				else
+				{
+					$accounting = $to_account;
+				}
+			}
+			else
+			{
+				$accounting = $last_ex_orderdeposit;
+			}
+
+
+			if ( $accounting != 0 )
+			{
+
+				$user_deposit=$last_userdeposit+$accounting;
+				$order_deposit=$last_orderdeposit+$accounting;
+
+				//SCHREIBE SYSTEMBUCHUNG - EXCHANGE(FROM)
+				$insert_data=array();
+				$insert_data["f_id"]=$last_ordertotalID;
+				$insert_data["shop_id"]=$order["shop_id"];
+				$insert_data["PN_date"]=time();
+				$insert_data["accounting_date"]=time();
+				$insert_data["notification_type"]=5;
+				$insert_data["reason"]="ExchangeSwapOrderDeposit";
+				$insert_data["reason_detail"]=(int)$return->id_return[0];
+				$insert_data["order_id"]=$orderid;
+				$insert_data["total"]=0;
+				$insert_data["currency"]=$order["currency"];
+				$insert_data["exchange_rate_from_EUR"]=$order["exchangerate"];
+				$insert_data["accounting_EUR"]=$accounting;
+				$insert_data["deposit_EUR"]=$order_deposit;
+				$insert_data["user_id"]=$order["user_id"];
+				$insert_data["user_deposit_EUR"]=$user_deposit;
+				$insert_data["payment_type_id"]=0;
+				$insert_data["buyer_lastname"]=$order["buyer_lastname"];
+				$insert_data["buyer_firstname"]=$order["buyer_firstname"];
+		
+				$res_insert = q_insert(PN_Table, $insert_data, $dbshop, __FILE__, __LINE__);
+				
+				$id_PN = mysqli_insert_id($dbshop);
+				
+				$accounting*=-1;
+		
+				$exchange_order=getOrderData($exchange_orderid, "single");
+		
+				//GET LAST ORDERTOTAL FROM EXCHANGE
+				$last_ex_ordertotal = getLastOrderTotal($exchange_orderid);
+				
+				//GET LAST ORDERDEPOSIT FROM EXCHANGE
+				$last_ex_orderdeposit = getLastOrderDeposit($exchange_orderid);
+				
+				$exchange_order_deposit=$last_ex_orderdeposit+$accounting;
+				
+				//GET LAST USERDEPOSIT
+				$user_deposit=getLastUserDeposit($order["user_id"]);
+				$user_deposit+=$accounting;
+		
+		
+				//SCHREIBE SYSTEMBUCHUNG - EXCHANGE(TO)
+				$insert_data=array();
+				$insert_data["f_id"]=$id_PN;
+				$insert_data["shop_id"]=$exchange_order["shop_id"];
+				$insert_data["PN_date"]=time();
+				$insert_data["accounting_date"]=time();
+				$insert_data["notification_type"]=5;
+				$insert_data["reason"]="ExchangeSwapOrderDeposit";
+				$insert_data["reason_detail"]=(int)$return->id_return[0];
+				$insert_data["order_id"]=$exchange_orderid;
+				$insert_data["total"]=0;
+				$insert_data["currency"]=$exchange_order["currency"];
+				$insert_data["exchange_rate_from_EUR"]=$exchange_order["exchangerate"];
+				$insert_data["accounting_EUR"]=$accounting;
+				$insert_data["deposit_EUR"]=$exchange_order_deposit;
+				$insert_data["user_id"]=$exchange_order["user_id"];
+				$insert_data["user_deposit_EUR"]=$user_deposit;
+				$insert_data["payment_type_id"]=0;
+				$insert_data["buyer_lastname"]=$exchange_order["buyer_lastname"];
+				$insert_data["buyer_firstname"]=$exchange_order["buyer_firstname"];
+				
+				$res_insert = q_insert(PN_Table, $insert_data, $dbshop, __FILE__, __LINE__);
+			}
+		}
+	}
 
 
 //**************************************************************************************
@@ -1486,13 +1692,13 @@ exit;
 		if (mysqli_num_rows($res_notification)==0)
 		{
 			// KEIN PAYMENT GEFUNDEN
-			show_error(9802, 7, __FILE__, __LINE__, "ReturnID".$_POST["return_id"]." paymentTransactionID: ".$_POST["TransactionID"]);
+			show_error(9802, 7, __FILE__, __LINE__, "OrderID".$_POST["orderid"]." paymentTransactionID: ".$_POST["TransactionID"]);
 			exit;
 		}
 		
 		$row_notification=mysqli_fetch_assoc($res_notification);
 
-		if ($row_notification["order_id"]!=0)
+		if ($row_notification["order_id"]==$_POST["orderid"])
 		{
 			//PAYMENT BEREITS ZUGEORDNET
 		}
@@ -1713,8 +1919,10 @@ exit;
 				$insert_data["parentPaymentTransactionID"]=$row_notification_type1["parentPaymentTransactionID"];
 				$insert_data["payment_note"]=$row_notification_type1["payment_note"];
 				$res_insert = q_insert(PN_Table, $insert_data, $dbshop, __FILE__, __LINE__);
-				
+
 				echo '<transactionID>'.$TxnID.'</transactionID>'."\n";
+
+
 			} // IF OK
 		}
 	} // IF MODE == "PaymentWriteBack"

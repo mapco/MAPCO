@@ -676,6 +676,22 @@
 		$lastmod_id_item[$row["MPN"]]=$row["id_item"];
 	}
 
+
+	//LETZTE_BEARB fix shop_items 1398930313 (31.04.2014)
+/*
+	$results=q("SELECT * FROM t_200 WHERE LETZTE_BEARB<1398930313;", $dbshop, __FILE__, __LINE__);
+	while( $row=mysqli_fetch_array($results) )
+	{
+		if( $lastmod_t200[$row["ArtNr"]]!=$row["LETZTE_BEARB"] and isset($lastmod_id_item[$row["ArtNr"]]) )
+		{
+			echo $row["ArtNr"]."\n";
+			$data=array();
+			$data["lastmod_t200"]=$row["LETZTE_BEARB"];
+			q_update("shop_items", $data, "WHERE id_item=".$lastmod_id_item[$row["ArtNr"]].";", $dbshop, __FILE__, __LINE__);
+		}
+	}
+*/
+
 	//compare LETZTE_BEARB from t_200 with shop_items
 	$old=array();
 	$results=q("SELECT * FROM t_200 ORDER BY LETZTE_BEARB;", $dbshop, __FILE__, __LINE__);

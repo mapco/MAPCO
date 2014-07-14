@@ -15,7 +15,7 @@
 		$users[$row['idCmsUser']]['lastname'] = $row['lastname'];
 	}
 		
-	$result = q("SELECT user_id FROM cms_mail_accounts_users WHERE account_id=".$_POST['account_id'].";", $dbweb, __FILE__, __LINE__);
+	$result = q("SELECT account_id, title, user FROM cms_mail_accounts, cms_mail_accounts_users WHERE account_id=".$_POST['account_id'].";", $dbweb, __FILE__, __LINE__);
 	while ( $row = mysqli_fetch_assoc($result) )
 	{
 		$users[$row['user_id']]['checked'] = 1;

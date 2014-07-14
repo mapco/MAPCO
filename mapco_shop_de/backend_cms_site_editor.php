@@ -4,13 +4,12 @@
 ?>
 
 <style type="text/css">
-
 	.language_dialog_button { width:25px; height:25px; margin:3px; }
 
 	#enabled-languages, #disabled-languages {
-		list-style-type: none; margin: 0; padding: 0; float: left; margin-right: 10px; padding: 5px; width: 143px;	
-		min-height:100px;
-		border: 1px solid #B5B0B0;
+		list-style-type: none;  float: left; padding: 5px; padding-right:20px; width: 143px;	
+		min-height:300px;
+		border: 0px solid #B5B0B0;
 	}
 	
 	#disabled-languages li, #enabled-languages li{
@@ -21,18 +20,31 @@
 
 <script type="text/javascript">
 
+	// global languages storage	(set by view())
 	var $language_array = new Array();
+	var $domain_array = new Array();
 	
-	function showview($xml) {
-
+	/**************
+	*	Base Sites-Editor View
+	*
+	**********/
+	
+	function main() {
+		wait_dialog_show();
+		PostData = new Object();
+		PostData['API'] = "cms";
+		PostData['APIRequest'] = "SitesGet_neu";
+		soa2(PostData, "view");	
+	}
+	
+	function view($xml) 
+	{
 			$xml.find('Languages').each(function()
 			{
-				
 				$language_array[$(this).find('id').text()] = $(this).find('title').text();
-				
 			});	
-					
-			var sites_details = '<table>';
+					 
+			var sites_details = '<table width="100%">';
 				sites_details += '	<tr>';
 				sites_details += '		<th>Seiten ID</th>';
 				sites_details += '		<th>Titel</th>';
@@ -43,16 +55,19 @@
 				sites_details += '		<th style="width:150px;">Sprachen - Fallback</th>';
 				sites_details += '		<th>Optionen</th>';
 				sites_details += '	<tr>';
-				$xml.find('Site').each(function(){
+				$xml.find('Site').each(function()
+				{
+					$domain_array[$(this).find('site_id').text()] = $(this).find('domain').text()
 					sites_details += '	<tr>';
 					sites_details += '		<td>'+$(this).find('site_id').text()+'</td>';
 					sites_details += '		<td>'+$(this).find('site_title').text()+'</td>';
 					sites_details += '		<td>'+$(this).find('description').text()+'</td>';
-					sites_details += '		<td>'+$(this).find('domain').text()+'</td>';
+					sites_details += '		<td><a href="http://www.'+$(this).find('domain').text()+'" target="'+$(this).find('domain').text()+' aufrufen">'+$(this).find('domain').text()+'</a></td>';
 					sites_details += '		<td>'+$(this).find('template').text()+'</td>';
 					sites_details += '		<td>'+$(this).find('google_analytics').text()+'</td>';
 					sites_details += '		<td>';
-					$(this).find('language').each(function(){
+					$(this).find('language').each(function()
+					{
 						sites_details += '<div>'+$(this).find('title').text() + ' - ' + $(this).find('fallback').text()+'</div>';
 					});
 					sites_details += '		</td>';
@@ -63,118 +78,331 @@
 					sites_details += '	<tr>';
 				});
 				sites_details += '</table>';
-			$("#view").empty().append(sites_details);
+			$("#view").html(sites_details);
 	
-			$(".button_edit_site").click(function(){
+			/*
+			*	general view events
+			*/
+			
+			$(".button_edit_site").click(function()
+			{
 				var id = $(this).attr('id');
 				var site_id = id.split('_');
-				dialog_edit_site(site_id[3]);
+				//dialog_edit_site(site_id[3]);
+				dialog_cms_site_editor(site_id[3]);
 			});
 			
-			$(".button_change_languages").click(function(){
+			$(".button_change_languages").click(function()
+			{
 				var id = $(this).attr('id');
 				var site_id = id.split('_');
 				dialog_change_languages(site_id[3]);
 			});
-		
+			
+			$(".button_new_site").click(function() 
+			{
+				dialog_cms_site_editor();
+			});
+					
 	}
-
-		
-	function dialog_edit_site(site_id)
+	
+	/**************
+	*	Site-Creator Dialogs
+	*
+	**********/
+	
+	// globals
+	var siteData = new Object();	// new site dialog storage
+		siteData['title'] = "";
+		siteData['domain'] = "";
+		siteData['template'] = "";
+		siteData['description'] = "";
+		siteData['ssl'] = "";
+		siteData['location_id'] = "";
+		siteData['id_site'] = "";
+		siteData['google_analytics'] = "";
+		siteData['language_id'] = "";
+	
+	// global location array 	
+	var $location_array = new Object();
+	
+	function dialog_cms_site_editor(id_site) 
 	{
-		if ($("#dialog_edit_site").length == 0)
+				
+		if (typeof id_site != 'undefined') 
+		{ 
+			siteData['id_site'] = id_site;		
+		}
+		
+		
+		if ($("#dialog_cms_site_editor").length === 0) 
 		{
-			var dialog_div = '<div id="dialog_edit_site" style="display:none;">';
-			dialog_div += '</div>';
-			$("#content").append(dialog_div);
+			$("#content").append('<div id="dialog_cms_site_editor" style="display:none;"></div>');
 		}
 		
 		wait_dialog_show();
-		var where = 'WHERE id_site='+site_id;
-		$.post("<?php echo PATH; ?>soa2/", { API:"cms", APIRequest:"TableDataSelect", table:'cms_sites', db:'dbweb', where:where }, function($data)
+		
+		if (siteData['id_site'] != '') 
+		{ 
+			var postData = new Object();
+				postData['API'] = 'cms';
+				postData['APIRequest'] = 'TableDataSelect';
+				postData['table'] = 'cms_sites';
+				postData['db'] = 'dbweb';
+				postData['where'] = 'WHERE id_site='+siteData['id_site'];
+			soa2(postData, "dialog_cms_site_editor_view");	
+		} 
+		else 
 		{
-			//show_status2($data); return;
-			try { $xml = $($.parseXML($data)); } catch ($err) { show_status($err.message); return; }
-			$ack = $xml.find("Ack");
-			if ( $ack.text()!="Success" ) { show_status2($data); return; }
+			dialog_cms_site_editor_view();	
+		}
 			
-			var site_details = '<table>';
-			site_details += '	<tr>';
-			site_details += '		<td>Titel</td>';
-			site_details += '		<td><input id="edit_site_title" value="'+$xml.find('title').text()+'"></td>';
-			site_details += '	</tr>';
-			site_details += '	<tr>';
-			site_details += '		<td>Beschreibung</td>';
-			site_details += '		<td><input id="edit_site_description" value="'+$xml.find('description').text()+'"></td>';
-			site_details += '	</tr>';
-			site_details += '	<tr>';
-			site_details += '		<td>Domäne</td>';
-			site_details += '		<td><input id="edit_site_domain" value="'+$xml.find('domain').text()+'"></td>';
-			site_details += '	</tr>';
-			site_details += '	<tr>';
-			site_details += '		<td>Template</td>';
-			site_details += '		<td><input id="edit_site_template" value="'+$xml.find('template').text()+'"></td>';
-			site_details += '	</tr>';
-			site_details += '	<tr>';
-			site_details += '		<td>Google-Analytics</td>';
-			site_details += '		<td><input id="edit_site_google_analytics" value="'+$xml.find('google_analytics').text()+'"></td>';
-			site_details += '	</tr>';
-			site_details += '</table>';
+	}
+	
+	function dialog_cms_site_editor_view($xml) 
+	{
+		
+		if (typeof $xml != 'undefined') 
+		{
+			siteData['title'] = $xml.find('title').text();
+			siteData['domain'] = $xml.find('domain').text();
+			siteData['template'] = $xml.find('template').text();
+			siteData['description'] = $xml.find('description').text();
+			siteData['ssl'] = $xml.find('ssl').text();
+			siteData['location_id'] = $xml.find('location_id').text();
+			siteData['google_analytics'] = $xml.find('google_analytics').text();
+		}
+		
+		var ssl_checked = "checked";	// ssl enabled by default
+		if (typeof(siteData) === 'object') 
+		{ 
+			if (siteData['ssl'] === true) 
+			{
+				ssl_checked = "checked";	
+			} 
+			else if (siteData['ssl'] === false)  
+			{
+				ssl_checked = "";	
+			}
+		}
+	
+		var site_content = '<table>';
+			site_content +='<tr><td>Seiten-Titel:</td><td><input id="editor_site_title" value="'+siteData['title']+'" /></td></tr>'; 
+			site_content +='<tr><td>Seiten-Domain:</td><td><input id="editor_site_domain" value="'+siteData['domain']+'" /></td></tr>';
+			site_content +='<tr><td>Template:</td><td><input id="editor_site_template" value="'+siteData['template']+'" disabled /></td></tr>';
+			site_content +='<tr><td>Beschreibung:</td><td><input id="editor_site_description" value="'+siteData['description']+'"/></td></tr>';
+			site_content +='<tr><td>SSL</td><td><input id="editor_site_ssl" value="true" type="checkbox" '+ssl_checked+' /></td></tr>'; 
+			site_content +='<tr><td>Google-Analytics:</td><td><input id="editor_site_google_analytics" value="'+siteData['google_analytics']+'"/></td></tr>';
+			if (siteData['id_site'] === '') 
+			{
+				site_content += '<tr><td>Hauptsprache:</td><td><select id="editor_site_language"><option>Sprache wählen</option>';
+				
+				$.each( $language_array, function( key, value )
+				{
+					if (key !== 0) 
+					{
+						site_content +='<option value="'+key+'">'+value+'</option>';
+					}
+				});
+				
+				site_content +='</select></td></tr>';
+			}
+			site_content +='</table>';
 			
-			$("#dialog_edit_site").html(site_details);
+		$("#dialog_cms_site_editor").html(site_content); 
+		/*
+			update template name by change the domain name
+		*/
+		$("input#editor_site_domain").focusout(function() 
+		{
+			$(this).trigger('change');
+		});
+
+		$("input#editor_site_domain").change(function() 
+		{
+			if (siteData['id_site'] === "") 
+			{
+				var this_domain = $(this).val();
+				if ($domain_array.indexOf(this_domain) > 0)
+				{
+					alert("Domain: "+this_domain+" existiert schon!");
+					$(this).val("");
+					setTimeout(function(){
+						$("input#editor_site_domain").focus();
+					}, 1);
+				}
+				else 
+				{
+					$("input#editor_site_template").val($(this).val());
+				}
+				
+			}
+
+		});
+
+		$("#dialog_cms_site_editor").dialog
+		({	buttons:
+			[
+				{ text: "Weiter", click: function() 
+					{ 
+						siteData['title'] = $('input#editor_site_title').val();
+						siteData['domain'] = $('input#editor_site_domain').val();
+						siteData['template'] = $('input#editor_site_template').val();
+						siteData['description'] = $('input#editor_site_description').val();	
+						siteData['ssl'] = $('input#editor_site_ssl').prop('checked');
+						siteData['google_analytics'] = $('input#editor_site_google_analytics').val();
+						if (siteData['id_site'] === "") 
+						{
+							$('select#editor_site_language option:selected').each(function() 
+							{
+								siteData['language_id'] =	$(this).val();
+							});	
+						}
+						dialog_cms_site_editor_location();
+						$(this).dialog("close"); 
+					} 
+				},
+				{ text: "Abbrechen", click: function() 
+					{ 
+						siteData['title'] = "";
+						siteData['domain'] = "";
+						siteData['template'] = "";
+						siteData['description'] = "";
+						siteData['ssl'] = "";
+						siteData['location_id'] = "";
+						siteData['id_site'] = "";
+						siteData['google_analytics'] = "";
+						siteData['language_id'] = "";
+						$(this).dialog("close"); 
+					} 
+				}
+			],
+			closeText:"Fenster schließen",
+			modal:true,
+			resizable:false,
+			title:"Seite bearbeiten",
+			width:450
+		});		
+		wait_dialog_hide();		
+	}
+				
+ 	function dialog_cms_site_editor_location() 
+	{	
+			if ($('#dialog_cms_site_editor_location').length == 0) 
+			{
+				$('#content').append('<div id="dialog_cms_site_editor_location" style="display:none;"></div>');	
+			}
+			var postData = new Object();
+				postData['API'] = 'cms';
+				postData['APIRequest'] = 'ContactsLocationGet';
+				postData['task'] = 'getFull';
+						
+			soa2(postData, "dialog_cms_site_editor_location_view");	
+	} 
+	
+	function dialog_cms_site_editor_location_view(data) 
+	{
+			data.find('Locations').each(function()
+			{
+				$location_array[$(this).find('id_location').text()] = $(this).find('location_name').text()+' ('+$(this).find('company').text()+')';
+			});
+		
+			var option_locations = "<option>Standort wählen</option>";
+			var checked = "";
+			 
+			$.each($location_array, function(key, value) 
+			{
+				if (siteData['location_id'] === key) 
+				{
+					selected = 'selected';
+				} 
+				else 
+				{
+					selected = '';	
+				}
+				option_locations += '<option value="'+key+'" '+selected+'>'+value+'</option>';	
+			});
+			 
+			var dialog_content = '<p>Standort auswählen:</p>';
+				dialog_content += '<table>';
+				dialog_content += '<tr><td>Standort:</td><td><select id="site_location_id">'+option_locations+'</select></td><td><img id="button_new_site_location" class="button_new_site_location" src="<? echo PATH; ?>images/icons/24x24/add.png" title="Neuen Standort anlegen" style="cursor:pointer;"></td></tr>';			
+				dialog_content += '</table>';
+
+			$('#dialog_cms_site_editor_location').html(dialog_content);
 			
-			$("#dialog_edit_site").dialog
+			$('#button_new_site_location').click(function()
+			{
+				window.location.href= '<? echo PATH; ?>backend/inhalte/kontakte/'; 
+			});
+							
+			$("#dialog_cms_site_editor_location").dialog
 			({	buttons:
 				[
-					{ text: "Speichern", click: function() { edit_site(site_id); $(this).dialog("close"); } },
-					{ text: "Abbrechen", click: function() { $(this).dialog("close"); } }
+					{ text: "Zurück", click: function() 
+						{ 
+							$('#site_location_id option:selected').each(function() 
+							{
+								siteData['location_id'] = $(this).val();
+							}); 
+							dialog_cms_site_editor(); 
+							$(this).dialog("close"); 
+						} 
+					},
+					{ text: "Speichern", click: function() 
+						{ 
+							$('#site_location_id option:selected').each(function() 
+							{
+								siteData['location_id'] = $(this).val();
+							}); 
+							
+							if (siteData['id_site'] !== "") {
+								siteData['API'] = 'cms';
+								siteData['APIRequest'] = 'SiteEdit';
+
+							} else {
+								delete siteData['id_site'];
+								siteData['API'] = 'cms';
+								siteData['APIRequest'] = 'SiteSaveNew';
+							}
+							soa2(siteData, "dialog_cms_site_editor_store",'');	
+							$(this).dialog("close"); 
+
+						} 
+					},
+					{ text: "Abbrechen", click: function() 
+						{ 
+							$(this).dialog("close"); 
+							siteData['title'] = "";
+							siteData['domain'] = "";
+							siteData['template'] = "";
+							siteData['description'] = "";
+							siteData['ssl'] = "";
+							siteData['location_id'] = "";
+							siteData['id_site'] = "";
+							siteData['google_analytics'] = "";
+							siteData['language_id'] = "";
+						} 
+					}
 				],
 				closeText:"Fenster schließen",
 				modal:true,
 				resizable:false,
-				title:"Seitendetails bearbeiten",
+				title:"Standortzuweisung",
 				width:450
-			});		
-			wait_dialog_hide();	
-		});
+			});	 
+	}
+ 	
+	function dialog_cms_site_editor_store(data)
+	{	
+		main();
+		delete siteData['API'];
+		delete siteData['APIRequest'];
 	}
 	
-	function edit_site(id_site)
-	{
-		var title = $("#edit_site_title").val();
-		var description = $("#edit_site_description").val();
-		var domain = $("#edit_site_domain").val();
-		var template = $("#edit_site_template").val();
-		var google_analytics = $("#edit_site_google_analytics").val();
-
-		wait_dialog_show();
-
-		$.post("<?php echo PATH; ?>soa2/", { API:"cms", APIRequest:"SiteEdit", id_site:id_site, title:title, description:description, domain:domain, template:template, google_analytics:google_analytics }, function($data)
-		{ 
-			//show_status2($data); //return;
-			try { $xml = $($.parseXML($data)); } catch ($err) { show_status($err.message); return; }
-			$ack = $xml.find("Ack");
-			if ( $ack.text()!="Success" ) { show_status2($data); return; }
-			
-			wait_dialog_hide();
-		});
-	}
-	
-	function mark_language ($id)
-	{
-		if ( $($id).hasClass('marked'))
-		{
-			$($id).css('background-color','white');
-			$($id).css('color','black');
-			$($id).removeClass('marked');
-		}
-		else
-		{
-			$($id).css('background-color','orange');
-			$($id).css('color','white');
-			$($id).addClass('marked');
-		}
-	}
+	/**************
+	*	Language-Selector Dialog
+	*
+	**********/
 	
 	function dialog_change_languages(site_id)
 	{
@@ -187,74 +415,190 @@
 		
 		wait_dialog_show();
 		
-		select_cols = 'language_id, fallback_language_id';
-		where = 'WHERE site_id='+site_id;
-		
+		select_cols = 'language_id, fallback_language_id, ordering';
+		where = 'WHERE site_id='+site_id+' ORDER BY `ordering` ASC';
 		$.post("<?php echo PATH; ?>soa2/", { API:"cms", APIRequest:"TableDataSelect", table:'cms_sites_languages', db:'dbweb', select:select_cols, where:where }, function($data)
 		{
-			//show_status2($data); return;
 			try { $xml = $($.parseXML($data)); } catch ($err) { show_status($err.message); return; }
 			$ack = $xml.find("Ack");
 			if ( $ack.text()!="Success" ) { show_status2($data); return; }
 			
-			/*
-				@array $site_languages 		
-			*/
 			$site_languages = new Array();
-			var language_id = 0;
-
-			$xml.find('cms_sites_languages').each(function(){
-				$site_languages[$(this).find('language_id').text()] = true;
-			});		
+			$fallback_languages= new Array();
+			$fallback_languages[0] = 'global default';
+			$ordering = new Array();
 			
-			var languages = new Object();
-				languages['disabled'] = "";
-				languages['enabled'] = "";
-			$.each( $language_array, function( key, value ){
-				
+			var language_id = 0;
+			
+			$xml.find('cms_sites_languages').each(function()
+			{		
+				$site_languages[$(this).find('language_id').text()] = true;
+				$fallback_languages[$(this).find('language_id').text()] = $(this).find('fallback_language_id').text();
+				$ordering[$(this).find('language_id').text()] = $(this).find('ordering').text();
+			});	
+	
+			var languages = "";
+			delete languages;	// important
+			languages = new Object();
+			languages['disabled'] = "";
+			languages['enabled'] = "";
+			var enabled_items = new Object();
+			var disabled_items = "";
+			$.each( $language_array, function( key, value )
+			{
 				if ( typeof(value) !== 'undefined')
-				{				
-					
-					if ($site_languages[key] === 'undefined') {
-						$state ='disabled';
-					} else {
-						$state ='enabled';	
+				{				 
+					if ($site_languages[key] === true) 
+					{
+						$state ='enabled';
+					} else 
+					{
+						$state ='disabled';	
 					} 
-					 
-					if (languages[$state] === 'undefined') {
-						languages[$state] = '<li id="dialog_language_'+key+'" class="dialog_ui_languages selectable-language" data-id="'+key+'" data-state="'+$state+'" style="background-color:white; cursor:pointer; width:150px;">'+value+'</li>';	
-					} else {
-						languages[$state] += '<li id="dialog_language_'+key+'" class="dialog_ui_languages selectable-language" data-id="'+key+'" data-state="'+$state+'" style="background-color:white; cursor:pointer; width:150px;">'+value+'</li>';	
+					
+					var fallback_value = "";
+					var fallback_id = "";
+					
+					if ($state === 'enabled') 
+					{
+						if ($language_array[$fallback_languages[key]] !== 'undefined' && key in $fallback_languages && $fallback_languages[key] !== 0) 
+						{ 	
+							fallback_value = $language_array[$fallback_languages[key]];
+							fallback_id = $fallback_languages[key];
+						}
+						if (typeof(fallback_value) === "undefined") 
+						{
+							fallback_value = "global default";
+							fallback_id = $fallback_languages[key];	
+						}
 					}
-				} 
- 
+					item_content = '<li id="dialog_language_'+key+'" class="dialog_ui_languages selectable-language" data-id="'+key+'" data-state="'+$state+'" data-fallback="'+fallback_id+'" style="background-color:white; cursor:pointer; width:150px;"><p>'+value+'</p> <p class="item-fallback">(Fallback: '+ fallback_value +')</p></li>';
+
+					if ($state === 'enabled') 
+					{
+						enabled_items[$ordering[key]] = item_content;
+					} else {
+						disabled_items += item_content;	
+					}
+				}
+
+			});
+
+			$.each(enabled_items, function(key, value) 
+			{	
+				languages['enabled'] += value;
 			});
 			
-			site_details = '<table><tr><td valign="top">';
-			site_details += '<h3>verfügbare Sprachen</h3><p><span style="font-size:9ox;">Nicht verwendete Sprachen<span></p>';
+			languages['disabled'] = disabled_items; 
+							
+			site_details = '<table><tr><td><img class="button_change_languages" src="<?php echo PATH; ?>images/icons/48x48/comments.png" title="Sprachen zuweisen" style="cursor:pointer;"></td><td><p>Hinweis: Per Drag&Drop die gewünschte Sprache zuweisen</p><p>Fallback Sprache für zugewiesene Sprachen per Doppelklick anpassbar</p></td></tr></table>  <table width="100%"><tr><td valign="top" width="50%">';
+			site_details += '<h3>verfügbare Sprachen</h3><p>Nicht verwendete Sprachen</p>';
 			site_details += '<ul id="disabled-languages">';
 			site_details += languages['disabled'];
-			site_details += '</ul></td><td width="50"></td>';
+			site_details += '</ul></td>';
 					 
-			site_details += '<td valign="top"><h3>zugewiesene Sprachen</h3><p><span style="font-size:9px;">Aktive Sprachen und dessen Reihenfolge</span></p>';
+			site_details += '<td valign="top" width="50%"><h3>zugewiesene Sprachen</h3><p>Aktive Sprachen</p>';
 			site_details += '<ul id="enabled-languages">';
 			site_details += languages['enabled'];
-			site_details += '</ul></td></tr></table>';
+			site_details += '</ul></td></tr></table>'; 
 					
 			$("#dialog_change_languages").html(site_details);
 			
-			$('#enabled-languages').sortable({
-      			connectWith: "ul"
+			$('li.selectable-language').dblclick(function() 
+			{
+				
+				var state = $(this).data('state');
+				var id = $(this).data('id');
+				var old_fallback = $(this).data('fallback');
+				
+				if (state === 'enabled') 
+				{
+					var options = '<option value="0">global default</option>';
+					$.each($language_array, function(key, value) 
+					{
+							if (key !== 0) 
+							{
+								var selection = "";
+								if (key === old_fallback) 
+								{
+									selection = 'selected';
+								}
+								if (key !== id && value !== undefined) 
+								{
+									options +='<option value="'+key+'" '+selection+'>'+value+'</option>';
+								}
+							}
+					});
+					$(this).html('<p>'+$language_array[id]+'</p><p><select id="fallback-select" data-id="'+id+'">'+options+'</select></p>');
+				}
+				 
+				$("select#fallback-select").focusout(function() 
+				{
+					$(this).trigger('change');	// see change event
+				});
+				
+				$('select#fallback-select').change(function() 
+				{
+					var id = $(this).data('id');
+					var list_item = $(this).parent().parent();
+					var new_fallback_id = $( "select#fallback-select option:selected" ).val();
+					list_item.data('fallback', new_fallback_id);
+					var new_val = "none";
+					if (new_fallback_id === '0') 
+					{
+						new_val	="global default";
+					} else {
+						new_val = $language_array[new_fallback_id];	
+					}
+					list_item.html('<p>'+$language_array[id]+'</p><p>(Fallback: '+ new_val +')</p>');	
+				});
+			}); 
+						
+			$('#enabled-languages').sortable(
+			{ 
+      			connectWith: "ul",
+				receive: function( event, ui ) 
+				{
+					ui.item.data('state', "enabled");
+					var elem_id = ui.item.attr('id');
+				}
     		});
 			
-			$('#disabled-languages').sortable({
-				connectWith: "ul"
+			$('#disabled-languages').sortable(
+			{
+				connectWith: "ul",
+				receive: function( event, ui ) 
+				{
+					ui.item.data('state', "disabled");
+				}
 			});
 						
 			$("#dialog_change_languages").dialog
 			({	buttons:
 				[
-					{ text: "Weiter", click: function() { change_language(site_id); } },
+					{ text: "Speichern", click: function() 
+						{  
+							// get the current enabled list from DOM
+							var order=0
+							var languages = new Object();
+							$("#enabled-languages > li").each(function()
+							{ 
+								order++;
+								languages[order] = new Object();
+								languages[order]['id'] = $(this).data('id');
+								languages[order]['fallback'] = $(this).data('fallback'); 
+							});
+							
+							// send the new enabled list
+							var postData = new Object();
+							postData['API'] = 'cms';
+							postData['APIRequest'] = 'SiteLanguagesSet';
+							postData['task'] = 'update';
+							postData['site_id'] = site_id;
+							postData['languages'] = languages;
+							soa2(postData, "dialog_change_languages_store"); 
+						} 
+					},
 					{ text: "Abbrechen", click: function() { $(this).dialog("close"); } }
 				],
 				closeText:"Fenster schließen",
@@ -262,231 +606,22 @@
 				resizable:false,
 				title:"Sprachen zuweisen",
 				width:510,
-				height:420
+				height:510
 			});
 			wait_dialog_hide();
 		});
 	}
-	/*
-	*	DEPRECATED!!!!! 
-	*/
-	function change_language(site_id)
-	{	
-		var x = 0;
-		var id = new Array();
-		$("#list_site_languages > li").each(function()
-	  	{ 
-			if (!$(this).hasClass('header'))
-			{
-				$row_id = $(this).attr('id');
-				$row_id = $row_id.split('_');
-				
-				id[x] = $row_id[3];
-				x++;
-			}
-			
-		});
-		var languages = id.join(',');
-
-		wait_dialog_show('Speicher Sprachzuordnung',0);
-		$.post("<?php echo PATH; ?>soa2/", { API:"cms", APIRequest:"SiteLanguagesSet", site_id:site_id, languages:languages }, function($data)
-		{
-			//show_status2($data); return;
-			try { $xml = $($.parseXML($data)); } catch ($err) { show_status($err.message); return; }
-			$ack = $xml.find("Ack");
-			if ( $ack.text()!="Success" ) { show_status2($data); return; }
-
-			wait_dialog_hide();
-			dialog_set_fallbacks(site_id, languages);
-		});
+	
+	function dialog_change_languages_store(data) 
+	{
+		main();
+		$("#dialog_change_languages").dialog("close");
 	}
 	
-/*	function dialog_set_fallbacks(site_id, languages)
+	$( document ).ready(function() 
 	{
-		if ($("#dialog_change_languages").length == 0)
-		{
-			var dialog_div = '<div id="dialog_change_languages" style="display:none;">';
-			dialog_div += '</div>';
-			$("#content").append(dialog_div);
-		}
-		
-		wait_dialog_show();
-		$.post("<?php echo PATH; ?>soa2/", { API:"cms", APIRequest:"SiteGetLanguages", site_id:site_id }, function($data)
-		{
-			$languages = new Array();
-			//show_status2($data); return;
-			try { $xml = $($.parseXML($data)); } catch ($err) { show_status($err.message); return; }
-			$ack = $xml.find("Ack");
-			if ( $ack.text()!="Success" ) { show_status2($data); return; }
-			
-			$languages = new Array();
-			
-			$x = 0;
-			$xml.find('language').each(function(){
-				$languages[$x] = new Array();
-				$languages[$x]['title'] = $(this).find('title').text();
-				$languages[$x]['id'] = $(this).find('id').text();
-				$languages[$x]['in_site'] = $(this).find('in_site').text();
-				$x++;
-			});			
-			
-			var site_details = '<table style="width:100;"><tr><td style="border:none; vertical-align:top;"><ul id="list_languages" class="orderlist language_list" style="width:150px;">';
-			site_details += '	<li class="header" style="width:150px;">verfügbare Sprachen</li>';
-			
-			for ( $i=0;$i<$x;$i++ )
-			{
-				$style = '';
-				if ( $languages[$i]['in_site'] == 1 )
-				{
-					$style = 'display:none;';
-				}
-				site_details += '	<li id="dialog_language_'+$languages[$i]['id']+'" class="dialog_ui_languages" value="'+$languages[$i]['id']+'" style="background-color:white; cursor:pointer; width:150px; '+$style+'">'+$languages[$i]['title']+'</li>';
-			}
-			
-			site_details += '</ul></td>';
-			
-			site_details += '<td style="border:none; width:116px;">';
-			site_details += '	<div style="margin-left:14px;">';
-			site_details += '		<button id="button_add_language" class="language_dialog_button">></button>';	
-			site_details += '		<button id="button_remove_language" class="language_dialog_button" style="margin-left:34px;"><</button>';
-			site_details += '	</div>';
-			site_details += '	<div style="margin-left:14px;">';
-			site_details += '		<button id="button_add_all" class="language_dialog_button" style="padding-left:4px;">>></button>';	
-			site_details += '		<button id="button_remove_all" class="language_dialog_button" style="padding-left:4px; margin-left:34px;"><<</button>'
-			site_details += '	</div>';
-			site_details += '</td>';
-			
-			site_details += '<td style="border:none; vertical-align:top;"><ul id="list_site_languages" class="orderlist language_list" style="width:150px;">';
-			site_details += '	<li class="header" style="width:150px;">zugewiesene Sprachen</li>';
-			
-			for ( $i=0;$i<$x;$i++ )
-			{
-				if ( $languages[$i]['in_site'] == 1 )
-				{
-					site_details += '	<li id="dialog_site_language_'+$languages[$i]['id']+'" class="dialog_ui_languages" value="'+$languages[$i]['id']+'" style="background-color:white; cursor:pointer; width:150px;">'+$languages[$i]['title']+'</li>';
-				}
-			}
-			site_details += '</ul></td></tr></table>';
-			
-			$("#dialog_change_languages").html(site_details);
-			
-			$("#dialog_change_languages").dialog
-			({	buttons:
-				[
-					{ text: "Speichern", click: function() { change_language(site_id); } },
-					{ text: "Abbrechen", click: function() { $(this).dialog("close"); } }
-				],
-				closeText:"Fenster schließen",
-				modal:true,
-				resizable:false,
-				title:"Sprachen zuweisen",
-				width:510,
-				height:420
-			});
-			wait_dialog_hide();
-	}*/
-	
-	function remove_language()
-	{
-		$( "#list_site_languages li[class*='marked']" ).each(function(){
-			$(this).css('background-color','white');
-			$(this).css('color','black');
-			
-			$id = $(this).attr('id');
-			$id = $id.split('_');
-			$(this).remove();					
-			
-			$("#dialog_language_"+$id[3]).css('display','');
-		});
-
-		$( "#list_languages").html( $( "#list_languages" ).html() );
-		
-		$( "#list_site_languages").html( $( "#list_site_languages" ).html()  );
-		
-		$(".dialog_ui_languages").click(function(){
-			mark_language($(this));
-		});	
-	}
-	
-	function add_language()
-	{
-		var site_language_entry = '';
-		$( "#list_languages li[class*='marked']" ).each(function(){
-			site_language_entry = $( "#list_site_languages" ).html();
-				
-			$row_id = $(this).attr('id');
-			$row_id = "#"+$row_id;
-			$id = $row_id.split('_');
-			$value = $($row_id).attr('value');
-			site_language_entry += '<li id="dialog_site_language_'+$id[2]+'" style="background-color:white; color:black; cursor:pointer; width:150px;" class="dialog_ui_languages" value="'+$value+'" onClick="Javascript:mark_language('+$value+');">'+$($row_id).html()+'</li>';
-			
-			$( "#list_site_languages" ).html( site_language_entry );
-			
-			$($row_id).css('background-color','white');
-			$($row_id).css('color','black');
-			$($row_id).removeClass('marked');
-			$($row_id).css('display','none');
-			$( "#list_languages" ).html( $( "#list_languages" ).html() );
-
-		});
-
-		$(".dialog_ui_languages").click(function(){
-			mark_language($(this));
-		});	
-	}
-	
-	function remove_all_language()
-	{
-		$("#list_site_languages > li").each(function()
-	  	{ 
-			if (!$(this).hasClass('header'))
-			{
-				$(this).remove();
-			}
-		});
-		
-		$("#list_languages > li").each(function()
-	  	{ 
-			$(this).css('display','');
-		});
-	}
-	
-	function add_all_language()
-	{
-		$("#list_site_languages > li").each(function()
-	  	{ 
-			if (!$(this).hasClass('header'))
-			{
-				$(this).remove();
-			}
-		});
-		
-		var site_language_entry = '<li class="header" style="width:150px;">zugewiesene Sprachen</li>';
-		$("#list_languages > li").each(function()
-	  	{ 
-			if (!$(this).hasClass('header'))
-			{
-				$row_id = $(this).attr('id');
-				$row_id = "#"+$row_id;
-				$id = $row_id.split('_');
-				$value = $($row_id).attr('value');
-				site_language_entry += '<li id="dialog_site_language_'+$id[2]+'" style="background-color:white; color:black; cursor:pointer; width:150px;" class="dialog_ui_languages" value="'+$value+'" onClick="Javascript:mark_language('+$value+');">'+$($row_id).html()+'</li>';
-				
-				$( "#list_site_languages" ).html( site_language_entry );
-				$(this).css('display','none');
-			}
-		});
-	}
-	
-	$( document ).ready(function() {
-		 
-		wait_dialog_show();
-		PostData = new Object();
-		PostData['API'] = "cms";
-		PostData['APIRequest'] = "SitesGet_neu";
-		soa2(PostData, "showview");
-	
-	 });
+		main();
+	});
 </script>
 
 <?php
@@ -494,9 +629,9 @@
 	echo '<p>';
 	echo '<a href="backend_index.php">Backend</a>';
 	echo ' > <a href="backend_cms_index.php">Content Management</a>';
-	echo ' > Seiten';
+	echo ' > Seiten ';
 	echo '</p>';
-	echo '<h1>Seiten</h1>';
+	echo '<h1>Seiten <img id="button_new_site" class="button_new_site" src="'. PATH .'images/icons/24x24/add.png" title="Neue Seite einrichten" style="cursor:pointer;"></h1>';
 
 	echo '<div id="view"></div>';
 	

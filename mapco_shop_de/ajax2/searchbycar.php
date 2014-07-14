@@ -10,14 +10,14 @@
 	if ($_GET["id_model"]!="")
 	{
 		$results=q("SELECT * FROM vehicles_".$_GET["lang"]." WHERE Exclude=0 AND KModNr=".$_GET["id_model"].";", $dbshop, __FILE__, __LINE__);
-		$row=mysql_fetch_array($results);
+		$row=mysqli_fetch_array($results);
 		$_GET["id_manufacturer"]=$row["KHerNr"];
 	}
 
 	if ($_GET["id_vehicle"]!="")
 	{
 		$results=q("SELECT * FROM vehicles_".$_GET["lang"]." WHERE Exclude=0 AND id_vehicle=".$_GET["id_vehicle"].";", $dbshop, __FILE__, __LINE__);
-		$row=mysql_fetch_array($results);
+		$row=mysqli_fetch_array($results);
 		$_GET["id_model"]=$row["KModNr"];
 		$_GET["id_manufacturer"]=$row["KHerNr"];
 	}
@@ -37,7 +37,7 @@
 	echo '<select style="width:160px;" name="id_manufacturer" onchange="select_manufacturer(this.value)">';
 	echo '<option>Hersteller wählen...</option>';
 	$results=q("SELECT * FROM vehicles_".$_GET["lang"]." WHERE Exclude=0 GROUP BY KHerNr ORDER BY BEZ1;", $dbshop, __FILE__, __LINE__);
-	while($row=mysql_fetch_array($results))
+	while($row=mysqli_fetch_array($results))
 	{
 		if ($_GET["id_manufacturer"]==$row["KHerNr"]) $selected=' selected="selected"'; else $selected='';
 		echo '<option'.$selected.' value="'.$row["KHerNr"].'">'.$row["BEZ1"].'</option>';
@@ -52,7 +52,7 @@
 		echo '<select style="width:160px;" name="id_model" onchange="select_model(this.value)">';
 		$results=q("SELECT * FROM vehicles_".$_GET["lang"]." WHERE Exclude=0 AND KHerNr='".$_GET["id_manufacturer"]."' GROUP BY KModNr ORDER BY BEZ2;", $dbshop, __FILE__, __LINE__);
 		echo '<option>Modell wählen...</option>';
-		while($row=mysql_fetch_array($results))
+		while($row=mysqli_fetch_array($results))
 		{
 			if ($_GET["id_model"]==$row["KModNr"]) $selected=' selected="selected"'; else $selected='';
 			echo '<option'.$selected.' value="'.$row["KModNr"].'">'.$row["BEZ2"].'</option>';
@@ -67,7 +67,7 @@
 		$results=q("SELECT * FROM vehicles_".$_GET["lang"]." WHERE Exclude=0 AND KModNr=".$_GET["id_model"]." ORDER BY BEZ3;", $dbshop, __FILE__, __LINE__);
 		echo '<select style="width:160px;" name="id_vehicle" onchange="select_vehicle(this.value)">';
 		echo '<option>Typ wählen...</option>';
-		while($row=mysql_fetch_array($results))
+		while($row=mysqli_fetch_array($results))
 		{
 			if ($_GET["id_vehicle"]==$row["id_vehicle"]) $selected=' selected="selected"'; else $selected='';
 			echo '<option'.$selected.' value="'.$row["id_vehicle"].'">'.$row["BEZ3"].'</option>';

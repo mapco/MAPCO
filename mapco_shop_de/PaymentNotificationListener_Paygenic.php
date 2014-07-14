@@ -52,7 +52,7 @@
 	
 	$postfields["API"]="payments";
 	$postfields["APIRequest"]="PaymentsNotificationSet_Paygenic";
-	$postfields["usertoken"]="merci2664";
+	$postfields["usertoken"]="YoeBdHw035a9Ai0KkKDtHBaPorF5rGTquEGXPZ4GU7gqAaCcsM";
 	//$postfields["ipn_track_id"]=$ipn_track_id;
 	$postfields["id"]=$id;
 	$responseXML=post(PATH."soa2/", $postfields);

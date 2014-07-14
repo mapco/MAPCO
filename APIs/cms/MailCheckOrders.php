@@ -110,19 +110,8 @@
 	$xml .= '</mail>'."\n";
 //var_dump($msg); die();
 
-	$x = 0;
-	// isoliere mögliche ids
-	preg_match_all("/[0-9]{4,16}/is", $msg['subject'], $out);
-	for($j=0; $j<sizeof($out[0]); $j++)
-	{
-		if ( $out[0][$j] != '' )
-		{
-			$possible_ids[$x] = intval($out[0][$j]);
-			$x++;
-		}
-	}
 
-	if ( $x == 0 )
+	if ( $header->from[0]->host == 'amazon.fr' or $header->from[0]->host == 'amazon.de' or $header->from[0]->host == 'amazon.it' or $header->from[0]->host == 'amazon.uk' or $header->from[0]->host == 'amazon.es')
 	{
 		if (!$mail_struct->parts)  // simple
 		{
@@ -137,9 +126,8 @@
 		}
 		
 		$newmsg = $plainmsg;
-	//var_dump($plainmsg); die();
-		preg_match_all("/[0-9]{4,16}/is", $newmsg, $out);
-//var_dump($out); die();
+		//var_dump($plainmsg); die();
+		preg_match_all("/([0-9]{3})-([0-9]{7})-([0-9]{7})/is", $newmsg, $out);
 		for($j=0; $j<sizeof($out[0]); $j++)
 		{
 			if ( $out[0][$j] != '' )
@@ -149,155 +137,228 @@
 			}
 		}
 		
-		//var_dump($out); die();	
+		if ( $x > 0 )
+		{
+			if ( $x == 1 )
+			{
+				$where_ids .= " AmazonOrderID=".$possible_ids[0];
+			}
+			elseif ( $x > 1 )
+			{
+				$where_ids .= " AmazonOrderID IN (".implode (',', $possible_ids).")";
+			}			
+			$res_amazon=q("SELECT id_orders FROM amazon_orders WHERE ".$where_ids.";", $dbshop, __FILE__, __LINE__);
+			if ( mysqli_num_rows($res_amazon) == 0 )
+			{
+				$xml = '<Error>Id extrahiert, jedoch nicht in DB gefunden!</Error>';	
+			}			
+			while ($row_amazon=mysqli_fetch_assoc($res_amazon))
+			{
+				$res_shop=q("SELECT id_order FROM shop_orders WHERE foreign_OrderID=".$row_amazon['id_orders'].";", $dbshop, __FILE__, __LINE__);
+				if ( mysqli_num_rows($res_shop) == 0 )
+				{
+					$xml = '<Error>Amazon Order gefunden, jedoch noch keine Shop Order!</Error>';	
+				}
+				$row_shop=mysqli_fetch_assoc($res_shop);
+				$match_lvl4[$row_shop['id_order']]['match_lvl'] = 4;
+			}
+		}
+	}
+	else
+	{
+		$x = 0;
+		// isoliere mögliche orderids
+		preg_match_all("/[0-9]{4,16}/is", $msg['subject'], $out);
+		for($j=0; $j<sizeof($out[0]); $j++)
+		{
+			if ( $out[0][$j] != '' )
+			{
+				$possible_ids[$x] = intval($out[0][$j]);
+				$x++;
+			}
+		}
+	
+		if ( $x == 0 )
+		{
+			if (!$mail_struct->parts)  // simple
+			{
+				getpart($mbox,$_POST['msg_num'],$mail_struct,0);  // pass 0 as part-number
+			}
+			else
+			{  // multipart: cycle through each part
+				foreach ($mail_struct->parts as $partno0=>$p)
+				{
+					getpart($mbox,$_POST['msg_num'],$p,$partno0+1);
+				}
+			}
+			
+			$newmsg = $plainmsg;
+		//var_dump($plainmsg); die();
+			preg_match_all("/[0-9]{4,16}/is", $newmsg, $out);
+	//var_dump($out); die();
+			for($j=0; $j<sizeof($out[0]); $j++)
+			{
+				if ( $out[0][$j] != '' )
+				{
+					$possible_ids[$x] = intval($out[0][$j]);
+					$x++;
+				}
+			}
+			
+			//var_dump($out); die();	
+		}
+		
+		imap_close($mbox);
+		
+		if ( sizeof($possible_ids) > 0 )
+		{
+			array_unique($possible_ids);
+		}
+		
+		//GET SHOPS
+		$shop_type=array();
+		$shops=array();
+		$res_shop=q("SELECT id_shop, title, shop_type FROM shop_shops;", $dbshop, __FILE__, __LINE__);
+		while ($row_shop=mysqli_fetch_assoc($res_shop))
+		{
+			$shop_type[$row_shop["id_shop"]]=$row_shop["shop_type"];
+			$shops[$row_shop["id_shop"]]=$row_shop['title'];
+		}
+	
+		if ( $x>0 )
+		{
+			$match_lvl1 = array();
+			$match_lvl2 = array();
+			$match_lvl3 = array();
+			$match_lvl4 = array();
+			$orders = array();
+		
+			$sql = "SELECT id_order, combined_with, usermail FROM shop_orders WHERE";
+			
+			if ( $x == 1 )
+			{
+				$where_ids .= " id_order=".$possible_ids[0];
+			}
+			elseif ( $x > 1 )
+			{
+				$where_ids .= " id_order IN (".implode (',', $possible_ids).")";
+			}
+			
+			$sql .= $where_ids." ORDER BY lastmod DESC;";
+			$result_order=q($sql, $dbshop, __FILE__, __LINE__);
+			while ( $row_order=mysqli_fetch_assoc($result_order) )
+			{
+				if ( $row_order['combined_with'] > 0 )
+				{
+					$temp_order = $row_order['combined_with'];
+				}
+				else
+				{
+					$temp_order = $row_order['id_order'];
+				}
+				
+				if ( in_array($row_order['id_order'], $possible_ids) && $row_order['usermail'] == $msg['reply_toaddress'] )
+				{
+					$match_lvl4[$temp_order] = array();
+					$match_lvl4[$temp_order]['match_lvl'] = 4;
+				}
+				else
+				{
+					$match_lvl3[$temp_order] = array();
+					$match_lvl3[$temp_order]['match_lvl'] = 3;
+				}
+			}
+			
+			$where_ids = '';
+			$sql = "SELECT so.id_order, so.combined_with, so.usermail FROM shop_orders AS so, idims_auf_status AS ias WHERE";
+			if ( $x == 1 )
+			{
+				$where_ids .= " ias.rng_nr=".$possible_ids[0];
+			}
+			elseif ( $x > 1 )
+			{
+				$where_ids .= " ias.rng_nr IN (".implode (',', $possible_ids).")";
+			}
+			$sql .= $where_ids." AND so.id_order=ias.auf_id";
+			$result_rng=q($sql, $dbshop, __FILE__, __LINE__);
+			while ( $row_rng=mysqli_fetch_assoc($result_rng) )
+			{
+				if ( $row_rng['combined_with'] >0 )
+				{
+					$id_order = $row_rng['combined_with'];
+				}
+				else
+				{
+					$id_order = $row_rng['id_order'];
+				}
+				
+				if ( $row_rng['usermail'] == '' )
+				{
+					$sql2 = "SELECT usermail FROM cms_users WHERE id_user=".$id_order.";";
+					$result_user=q($sql2, $dbweb, __FILE__, __LINE__);
+					$row_user=mysqli_fetch_array($result_user);
+					$row_rng['usermail'] = $row_user['usermail'];
+				}
+			//	var_dump($row_rng['usermail'] +'=='+ $msg['reply_toaddress']);
+				if ( $row_rng['usermail'] == $msg['reply_toaddress'] )
+				{
+					$match_lvl2[$id_order] = array();
+					$match_lvl2[$id_order]['match_lvl'] = 2;
+				}
+				else
+				{
+					$match_lvl1[$id_order] = array();
+					$match_lvl1[$id_order]['match_lvl'] = 1;
+				}
+			}
+				
+			$where_ids = '';
+			$sql = "SELECT DISTINCT so.id_order, so.combined_with, so.usermail FROM shop_orders AS so, shop_orders_items AS soi, ebay_orders_items AS eoi WHERE";
+			if ( $x == 1 )
+			{
+				$where_ids .= " eoi.ItemItemID=".$possible_ids[0];
+			}
+			elseif ( $x > 1 )
+			{
+				$where_ids .= " eoi.ItemItemID IN (".implode (',', $possible_ids).")";
+			}
+			$sql .= $where_ids." AND soi.foreign_transactionID=eoi.TransactionID AND so.id_order=soi.order_id";
+			$result_ebay=q($sql, $dbshop, __FILE__, __LINE__);
+			while ( $row_ebay=mysqli_fetch_assoc($result_ebay) )
+			{
+				if ( $row_rng['combined_with'] >0 )
+				{
+					$id_order = $row_ebay['combined_with'];
+				}
+				else
+				{
+					$id_order = $row_ebay['id_order'];
+				}
+				
+				if ( $row_ebay['usermail'] == '' )
+				{
+					$sql2 = "SELECT usermail FROM cms_users WHERE id_user=".$id_order.";";
+					$result_user=q($sql2, $dbweb, __FILE__, __LINE__);
+					$row_user=mysqli_fetch_array($result_user);
+					$row_ebay['usermail'] = $row_user['usermail'];
+				}
+	//			var_dump($row_rng['usermail'] +'=='+ $msg['reply_toaddress']);
+				if ( $row_ebay['usermail'] == $msg['reply_toaddress'] )
+				{
+					$match_lvl2[$id_order] = array();
+					$match_lvl2[$id_order]['match_lvl'] = 2;
+				}
+				else
+				{
+					$match_lvl1[$id_order] = array();
+					$match_lvl1[$id_order]['match_lvl'] = 1;
+				}
+			}
+		}
 	}
 	
-	imap_close($mbox);
-	
-	if ( sizeof($possible_ids) > 0 )
+	if ( $x > 0 )
 	{
-		array_unique($possible_ids);
-	}
-	
-	//GET SHOPS
-	$shop_type=array();
-	$shops=array();
-	$res_shop=q("SELECT id_shop, title, shop_type FROM shop_shops;", $dbshop, __FILE__, __LINE__);
-	while ($row_shop=mysqli_fetch_assoc($res_shop))
-	{
-		$shop_type[$row_shop["id_shop"]]=$row_shop["shop_type"];
-		$shops[$row_shop["id_shop"]]=$row_shop['title'];
-	}
-
-	if ( $x>0 )
-	{
-		$match_lvl1 = array();
-		$match_lvl2 = array();
-		$match_lvl3 = array();
-		$match_lvl4 = array();
-		$orders = array();
-	
-		$sql = "SELECT id_order, combined_with, usermail FROM shop_orders WHERE";
-		
-		if ( $x == 1 )
-		{
-			$where_ids .= " id_order=".$possible_ids[0];
-		}
-		elseif ( $x > 1 )
-		{
-			$where_ids .= " id_order IN (".implode (',', $possible_ids).")";
-		}
-		
-		$sql .= $where_ids." ORDER BY lastmod DESC;";
-		$result_order=q($sql, $dbshop, __FILE__, __LINE__);
-		while ( $row_order=mysqli_fetch_assoc($result_order) )
-		{
-			if ( $row_order['combined_with'] > 0 )
-			{
-				$temp_order = $row_order['combined_with'];
-			}
-			else
-			{
-				$temp_order = $row_order['id_order'];
-			}
-			
-			if ( in_array($row_order['id_order'], $possible_ids) && $row_order['usermail'] == $msg['reply_toaddress'] )
-			{
-				$match_lvl4[$temp_order] = array();
-				$match_lvl4[$temp_order]['match_lvl'] = 4;
-			}
-			else
-			{
-				$match_lvl3[$temp_order] = array();
-				$match_lvl3[$temp_order]['match_lvl'] = 3;
-			}
-		}
-		
-		$where_ids = '';
-		$sql = "SELECT so.id_order, so.combined_with, so.usermail FROM shop_orders AS so, idims_auf_status AS ias WHERE";
-		if ( $x == 1 )
-		{
-			$where_ids .= " ias.rng_nr=".$possible_ids[0];
-		}
-		elseif ( $x > 1 )
-		{
-			$where_ids .= " ias.rng_nr IN (".implode (',', $possible_ids).")";
-		}
-		$sql .= $where_ids." AND so.id_order=ias.auf_id";
-		$result_rng=q($sql, $dbshop, __FILE__, __LINE__);
-		while ( $row_rng=mysqli_fetch_assoc($result_rng) )
-		{
-			if ( $row_rng['combined_with'] >0 )
-			{
-				$id_order = $row_rng['combined_with'];
-			}
-			else
-			{
-				$id_order = $row_rng['id_order'];
-			}
-			
-			if ( $row_rng['usermail'] == '' )
-			{
-				$sql2 = "SELECT usermail FROM cms_users WHERE id_user=".$id_order.";";
-				$result_user=q($sql2, $dbweb, __FILE__, __LINE__);
-				$row_user=mysqli_fetch_array($result_user);
-				$row_rng['usermail'] = $row_user['usermail'];
-			}
-		//	var_dump($row_rng['usermail'] +'=='+ $msg['reply_toaddress']);
-			if ( $row_rng['usermail'] == $msg['reply_toaddress'] )
-			{
-				$match_lvl2[$id_order] = array();
-				$match_lvl2[$id_order]['match_lvl'] = 2;
-			}
-			else
-			{
-				$match_lvl1[$id_order] = array();
-				$match_lvl1[$id_order]['match_lvl'] = 1;
-			}
-		}
-			
-		$where_ids = '';
-		$sql = "SELECT DISTINCT so.id_order, so.combined_with, so.usermail FROM shop_orders AS so, shop_orders_items AS soi, ebay_orders_items AS eoi WHERE";
-		if ( $x == 1 )
-		{
-			$where_ids .= " eoi.ItemItemID=".$possible_ids[0];
-		}
-		elseif ( $x > 1 )
-		{
-			$where_ids .= " eoi.ItemItemID IN (".implode (',', $possible_ids).")";
-		}
-		$sql .= $where_ids." AND soi.foreign_transactionID=eoi.TransactionID AND so.id_order=soi.order_id";
-		$result_ebay=q($sql, $dbshop, __FILE__, __LINE__);
-		while ( $row_ebay=mysqli_fetch_assoc($result_ebay) )
-		{
-			if ( $row_rng['combined_with'] >0 )
-			{
-				$id_order = $row_ebay['combined_with'];
-			}
-			else
-			{
-				$id_order = $row_ebay['id_order'];
-			}
-			
-			if ( $row_ebay['usermail'] == '' )
-			{
-				$sql2 = "SELECT usermail FROM cms_users WHERE id_user=".$id_order.";";
-				$result_user=q($sql2, $dbweb, __FILE__, __LINE__);
-				$row_user=mysqli_fetch_array($result_user);
-				$row_ebay['usermail'] = $row_user['usermail'];
-			}
-//			var_dump($row_rng['usermail'] +'=='+ $msg['reply_toaddress']);
-			if ( $row_ebay['usermail'] == $msg['reply_toaddress'] )
-			{
-				$match_lvl2[$id_order] = array();
-				$match_lvl2[$id_order]['match_lvl'] = 2;
-			}
-			else
-			{
-				$match_lvl1[$id_order] = array();
-				$match_lvl1[$id_order]['match_lvl'] = 1;
-			}
-		}
 		$orders += $match_lvl4;
 		$orders += $match_lvl3;
 		$orders += $match_lvl2;
@@ -310,7 +371,7 @@
 		
 		if ( sizeof($arr_order_ids) > 0 )
 		{
-			$sql = "SELECT so.id_order, sost.title AS order_status, so.shop_id, so.usermail, so.bill_adr_id, so.bill_company, so.bill_firstname, so.bill_lastname, so.bill_street, so.bill_number, so.bill_additional, so.bill_zip, so.bill_city, so.customer_id, so.firstmod, so.lastmod FROM shop_orders AS so, shop_orders_state_types AS sost, shop_orders_items AS soi, shop_items AS si WHERE";
+			$sql = "SELECT so.id_order, so.foreign_OrderID, ss.shop_type, sost.title AS order_status, so.shop_id, so.usermail, so.bill_adr_id, so.bill_company, so.bill_firstname, so.bill_lastname, so.bill_street, so.bill_number, so.bill_additional, so.bill_zip, so.bill_city, so.customer_id, so.firstmod, so.lastmod FROM shop_orders AS so, shop_orders_state_types AS sost, shop_orders_items AS soi, shop_items AS si WHERE";
 			$where_ids = '';
 			if ( sizeof($arr_order_ids) > 1)
 			{
@@ -321,7 +382,7 @@
 				$where_ids .= " id_order=".$arr_order_ids[0];
 			}
 	
-			$sql .= $where_ids." AND soi.order_id=so.id_order AND soi.item_id=si.id_item AND sost.shop_orders_status_id=so.status_id ORDER BY so.lastmod DESC;";
+			$sql .= $where_ids." AND soi.order_id=so.id_order AND soi.item_id=si.id_item AND sost.shop_orders_status_id=so.status_id AND ss.id_shop=so.shop_id ORDER BY so.lastmod DESC LIMIT 1;";
 
 			$result_order_detail=q($sql, $dbshop, __FILE__, __LINE__);
 			while ( $row_order_detail=mysqli_fetch_assoc($result_order_detail) )
@@ -339,6 +400,15 @@
 				$orders[$row_order_detail['id_order']]['user_id'] = $row_order_detail['customer_id'];
 				$orders[$row_order_detail['id_order']]['usermail'] = $row_order_detail['usermail'];
 				$orders[$row_order_detail['id_order']]['firstmod'] = $row_order_detail['firstmod'];
+				
+				if ( $row_order_detail['shop_type'] == 2 )
+				{
+					$orders[$row_order_detail['id_order']]['ebay_order_id'] = $row_order_detail['foreign_OrderID'];
+				}
+				elseif ( $row_order_detail['shop_type'] == 3 )
+				{
+					$orders[$row_order_detail['id_order']]['amazon_order_id'] = $row_order_detail['foreign_OrderID'];
+				}
 				
 				if ( $row_order_detail['customer_id'] != NULL || $row_order_detail['customer_id'] != '' )
 				{

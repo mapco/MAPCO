@@ -81,14 +81,16 @@
 			}
 		}
 	}
-	//GET shipping_title, payment_title
+	//GET shipping_title, payment_title, shipping, payment
 	$shipping_title = 	array();
 	$payment_title = 	array();
+	$shippingname = 	array();
+	$payment = 			array();
 	
 	for ($k=0; $k<sizeof($order); $k++)
-	{
+	{		
 		if($order[$k]["shipping_type_id"]!=0)
-		{
+		{			
 			$res_shipping=q("SELECT * FROM shop_shipping_types WHERE id_shippingtype = ".$order[$k]["shipping_type_id"].";", $dbshop, __FILE__, __LINE__);
 			if (mysqli_num_rows($res_shipping)==1)
 			{
@@ -112,6 +114,27 @@
 			else
 			{
 				$payment_title[$k]="";
+			}
+		}
+		
+		// get payment & shipping
+		$country_id = 1;
+		$res2 = q( "SELECT * FROM shop_bill_adr WHERE adr_id=" . $order[$k]['bill_adr_id'], $dbshop, __FILE__, __LINE__ );
+		if ( mysqli_num_rows( $res2 ) > 0 )
+		{
+			$shop_bill_adr = 	mysqli_fetch_assoc( $res2 );
+			$country_id = 		$shop_bill_adr['country_id'];
+		}
+		$res3 = q( "SELECT * FROM shop_payment WHERE active=1 AND paymenttype_id=" . $order[$k]['payments_type_id'] . ' AND shop_id=' . $order[$k]['shop_id'] . ' AND country_id=' . $country_id, $dbshop, __FILE__, __LINE__ );
+		if ( mysqli_num_rows( $res3 ) > 0 )
+		{
+			$shop_payment = mysqli_fetch_assoc( $res3 );
+			$payment[$k] = 	$shop_payment['payment'];
+			$res4 = 		q( "SELECT * FROM shop_shipping WHERE active=1 AND payment_id=" . $shop_payment['id_payment'] . ' AND shippingtype_id=' . $order[$k]['shipping_type_id'], $dbshop, __FILE__, __LINE__ );
+			if ( mysqli_num_rows( $res4 ) > 0 )
+			{
+				$shop_shipping = 	mysqli_fetch_assoc( $res4 );
+				$shippingname[$k] = $shop_shipping['shipping'];
 			}
 		}
 	}
@@ -336,6 +359,7 @@
 	$xmldata.="	<shipping_details><![CDATA[".$order[0]["shipping_details"]."]]></shipping_details>\n";
 	$xmldata.="	<shipping_details_memo><![CDATA[".$order[0]["shipping_details_memo"]."]]></shipping_details_memo>\n";
 	$xmldata.="	<shipping_type_id><![CDATA[".$order[0]["shipping_type_id"]."]]></shipping_type_id>\n";
+	$xmldata.="	<shipping><![CDATA[".$shippingname[0]."]]></shipping>\n";
 	$xmldata.="	<shipping_title><![CDATA[".$shipping_title[0]."]]></shipping_title>\n";
 	$xmldata.="	<shipping_title_2><![CDATA[".$shipping_title[0]."]]></shipping_title_2>\n";
 	$xmldata.="	<shipping_number><![CDATA[".$order[0]["shipping_number"]."]]></shipping_number>\n";
@@ -343,6 +367,7 @@
 	
 	$xmldata.="	<payments_type_id>".$order[0]["payments_type_id"]."</payments_type_id>\n";
 	$xmldata.="	<payment_title><![CDATA[".$payment_title[0]."]]></payment_title>\n";
+	$xmldata.="	<payment><![CDATA[".$payment[0]."]]></payment>\n";
 	$xmldata.="	<invoice_id>".$order[0]["invoice_id"]."</invoice_id>\n";
 	$xmldata.="	<invoice_nr><![CDATA[".$order[0]["invoice_nr"]."]]></invoice_nr>\n";
 	$xmldata.="	<userphone><![CDATA[".$order[0]["userphone"]."]]></userphone>\n";
@@ -647,6 +672,20 @@
 		if ( mysqli_num_rows( $res_article_image ) > 0 )
 		{
 			$row_article_image = mysqli_fetch_assoc( $res_article_image );
+			//tumbnail
+			$results=q("SELECT * FROM cms_files WHERE original_id='" . $row_article_image["file_id"] . "' AND imageformat_id=" . $shop[$order[0]['shop_id']]["imageformat_id"] . " LIMIT 1;", $dbweb, __FILE__, __LINE__);
+			$row2 = mysqli_fetch_array( $results );
+			
+			$postdata = 			array();
+			$postdata["API"] = 		"cms";
+			$postdata["Action"] = 	"ImageThumbnail";
+			$postdata["id_file"] = 	$row2["id_file"];
+			
+			$src = post(PATH."soa/", $postdata);
+			
+			$xmldata .= '<ItemThumbSrc>' . $src . '</ItemThumbSrc>' . "\n";
+			
+			// other images
 			$res_image_files = q("SELECT * FROM cms_files WHERE id_file = ".$row_article_image["file_id"]." OR original_id = ".$row_article_image["file_id"], $dbweb, __FILE__, __LINE__);
 			while ($row_image_files = mysqli_fetch_assoc( $res_image_files ))
 			{
@@ -655,6 +694,17 @@
 				$xmldata .= "				<ItemPictureFilePath>".floor($row_image_files["id_file"]/1000)."/".$row_image_files["id_file"].".".$row_image_files["extension"]."</ItemPictureFilePath>\n";
 				$xmldata .= "			</ItemPicture>\n";
 			}
+		}
+		else
+		{
+			$postdata = 			array();
+			$postdata["API"] = 		"cms";
+			$postdata["Action"] = 	"ImageThumbnail";
+			$postdata["id_file"] = 	0;
+			
+			$src = post(PATH."soa/", $postdata);
+			
+			$xmldata .= '<ItemThumbSrc>' . $src . '</ItemThumbSrc>' . "\n";
 		}
 		$xmldata .= "		</ItemPictures>\n";
 		

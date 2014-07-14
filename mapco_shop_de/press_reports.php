@@ -16,7 +16,7 @@
 	{
 			echo '<h3>'.$row["title"].'</h3>';
 			echo '<p>'.$row["introduction"].'</p>';
-			echo '<p><a style="font-size:14px; float:right;" href="'.PATHLANG.'presse/presseberichte/'.$row["id_article"].'/'.url_encode($row["title"]).'" title="'.$row["title"].'">'.t("weiterlesen").'</a></p>';
+			echo '<p><a style="font-size:14px; float:right;" href="'.PATHLANG.'news/'.$row["id_article"].'/'.url_encode($row["title"]).'" title="'.$row["title"].'">'.t("weiterlesen").'</a></p>';
 			if ($i<4) echo '<br style="clear:both;" /><hr />';
 	}
 	echo '</div>';

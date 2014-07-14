@@ -8,8 +8,11 @@
 	
 	define('TABLE_CREDITS', 'shop_orders_credits2');
 	define('TABLE_CREDITS_POSITIONS', 'shop_orders_credits_positions');
+	define('TABLE_CREDITS_REASONS', 'shop_orders_credits_reasons');
+	
 	define('TABLE_RETURNS', 'shop_returns2');
 	define('TABLE_RETURNS_ITEMS', 'shop_returns_items');
+	
 	define('TABLE_SHOP_ORDERS', 'shop_orders');
 	define('TABLE_SHOP_ORDERS_ITEMS', 'shop_orders_items');
 	define('TABLE_SHOP_ITEMS', 'shop_items');
@@ -38,6 +41,13 @@
 		$credit_positions[] = $row_credit_positions;
 	}
 
+	//GET CREDIT REASONS
+	$credit_reasons = array();
+	$res_credit_reasons = q("SELECT * FROM ".TABLE_CREDITS_REASONS, $dbshop, __FILE__, __LINE__);
+	while ( $row_credit_reasons = mysqli_fetch_assoc( $res_credit_reasons ) )
+	{
+		$credit_reasons[$row_credit_reasons['id_reason']] = $row_credit_reasons;		
+	}
 
 	$return_items = array();
 	
@@ -195,11 +205,15 @@
 	{
 		$user_id[] = $return["firstmod_user"];
 		$user_id[] = $return["lastmod_user"];	
+		$user_id[] = $return["closed_by_user"];	
 	}
 	if ( isset( $order_exchange ) )
 	{
+		$user_id[] = $return["firstmod_user"];
+		$user_id[] = $return["lastmod_user"];	
+		$user_id[] = $return["closed_by_user"];	
 		$user_id[] = $order_exchange["firstmod_user"];
-		$user_id[] = $order_exchange["lastmod_user"];	
+		$user_id[] = $order_exchange["lastmod_user"];
 	}
 
 	$usernames = array();
@@ -268,6 +282,11 @@
 					$xmldata .= '			<'.$key.'><![CDATA['.$val.']]></'.$key.'>'."\n";
 				}
 			}
+			//REASON TITLE
+			$xmldata .= '			<reason_title><![CDATA['.$credit_reasons[$credit_position['reason_id']] ['title'].']]></reason_title>'."\n";
+			//REASON DESCRIPTION
+//			$xmldata .= '			<reason_description><![CDATA['.$credit_reasons[$credit_position['reason_id']] ['description'].']]></reason_description>'."\n";
+			
 			// R E T U R N
 			if ( $credit_position['reason_id'] == 1 && isset( $return ) )
 			{
@@ -283,6 +302,10 @@
 						$xmldata .= '				<'.$key.'><![CDATA['.$val.']]></'.$key.'>'."\n";
 					}
 				}
+				//USERNAMES
+				$xmldata .= '	<closed_by_user_name><![CDATA['.$usernames[$return['closed_by_user']].']]></closed_by_user_name>'."\n";
+				$xmldata .= '	<firstmod_user_name><![CDATA['.$usernames[$return['firstmod_user']].']]></firstmod_user_name>'."\n";
+				$xmldata .= '	<lastmod_user_name><![CDATA['.$usernames[$return['lastmod_user']].']]></lastmod_user_name>'."\n";
 				// R E T U R N I T E M S
 				if ( sizeof( $return_items ) > 0 )
 				{
@@ -301,58 +324,76 @@
 								$xmldata .= '						<'.$key.'><![CDATA['.$val.']]></'.$key.'>'."\n";
 							}
 						}
+						//USERNAMES
+						$xmldata .= '	<firstmod_user_name><![CDATA['.$usernames[$return_item['firstmod_user']].']]></firstmod_user_name>'."\n";
+						$xmldata .= '	<lastmod_user_name><![CDATA['.$usernames[$return_item['lastmod_user']].']]></lastmod_user_name>'."\n";
+
 						//ITEMTITLE
-						$xmldata .= '						<returnitem_title><![CDATA['.$itemtitle[$return_item['item_id']].']]></returnitem_title>'."\n";
-						
+						$xmldata .= '						<returnitem_title><![CDATA['.$itemtitle[$return_item['item_id']].']]></returnitem_title>'."\n";		
+						//ITEM MPN
+						$xmldata .= '						<returnitem_MPN><![CDATA['.$MPN[$return_item['item_id']].']]></returnitem_MPN>'."\n";
+						//ITEM PRICE
+						$xmldata .= '						<returnitem_price><![CDATA['.$orderitems[$return_item['shop_orders_items_id']] ['price'].']]></returnitem_price>'."\n";
+						//ITEM NET
+						$xmldata .= '						<returnitem_net><![CDATA['.$orderitems[$return_item['shop_orders_items_id']] ['net'].']]></returnitem_net>'."\n";
+						//ITEM Exchangerate
+						$xmldata .= '						<returnitem_exchange_rate_to_EUR><![CDATA['.$orderitems[$return_item['shop_orders_items_id']] ['exchange_rate_to_EUR'].']]></returnitem_exchange_rate_to_EUR>'."\n";
+
 						$xmldata .= '					</returnitem>'."\n";
 					}
 					$xmldata .= '				</returnitems>'."\n";
 				}
 				$xmldata .= '			</return>'."\n";
-			}
 
-			//E X C H N A G E O R D E R
-			if ( isset( $return ) && $return['return_type'] == 'exchange' && isset( $order_exchange ) )
-			{
-				$xmldata .= '			<exchange_order>'."\n";
-				foreach ( $order_exchange as $key => $val )
+				//E X C H N A G E O R D E R
+				if ( isset( $return ) && $return['return_type'] == 'exchange' && isset( $order_exchange ) )
 				{
-					if ( is_numeric( $val ) )
+					$xmldata .= '			<exchange_order>'."\n";
+					foreach ( $order_exchange as $key => $val )
 					{
-						$xmldata .= '				<'.$key.'>'.$val.'</'.$key.'>'."\n";
-					}
-					else
-					{
-						$xmldata .= '				<'.$key.'><![CDATA['.$val.']]></'.$key.'>'."\n";
-					}
-				}
-				// E X C H N A G E O R D E R I T E M S
-				if ( sizeof( $order_items_exchange ) > 0 )
-				{
-					$xmldata .= '				<exchangeorderitems>'."\n";
-					foreach ( $order_items_exchange as $order_item_exchange )
-					{
-						$xmldata .= '					<exchangordereitem>'."\n";
-						foreach ( $order_item_exchange as $key => $val )
+						if ( is_numeric( $val ) )
 						{
-							if ( is_numeric( $val ) )
-							{
-								$xmldata .= '						<'.$key.'>'.$val.'</'.$key.'>'."\n";
-							}
-							else
-							{
-								$xmldata .= '						<'.$key.'><![CDATA['.$val.']]></'.$key.'>'."\n";
-							}
+							$xmldata .= '				<'.$key.'>'.$val.'</'.$key.'>'."\n";
 						}
-						//ITEMTITLE
-						$xmldata .= '						<exchangordereitem_title><![CDATA['.$itemtitle[$order_item_exchange['item_id']].']]></exchangordereitem_title>'."\n";
-
-						$xmldata .= '					</exchangordereitem>'."\n";
+						else
+						{
+							$xmldata .= '				<'.$key.'><![CDATA['.$val.']]></'.$key.'>'."\n";
+						}
 					}
-					$xmldata .= '				</exchangeorderitems>'."\n";
+					//USERNAMES
+					$xmldata .= '	<firstmod_user_name><![CDATA['.$usernames[$order_exchange['firstmod_user']].']]></firstmod_user_name>'."\n";
+					$xmldata .= '	<lastmod_user_name><![CDATA['.$usernames[$order_exchange['lastmod_user']].']]></lastmod_user_name>'."\n";
+	
+					// E X C H N A G E O R D E R I T E M S
+					if ( sizeof( $order_items_exchange ) > 0 )
+					{
+						$xmldata .= '				<exchangeorderitems>'."\n";
+						foreach ( $order_items_exchange as $order_item_exchange )
+						{
+							$xmldata .= '					<exchangeorderitem>'."\n";
+							foreach ( $order_item_exchange as $key => $val )
+							{
+								if ( is_numeric( $val ) )
+								{
+									$xmldata .= '						<'.$key.'>'.$val.'</'.$key.'>'."\n";
+								}
+								else
+								{
+									$xmldata .= '						<'.$key.'><![CDATA['.$val.']]></'.$key.'>'."\n";
+								}
+							}
+							//ITEMTITLE
+							$xmldata .= '						<exchangeorderitem_title><![CDATA['.$itemtitle[$order_item_exchange['item_id']].']]></exchangeorderitem_title>'."\n";
+	
+							//ITEM MPN
+							$xmldata .= '						<exchangeorderitem_MPN><![CDATA['.$MPN[$order_item_exchange['item_id']].']]></exchangeorderitem_MPN>'."\n";
+	
+							$xmldata .= '					</exchangeorderitem>'."\n";
+						}
+						$xmldata .= '				</exchangeorderitems>'."\n";
+					}
+					$xmldata .= '			</exchange_order>'."\n";
 				}
-				$xmldata .= '			</exchange_order>'."\n";
-				
 			}
 			$xmldata .= '		</creditposition>'."\n";
 		}

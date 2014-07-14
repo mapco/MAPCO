@@ -192,6 +192,7 @@
 					$html += '<table>';
 					$html += '	<tr>';
 					$html += '		<th>Nr.</th>';
+					$html += '		<th>ID</th>';
 					$html += '		<th>Shop</th>';
 					$html += '		<th>Domain</th>';
 					$html += '		<th>';
@@ -204,6 +205,8 @@
 						$nr++;
 						$html += '	<tr>';
 						$html += '		<td>'+$nr+'</td>';
+						var $id_shop=$(this).find("id_shop").text();
+						$html += '		<td>'+$id_shop+'</td>';
 						var $title=$(this).find("title").text();
 						$html += '		<td>'+$title+'</td>';
 						var $domain=$(this).find("domain").text();

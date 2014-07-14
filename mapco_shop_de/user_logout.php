@@ -1,14 +1,21 @@
 <?php
+
 	include("config.php");
-	$title="Abmeldung";	
+	//$title="Abmeldung";	
+	
+	//$id_language = $_SESSION['id_language'];
 	
 	session_unset();
 	session_destroy();
 	session_start();
 	session_regenerate_id();
 	
+	//$_SESSION['id_language'] = $id_language;
+	
+	include("config.php");
 	include("templates/".TEMPLATE."/header.php");
 	include("functions/cms_t.php");
+	
 	
 	//left column
 //	include("templates/".TEMPLATE."/cms_leftcolumn.php");

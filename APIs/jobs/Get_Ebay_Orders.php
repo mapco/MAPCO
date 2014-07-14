@@ -1,10 +1,10 @@
 <?php
 
 if (!isset($_POST["from"])) $_POST["from"]=time()-3*3600; 
-//$_POST["from"]=mktime(0,0,1,6,4,2014);
+//$_POST["from"]=mktime(0,0,1,7,8,2014);
 //$_POST["from"]=time()-20*3600; 
 if (!isset($_POST["to"])) $_POST["to"]=time();
-//$_POST["to"]=mktime(23,59,59,6,4,2014);
+//$_POST["to"]=mktime(23,59,59,7,8,2014);
 //$_POST["to"]=time()-6*3600;
 
 	// ABFRAGEZEITRAUM um 5 Minuten verkürzen, um Überschneidungen bei ZUsammenfassungen und anschließender Zahlung zu vermeiden

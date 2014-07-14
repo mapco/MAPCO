@@ -5,17 +5,62 @@
 	include("functions/shop_show_item.php");
 	include("functions/shop_itemstatus.php");
 	include("functions/mapco_get_titles.php");
+	include("functions/cms_t.php");
+	include("functions/cms_tl.php");
 	
-	//language check
-	if ( !isset($_GET["lang"]) ) $_GET["lang"]="de";
+
+	if(($_SESSION["id_shop"]>8 and $_SESSION["id_shop"]<17) or $_SESSION["id_shop"]==18)
+	{
+		$login_required=true;	
+	}
 	
-	//redirect old URLs	
-	if ( strpos($_SERVER['REQUEST_URI'], "shop_searchbycar.php") )
+	//redirect OBSOLETE standard vehicle-id search
+	if ( $_GET["id_menuitem"]==825 )
+	{
+		$link  = PATHLANG.tl(826, "alias");
+		if( isset($_GET["getvars1"]) and $_GET["getvars1"]!="" ) $link .= $_GET["getvars1"]."/";
+		if( isset($_GET["getvars2"]) and $_GET["getvars2"]!="" ) $link .= $_GET["getvars2"]."/";
+		header("HTTP/1.1 301 Moved Permanently");
+		header("location: ".$link);
+		exit;
+	}
+	//redirect OBSOLETE kba vehicle search
+	elseif ( $_GET["id_menuitem"]==829 )
+	{
+		$link  = PATHLANG.tl(828, "alias");
+		if( isset($_GET["getvars1"]) and $_GET["getvars1"]!="" ) $link .= $_GET["getvars1"]."/";
+		header("HTTP/1.1 301 Moved Permanently");
+		header("location: ".$link);
+		exit;
+	}
+	//standard vehicle-id search
+	elseif ( $_GET["id_menuitem"]==826 )
+	{
+		$_GET["id_vehicle"]=$_GET["getvars1"];
+		if( isset($_GET["getvars2"]) and $_GET["getvars2"]!="" ) $_GET["kbanr"]=$_GET["getvars2"];
+	}
+	//kba vehicle search
+	elseif ( $_GET["id_menuitem"]==828 )
+	{
+		$_GET["kbanr"]=$_GET["getvars1"];
+	}
+	//carfleet search
+	elseif ( $_GET["id_menuitem"]==830 )
+	{
+		$results=q("SELECT * FROM shop_carfleet WHERE id=".$_GET["getvars1"]." AND shop_id=".$_SESSION["id_shop"].";", $dbshop, __FILE__, __LINE__);
+		if( mysqli_num_rows($results)>0 )
+		{
+			$row=mysqli_fetch_assoc($results);
+			$_GET["id_vehicle"]=$row["vehicle_id"];
+			$_GET["kbanr"]=$row["kbanr"];
+		}
+	}
+	else
 	{
 		if ( isset($_GET["id_vehicle"]) and is_numeric($_GET["id_vehicle"]) )
 		{
 			header("HTTP/1.1 301 Moved Permanently");
-			header("location: ".PATHLANG.'fahrzeugsuche/'.$_GET["id_vehicle"].'/');
+			header("location: ".PATHLANG.tl(826, "alias").$_GET["id_vehicle"].'/');
 			exit;
 		}
 	}
@@ -116,10 +161,11 @@
 		}
 		//**************************************************************
 		$vehicle_Year=baujahr($row["BJvon"]).' - '.baujahr($row["BJbis"]);
-		$vehicle_Power=number_format($row["kW"]).'kW ('.number_format($row["PS"]).'PS)';
+		$vehicle_Power=number_format($row["kW"]).t("kW").' ('.number_format($row["PS"]).t("PS").')';
 		$vehicle_CubicCapacity=number_format($row["ccmTech"]).'ccm';
 		$vehicle_Motor=motorart($row["MotArt"]);
-		$title='Autoteile für '.$vehicle_title.' günstig online kaufen';
+		$meta_title.=" ".$vehicle_title.' '.$vehicle_Power;
+		$meta_description=$vehicle_title.' '.$vehicle_Power." ".$meta_description;
 
 		include("templates/".TEMPLATE."/header.php");
 		
@@ -188,7 +234,7 @@
 		echo '<tr><td>'.t("Baujahr").'</td><td>'.$vehicle_Year.'</td></tr>';
 		echo '<tr><td>'.t("Leistung").'</td><td>'.$vehicle_Power.'</td></tr>';
 		echo '<tr><td>'.t("Hubraum").'</td><td>'.$vehicle_CubicCapacity.'</td></tr>';
-		echo '<tr><td>'.t("Motorart").'</td><td>'.$vehicle_Motor.'</td></tr>';
+		echo '<tr><td>'.t("Motorart").'</td><td>'.t($vehicle_Motor).'</td></tr>';
 		if($_SESSION["id_user"]!=0)
 		{
 			$responseXml = post(PATH."soa2/", array("API" => "shop", "APIRequest" => "CarfleetAdd", "id_vehicle" => $_GET["id_vehicle"], "kbanr" => $kba_nr));
@@ -254,9 +300,13 @@
 			$category[$i]=$menuitem[$row2["menuitem_id"]];
 			if ( isset($catcount[$row2["menuitem_id"]]) ) $catcount[$row2["menuitem_id"]]++; else $catcount[$row2["menuitem_id"]]=1;
 
+			$results3=q("SELECT * FROM shop_items_keywords WHERE GART=".$row2["GART"]." AND language_id=".$_SESSION["id_language"]." ORDER BY ordering;", $dbshop, __FILE__, __LINE__);
+			$row3=mysqli_fetch_array($results3);
+			$title[$i]='MAPCO '.$row2["MPN"].' '.$row3["keyword"];
+
 			$results2=q("SELECT * FROM shop_items_".$_GET["lang"]." WHERE id_item=".$row["item_id"].";", $dbshop, __FILE__, __LINE__);
 			$row2=mysqli_fetch_array($results2);
-			$title[$i]=$row2["title"];
+//			$title[$i]=$row2["title"];
 			$description[$i]=$row2["short_description"];
 			if ( $row["criteria"]!="" ) $description[$i].='; <span style="color:#ff0000;">'.$row["criteria"].'</span>';
 
@@ -286,7 +336,7 @@
 //	echo $time=number_format($stoptime-$starttime, 2);
 
 	//show items by category
-	echo '<h2>Ersatzteile für '.$vehicle_title.'</h2>';
+	echo '<h2>'.t("Ersatzteile für").' '.$vehicle_title.'</h2>';
 	$categ='';
 	$j=0;
 	for($i=0; $i<sizeof($category); $i++)
@@ -302,9 +352,9 @@
 			}
 //			echo '<br style="clear:both;" />';
 			if(isset($_SESSION["id_user"]) and $_SESSION["id_user"]>0)
-				show_item($id_item[$i], $art_nr[$i], $title[$i].' für '.$vehicle_title, $description[$i], "", 1);
+				show_item($id_item[$i], $art_nr[$i], $title[$i], $description[$i], "", 1, $title[$i].' für '.$vehicle_title);
 			else
-				show_item($id_item[$i], $art_nr[$i], $title[$i].' für '.$vehicle_title, $description[$i], "", 0);
+				show_item($id_item[$i], $art_nr[$i], $title[$i], $description[$i], "", 0, $title[$i].' für '.$vehicle_title);
 			$j++;
 		}
 	}

@@ -3,6 +3,7 @@
 	include("templates/".TEMPLATE_BACKEND."/header.php");
 ?>
 
+<script src="<?php echo PATH; ?>javascript/cms/ArticleEditor/ImageView.php"></script>
 <script>
 	var id_imageprofile=0;
 	
@@ -44,7 +45,7 @@
 		var watermark=$("#imageformat_add_watermark").val();
 		var watermark_position=$("#imageformat_add_watermark_position").val();
 		var watermark_opacity=$("#imageformat_add_watermark_opacity").val();
-		$.post("modules/backend_cms_imageprofiles_actions.php", { action:"imageformat_add", imageprofile_id:id_imageprofile, title:title, width:width, height:height, aoe:aoe, zc:zc, zoom:zoom, background_image:background_image, watermark:watermark, watermark_position:watermark_position, watermark_opacity:watermark_opacity },
+		$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php", { action:"imageformat_add", imageprofile_id:id_imageprofile, title:title, width:width, height:height, aoe:aoe, zc:zc, zoom:zoom, background_image:background_image, watermark:watermark, watermark_position:watermark_position, watermark_opacity:watermark_opacity },
 			function(data)
 			{
 				if (data=="")
@@ -73,7 +74,7 @@
 			title:"Bildanalyse",
 		});
 		$("#image_fix_dialog").html("Analysiere Artikel...");
-		$.post("modules/backend_cms_imageprofiles_actions.php", { action:"articles_get", id_imageprofile:id_imageprofile },
+		$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php", { action:"articles_get", id_imageprofile:id_imageprofile },
 			function(data)
 			{
 				if (data=="")
@@ -92,7 +93,7 @@
 	function imageformat_check2(article_ids)
 	{
 		$("#image_fix_dialog").html("Analysiere Originalbilder...");
-		$.post("modules/backend_cms_imageprofiles_actions.php", { action:"images_get", article_ids:article_ids },
+		$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php", { action:"images_get", article_ids:article_ids },
 			function(data)
 			{
 				if (data=="")
@@ -111,9 +112,11 @@
 	function imageformat_check3(originals)
 	{
 		$("#image_fix_dialog").html("Suche Fehler...");
-		$.post("modules/backend_cms_imageprofiles_actions.php", { action:"errors_get", id_imageprofile:id_imageprofile, originals:originals },
+		$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php", { action:"errors_get", id_imageprofile:id_imageprofile, originals:originals },
 			function(data)
 			{
+				alert(data);
+				return;
 				if (data=="")
 				{
 					$("#image_fix_dialog").html("Keine Fehler gefunden.");
@@ -132,7 +135,7 @@
 		if (i<errors.length)
 		{
 			$("#image_fix_dialog").html("Behebe Fehler "+(i+1)+" von "+errors.length+"<br /><br />("+errors[i]+")");
-			$.post("modules/backend_cms_imageprofiles_actions.php", { action:"fix_image", error:errors[i] },
+			$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php", { action:"fix_image", error:errors[i] },
 				function(data)
 				{
 					if (data=="")
@@ -195,7 +198,7 @@
 		var watermark=$("#imageformat_edit_watermark").val();
 		var watermark_position=$("#imageformat_edit_watermark_position").val();
 		var watermark_opacity=$("#imageformat_edit_watermark_opacity").val();
-		$.post("modules/backend_cms_imageprofiles_actions.php", { action:"imageformat_edit", id_imageformat:id_imageformat, title:title, width:width, height:height, aoe:aoe, zc:zc, zoom:zoom, background_image:background_image, watermark:watermark, watermark_position:watermark_position, watermark_opacity:watermark_opacity },
+		$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php", { action:"imageformat_edit", id_imageformat:id_imageformat, title:title, width:width, height:height, aoe:aoe, zc:zc, zoom:zoom, background_image:background_image, watermark:watermark, watermark_position:watermark_position, watermark_opacity:watermark_opacity },
 			function(data)
 			{
 				if (data=="")
@@ -233,7 +236,7 @@
 	function imageformat_remove_accept()
 	{
 		var id_imageformat=$("#imageformat_remove_id_imageformat").val();
-		$.post("modules/backend_cms_imageprofiles_actions.php", { action:"imageformat_remove", id_imageformat:id_imageformat },
+		$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php", { action:"imageformat_remove", id_imageformat:id_imageformat },
 			function(data)
 			{
 				if (data=="")
@@ -273,7 +276,7 @@
 	{
 		var title=$("#imageprofile_add_title").val();
 		var description=$("#imageprofile_add_description").val();
-		$.post("modules/backend_cms_imageprofiles_actions.php", { action:"imageprofile_add", title:title, description:description },
+		$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php", { action:"imageprofile_add", title:title, description:description },
 			function(data)
 			{
 				if (data=="")
@@ -315,7 +318,7 @@
 		var id_imageprofile=$("#imageprofile_edit_id_imageprofile").val();
 		var title=$("#imageprofile_edit_title").val();
 		var description=$("#imageprofile_edit_description").val();
-		$.post("modules/backend_cms_imageprofiles_actions.php", { action:"imageprofile_edit", id_imageprofile:id_imageprofile, title:title, description:description },
+		$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php", { action:"imageprofile_edit", id_imageprofile:id_imageprofile, title:title, description:description },
 			function(data)
 			{
 				if (data=="")
@@ -353,7 +356,7 @@
 	function imageprofile_remove_accept()
 	{
 		var id_imageprofile=$("#imageprofile_remove_id_imageprofile").val();
-		$.post("modules/backend_cms_imageprofiles_actions.php", { action:"imageprofile_remove", id_imageprofile:id_imageprofile },
+		$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php", { action:"imageprofile_remove", id_imageprofile:id_imageprofile },
 			function(data)
 			{
 				if (data=="")
@@ -372,7 +375,7 @@
 
 	function view()
 	{
-		$.post("modules/backend_cms_imageprofiles_actions.php?lang=<?php echo $_GET["lang"]; ?>", { action:"view", id_imageprofile:id_imageprofile },
+		$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php?lang=<?php echo $_GET["lang"]; ?>", { action:"view", id_imageprofile:id_imageprofile },
 			function(data)
 			{
 				$("#view").html(data);
@@ -383,7 +386,7 @@
 					$( "#imageprofiles" ).bind( "sortupdate", function(event, ui)
 					{
 						var list = $('#imageprofiles').sortable('toArray');
-						$.post("modules/backend_cms_imageprofiles_actions.php", { action:"imageprofile_sort", list:list}, function(data) { show_status(data); view(); });
+						$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php", { action:"imageprofile_sort", list:list}, function(data) { show_status(data); view(); });
 					});
 				});
 				$(function() {
@@ -394,7 +397,7 @@
 					$( "#imageformats" ).bind( "sortupdate", function(event, ui)
 					{
 						var list = $('#imageformats').sortable('toArray');
-						$.post("modules/backend_cms_imageprofiles_actions.php", { action:"imageformat_sort", list:list, id_imageprofile:id_imageprofile }, function(data) { show_status(data); view(); });
+						$.post("<?php echo PATH; ?>modules/backend_cms_imageprofiles_actions.php", { action:"imageformat_sort", list:list, id_imageprofile:id_imageprofile }, function(data) { show_status(data); view(); });
 					});
 				});
 			}
@@ -406,8 +409,8 @@
 <?php	
 	//PATH
 	echo '<p>';
-	echo '<a href="backend_index.php?lang='.$_GET["lang"].'">'.t("Backend").'</a>';
-	echo ' > <a href="backend_cms_index.php?lang='.$_GET["lang"].'">'.t("Content Management").'</a>';
+	echo '<a href="'.PATH.'backend_index.php?lang='.$_GET["lang"].'">'.t("Backend").'</a>';
+	echo ' > <a href="'.PATH.'backend_cms_index.php?lang='.$_GET["lang"].'">'.t("Content Management").'</a>';
 	echo ' > Bildprofile';
 	echo '</p>';
 

@@ -16,7 +16,7 @@
 	//GET ORDER DATA
 	$postfield = array();
 	$postfield["API"]				= "shop";
-	$postfield["APIRequest"]		= "OrderDetailGet_neu";
+	$postfield["APIRequest"]		= "OrderDetailGet_neu_test";
 	$postfield["OrderID"]			= $_POST["order_id"];
 	
 	$order = soa2($postfield, __FILE__, __LINE__, "obj");
@@ -204,7 +204,14 @@
 		
 		$item_title = (string)$order->Order[0]->OrderItems[0]->Item[$positionCount]->OrderItemDesc[0];
 		
-		$itemprice = str_replace(",", ".", (string)$order->Order[0]->OrderItems[0]->Item[$positionCount]->orderItemPriceGrossFC[0] );
+		if ((string)$order->Order[0]['type'] == "business" )
+		{
+			$itemprice = str_replace(",", ".", (string)$order->Order[0]->OrderItems[0]->Item[$positionCount]->orderItemPriceNetFC[0] );
+		}
+		else
+		{
+			$itemprice = str_replace(",", ".", (string)$order->Order[0]->OrderItems[0]->Item[$positionCount]->orderItemPriceGrossFC[0] );
+		}
 		
 		$amount = (int)$order->Order[0]->OrderItems[0]->Item[$positionCount]->OrderItemAmount[0];
 		
@@ -217,10 +224,22 @@
 		
 	}
 
-	$orderItemsTotalGrossFC 			= str_replace(",", ".",$order->Order[0]->orderItemsTotalGrossFC[0]);
-	$shippingCostsGrossFC 				= str_replace(",", ".",$order->Order[0]->shippingCostsGrossFC[0]);
-	$orderTotalTaxFC 					= str_replace(",", ".",$order->Order[0]->orderTotalTaxFC[0]);
-	$orderTotalGrossFC 					= str_replace(",", ".",$order->Order[0]->orderTotalGrossFC[0]);
+		if ((string)$order->Order[0]['type'] == "business" )
+		{
+			$orderItemsTotalFC 			= str_replace(",", ".",$order->Order[0]->orderItemsTotalNetFC[0]);
+			$shippingCostsFC 			= str_replace(",", ".",$order->Order[0]->shippingCostsNetFC[0]);
+			$orderTotalTaxFC 			= str_replace(",", ".",$order->Order[0]->orderTotalTaxFC[0]);
+			//$orderTotalFC 				= str_replace(",", ".",$order->Order[0]->orderTotalNetFC[0]);
+
+		}
+		else
+		{
+			$orderItemsTotalFC 			= str_replace(",", ".",$order->Order[0]->orderItemsTotalGrossFC[0]);
+			$shippingCostsFC 			= str_replace(",", ".",$order->Order[0]->shippingCostsGrossFC[0]);
+			$orderTotalTaxFC 			= str_replace(",", ".",$order->Order[0]->orderTotalTaxFC[0]);
+			
+		}
+	$orderTotalFC 						= str_replace(",", ".",$order->Order[0]->orderTotalGrossFC[0]);
 	$Currency_Code 						= (string)$order->Order[0]->Currency_Code[0];
 	
 	$usermail 							= (string)$order->Order[0]->usermail[0];
@@ -241,15 +260,20 @@
 	}
 
 	
-	 $postfields["PAYMENTREQUEST_0_ITEMAMT"]		= $orderItemsTotalGrossFC;
-	 $postfields["PAYMENTREQUEST_0_SHIPPINGAMT"]	= $shippingCostsGrossFC;
- //  $postfields["PAYMENTREQUEST_0_TAXAMT"]			= $orderTotalTaxFC;
-	 $postfields["PAYMENTREQUEST_0_AMT"]			= $orderTotalGrossFC;
-	 $postfields["PAYMENTREQUEST_0_CURRENCYCODE"]	= $Currency_Code;
+	$postfields["PAYMENTREQUEST_0_ITEMAMT"]			= $orderItemsTotalFC;
+	$postfields["PAYMENTREQUEST_0_SHIPPINGAMT"]		= $shippingCostsFC;
 	
-	 $postfields["PAYMENTREQUEST_0_PAYMENTACTION"]	= "sale";
-	 $postfields["PAYMENTREQUEST_0_DESC"]			= $shop_title;
-	 $postfields["PAYMENTREQUEST_0_CUSTOM"]			= $orderid;
+	if ((string)$order->Order[0]['type'] == "business" )
+	{
+		$postfields["PAYMENTREQUEST_0_TAXAMT"]			= $orderTotalTaxFC;
+	}
+
+	$postfields["PAYMENTREQUEST_0_AMT"]				= $orderTotalFC;
+	$postfields["PAYMENTREQUEST_0_CURRENCYCODE"]	= $Currency_Code;
+	
+	$postfields["PAYMENTREQUEST_0_PAYMENTACTION"]	= "sale";
+	$postfields["PAYMENTREQUEST_0_DESC"]			= $shop_title;
+	$postfields["PAYMENTREQUEST_0_CUSTOM"]			= $orderid;
 //	 $postfields["PAYMENTREQUEST_0_INVNUM"]			= $orderid;
 	
 	

@@ -43,9 +43,9 @@
 	//echo '<h1>Meine Top-Artikel</h1>';
 	echo '<table class="hover">';
 	echo '	<tr>';
-	echo '		<th>Nr.</th>';
-	echo '		<th>Artikel</th>';
-	echo '		<th>Menge</th>';
+	echo '		<th>'.t("Nr.").'</th>';
+	echo '		<th>'.t("Artikel").'</th>';
+	echo '		<th>'.t("Menge").'</th>';
 	echo '	</tr>';
 	for($i=0; $i<sizeof($topitems_amount); $i++)
 	{
@@ -115,11 +115,10 @@
 	function list_view()
 	{
 		wait_dialog_show();
-		//$.post("<?php echo PATH; ?>soa/", { API:"shop", Action:"ReorderListGet" },
 		$.post("<?php echo PATH; ?>soa2/", { API:"shop", APIRequest:"ReorderListGet" },
 			function(data)
 			{
-				//show_status2(data);
+//				show_status2(data);
 				try
 				{
 					var ids = 		new Array();
@@ -155,7 +154,7 @@
 									html += '		<td></td>';
 									html += '		<td></td>';
 								}
-								html += '		<td style="padding-left: 17px"><img src="<?php echo PATH;?>/images/icons/24x24/remove.png" style="cursor: pointer; margin-top: 4px" id="' + $(this).find("id").text() + 'deletebutton"></td>';
+								html += '		<td style="padding-left: 17px"><img src="<?php echo PATH;?>/images/icons/24x24/remove.png" style="cursor: pointer; margin-top: 4px" id="' + $(this).find("item_id").text() + 'deletebutton"></td>';
 								html += '	</tr>';
 							});
 					
@@ -171,13 +170,13 @@
 							})(item_ids[a]);
 						}
 						
-						for(var n in ids)
+						for(var n in item_ids)
 						{
 						 	(function(k) {
 						  		$("#" + k + "deletebutton").click(function() {
-							  		reorder_list_item_remove(k);
+							  		reorder_list_item_remove( k, $xml.find( 'list_id' ).text() );
 								});
-						  	})(ids[n]);
+						  	})(item_ids[n]);
 						}
 						
 						wait_dialog_hide();
@@ -195,17 +194,18 @@
 		);
 	}
 	
-	function reorder_list_item_remove(id)
+	function reorder_list_item_remove( id, list_id )
 	{
 		delete_dialog("<?php echo t("Wollen Sie diesen Artikel wirklich löschen?"); ?>");
-		function close()
-		{
-			$.post("<?php echo PATH;?>soa/", { API: "shop", Action:"ListItemRemove", id: id},
-				function(data)
-				{
-					list_view();
-				}
-			);
+		function d_close()
+		{			
+			$post_data = 				new Object();
+			$post_data['API'] = 		'shop';
+			$post_data['APIRequest'] = 	'ListItemsRemove';
+			$post_data['id_list'] = 	list_id;
+			$post_data['ids'] = 		id;
+			
+			soa2( $post_data, 'reorder_list_item_remove_callback' );
 		}
 		function delete_dialog(message)
 		{
@@ -213,7 +213,7 @@
 			$("#message").dialog
 			({	buttons:
 				[
-					{ text: "<?php echo t("Ok"); ?>", click: function() {close(); $(this).dialog("close");} },
+					{ text: "<?php echo t("Ok"); ?>", click: function() {d_close(); $(this).dialog("close");} },
 					{ text: "<?php echo t("Abbrechen"); ?>", click: function() {$(this).dialog("close");} }
 				],
 				closeText:"<?php echo t("Fenster schließen"); ?>",
@@ -226,4 +226,10 @@
 			});
 		}
 	}
+	
+	function reorder_list_item_remove_callback( $xml )
+	{
+		list_view();
+	}
+	
 </script>

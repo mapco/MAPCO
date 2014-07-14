@@ -15,7 +15,8 @@
 	$main=array("Antrieb / Lagerung", "Bremse", "Fahrwerk / Lenkung", "Motor / Filter", "Zubehör");
 	
 	//Unterkategorien
-	$sub=array(16 => 0,
+	$sub=array(14 => 0,
+				16 => 0,
 				 17 => 0,
 				 18 => 0,
 				 26 => 0,
@@ -102,7 +103,19 @@
 		$results=q("SELECT * FROM cms_menuitems WHERE title='".$main[$i]."' AND menu_id=".$id_menu.";", $dbweb, __FILE__, __LINE__);
 		if (mysqli_num_rows($results)==0)
 		{
-			q("INSERT INTO cms_menuitems (link, title, description, ordering, icon, menu_id, menuitem_id, firstmod, firstmod_user, lastmod, lastmod_user) VALUES('shop.php', '".$main[$i]."', '".$main[$i]."', 0, '', ".$id_menu.", 0, ".time().", 0, ".time().", 0);", $dbweb, __FILE__, __LINE__);
+			$data=array();
+			$data["link"]='shop.php';
+			$data["title"]=$main[$i];
+			$data["description"]=$main[$i];
+			$data["ordering"]=0;
+			$data["icon"]='';
+			$data["menu_id"]=$id_menu;
+			$data["menuitem_id"]=0;
+			$data["firstmod"]=time();
+			$data["firstmod_user"]=1;
+			$data["lastmod"]=time();
+			$data["lastmod_user"]=1;
+			q_insert("cms_menuitems", $data, $dbweb, __FILE__, __LINE__);
 		}
 	}
 
@@ -130,9 +143,24 @@
 		//create menuitem
 		if (!isset($mid[$artgr[$i]]))
 		{
-			q("INSERT INTO cms_menuitems (link, title, description, ordering, icon, menu_id, menuitem_id, firstmod, firstmod_user, lastmod, lastmod_user) VALUES('shop.php', '".$artgr[$i]."', '".$artgr[$i]."', 0, '', ".$id_menu.", ".$mainmenuitem[$main[$sub[$artgr[$i]]]].", ".time().", 0, ".time().", 0);", $dbweb, __FILE__, __LINE__);
-			$id_menuitem=mysqli_insert_id($dbweb);
-			q("INSERT INTO shop_menuitems_artgr (menuitem_id, artgr) VALUES(".$id_menuitem.", ".$artgr[$i].");", $dbshop, __FILE__, __LINE__);
+			$data=array();
+			$data["link"]='shop.php';
+			$data["title"]=$artgr[$i];
+			$data["description"]=$artgr[$i];
+			$data["ordering"]=0;
+			$data["icon"]='';
+			$data["menu_id"]=$id_menu;
+			$data["menuitem_id"]=$mainmenuitem[$main[$sub[$artgr[$i]]]];
+			$data["firstmod"]=time();
+			$data["firstmod_user"]=1;
+			$data["lastmod"]=time();
+			$data["lastmod_user"]=1;
+			q_insert("cms_menuitems", $data, $dbweb, __FILE__, __LINE__);
+
+			$data=array();
+			$data["menuitem_id"]=mysqli_insert_id($dbweb);
+			$data["artgr"]=$artgr[$i];
+			q_insert("shop_menuitems_artgr", $data, $dbshop, __FILE__, __LINE__);
 			echo 'Neue Artikelgruppe angelegt!<br />';
 		}
 	}

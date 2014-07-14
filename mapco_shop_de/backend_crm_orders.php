@@ -938,8 +938,8 @@ var preloadcount=0;
 				var $Code=$xml.find("Error Code").text();
 				var $shortMsg=$xml.find("Error shortMsg").text();
 				var $longMsg=$xml.find("Error longMsg").text();
-				//alert("Fehler "+$Code+"\n\n"+$longMsg);
-				alert($xml.find("text").text());
+				alert("Fehler "+$Code+"\n\n"+$shortMsg+"\n\n"+$longMsg);
+				//alert("Fehlercode: "+$Code+");
 				return;
 			}
 
@@ -1003,41 +1003,6 @@ var preloadcount=0;
 			$("#order_send_dialog").dialog("close");
 			show_status("Auftrag erfolgreich im IDIMS eingetragen.");
 
-			update_view($id_order);
-			return;
-		});
-	}
-
-
-	function order_send2($id_order)
-	{
-//		alert($id_order);
-		wait_dialog_show();
-		$.post("<?php echo PATH; ?>soa/", { API:"idims", Action:"OrderSend", id_order:$id_order }, function($data)
-		{
-			show_status2($data);
-			return;
-			wait_dialog_hide();
-			try
-			{
-				$xml = $($.parseXML($data));
-				$ack = $xml.find("Ack");
-				if ( $ack.text()!="Success" )
-				{
-					show_status2($data);
-					return;
-				}
-			}
-
-
-			catch (err)
-			{
-				show_status2(err.message);
-				return;
-			}
-
-			$("#order_send_dialog").dialog("close");
-			show_status("Auftrag erfolgreich im IDIMS eingetragen.");
 			update_view($id_order);
 			return;
 		});
@@ -1425,7 +1390,7 @@ var preloadcount=0;
 	
 			// ALLE ARTIKEL GECHECKT?		
 				//CHECK NUR, WENN shop_type = 2
-			if(user_id != 28623)
+			if(user_id != 28623 && user_id != 28625)
 			{	
 				if (Shop_Shops[orders[orderid]["shop_id"]]["shop_type"]==2)
 				{
@@ -1446,6 +1411,9 @@ var preloadcount=0;
 		//UMTAUSCH?
 		if (orders[orderid]["ordertype_id"] == 4) 
 		{
+			// CHECK, ob Bestellung bereits versandt wurde
+			if (orders[orderid]["AUF_ID"]!=0) return false;
+
 			//VERSAND GEWÄHLT??
 			if (orders[orderid]["shipping_type_id"]==0) return false;
 	
@@ -1520,11 +1488,6 @@ var preloadcount=0;
 		else if (IDIMS_Order_check(orderid))
 		{
 			menu+='<a href="javascript:order_update_dialog('+orderid+', \'IDIMS\');">IDIMS</a><br /><br />';
-			if( <?php echo $_SESSION["id_user"] ?>==21371 )
-			{
-				menu+='<a href="javascript:order_send2('+orderid+', \'IDIMS\');">IDIMS2</a><br /><br />';
-
-			}
 		}
 		else if (orders[orderid]["AUF_ID"]!=0)
 		{
@@ -1640,8 +1603,17 @@ var preloadcount=0;
 		menu+='<strong>Sonstige</strong>';
 		menu+='<ul>';
 	
-		
-	menu+='	<li style="margin:5px; margin-left:-22px;"><a href="javascript:send_orderConfirmation('+orderid+');">Bestellbestätigung versenden</a></li>';
+	if ( orders[orderid]["usermail"] != ""  )
+	{
+		if (orders[orderid]["ordertype_id"] == 5 )
+		{	
+			menu+='	<li style="margin:5px; margin-left:-22px;"><a href="javascript:send_orderOffer('+orderid+');">Angebot versenden</a></li>';
+		}
+		else 
+		{
+			menu+='	<li style="margin:5px; margin-left:-22px;"><a href="javascript:send_orderConfirmation('+orderid+');">Bestellbestätigung versenden</a></li>';
+		}
+	}
 
 	//AUFTRAG ABBRECHEN
 		if (orders[orderid]["status_id"]!=4 && orders[orderid]["status_id"]!=8)
@@ -1651,7 +1623,11 @@ var preloadcount=0;
 	
 	//BESTELLVERLAUF
 		menu+='<li style="margin:10px; margin-left:-22px;"><a href="javascript:show_order_events('+orderid+');">Bestellverlauf</a></li>';
-
+	//AUFID_RESET
+		if ( <?php echo $_SESSION['userrole_id']; ?> == 1 )
+		{
+			menu+='<li style="margin:10px; margin-left:-22px;"><a href="javascript:order_aufid_reset('+orderid+');">AuftragsID Reset</a></li>';
+		}
 		menu+='</ul>';
 		menu+='</div>';
 		
@@ -1662,7 +1638,7 @@ var preloadcount=0;
 		menu+='<br /><br /><a href="javascript:communication_show('+orderid+');" style="float: left"><img src="<?php echo PATH;?>images/icons/16x16/comments.png" title="Kommunikation"></a><span>&nbsp;'+orders[orderid]["OrderConCntOrder"]+' ('+orders[orderid]["OrderConCntAll"]+')</span>' ;
 		menu+='<br /><br /><a href="javascript:user_contact_2('+orderid+');" style="float: left"><img src="<?php echo PATH;?>images/icons/16x16/comment_add.png" title="Kunden kontaktieren"></a>';
 		//menu+='<div class="action_menu_options" id="order_events_'+orderid+'" style="position:absolute; display:none; background-color:#fee; z-index:100; padding:3px; border:1px solid #999; height:500px; overflow:auto">blablabla</div>';
-				
+		
 		return menu;
 	}
 	
@@ -1884,7 +1860,12 @@ var preloadcount=0;
 		tr = $('<tr class="con_cols_mail" style="display:none;"></tr>');
 			td = $('<td style="font-weight:bold;">Betreff:</td>');
 			tr.append(td);
-			td = $('<td><input type="text" id="con_subject" style="width: 400px;"></td>');
+			var subject = '';
+			if ( order_id > 0 && order_id != '' )
+			{
+				subject = 'ID: '+order_id;
+			}
+			td = $('<td><input type="text" id="con_subject" style="width: 400px;" value="'+subject+'"></td>');
 			tr.append(td);
 		table.append(tr);
 		tr = $('<tr></tr>');
@@ -2054,18 +2035,44 @@ var preloadcount=0;
 	function send_orderConfirmation(orderid)
 	{
 		show_actions_menu(orderid); //hide options
+		if (confirm("Soll eine Bestellbestätigung versendet werden?"))
+		{
 
-		$post_data = new Object;
-		$post_data['API'] = 'shop';
-		$post_data['APIRequest'] = 'MailOrderConfirmation';
-		$post_data['order_id'] = orderid;
+			$post_data = new Object;
+			$post_data['API'] = 'shop';
+			$post_data['APIRequest'] = 'MailOrderConfirmation';
+			$post_data['order_id'] = orderid;
+	
+			$.post('<?php echo PATH;?>soa2/', $post_data, function($data){
+				try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); wait_dialog_hide(); return; }
+				if ( $xml.find("Ack").text()!="Success" ) { show_status2('Bestellbestätigungsmail konnte nicht versendet werden. Error Code:'+ $xml.find("Code").text()); wait_dialog_hide(); return; }
+				
+				show_status("Bestellbestätigungsmail erfolgreich versendet!");
+				update_view(orderid);
+			});
+		}
+	}
+	
+	function send_orderOffer ($orderid)
+	{
+		alert("Nichts passiert");	
+	}
+	
+	function order_aufid_reset($orderid)
+	{
+		show_actions_menu($orderid); //hide options
+
+		$post_data 					= new Object;
+		$post_data['API'] 			= 'shop';
+		$post_data['APIRequest']	= 'OrderAufidReset';
+		$post_data['order_id'] 		= $orderid;
 
 		$.post('<?php echo PATH;?>soa2/', $post_data, function($data){
 			try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); wait_dialog_hide(); return; }
-			if ( $xml.find("Ack").text()!="Success" ) { show_status2('Bestellbestätigungsmail konnte nicht versendet werden. Error Code:'+ $xml.find("Code").text()); wait_dialog_hide(); return; }
+			if ( $xml.find("Ack").text()!="Success" ) { show_status2('AuftragsID konnte nicht zurückgesetzt werden!. Error Code:'+ $xml.find("Code").text()); wait_dialog_hide(); return; }
 			
-			show_status("Bestellbestätigungsmail erfolgreich versendet!");
-			update_view(orderid);
+			show_status("AuftragsID erfolgreich zurückgesetzt");
+			update_view($orderid);
 		});
 	}
 	
@@ -2148,15 +2155,16 @@ var preloadcount=0;
 		$postfield = new Object;
 		$postfield['API'] = 'cms';
 		$postfield['APIRequest'] = 'TableDataSelect';
+		$postfield['select'] = 'data';
 		$postfield['table'] = 'shop_orders_events';
 		$postfield['db'] = 'dbshop';
 		$postfield['where'] = 'WHERE id_event = '+$event_id;
+		$postfield['cdata'] = 'false';
 		
 		$.post('<?php echo PATH;?>soa2/', $postfield, function($data){
 			try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); wait_dialog_hide(); return; }
 			if ( $xml.find("Ack").text()!="Success" ) { show_status2($data); return; }
 			
-			$detail = $xml.find("data");
 			if ( typeof($detail) != "undefined" )
 			{
 				$detailtext += '<table style="width:550px;">';
@@ -2170,7 +2178,7 @@ var preloadcount=0;
 					var $tagname=this.tagName;
 					$detailtext += '<tr>';
 					$detailtext += 	'<th>'+$tagname+'</th>';
-					$detailtext +=	'<td>'+$(this).text()+'</td>>';
+					$detailtext +=	'<td>'+$(this).text()+'</td>';
 					$detailtext += '</tr>';												
 				});
 				
@@ -2855,7 +2863,7 @@ var preloadcount=0;
 		$.post("<?php echo PATH; ?>soa/", { API: "crm", Action: "crm_orders_list", mode:mode, order_id:orderid, FILTER_Platform:FILTER_Platform, FILTER_Status:FILTER_Status, FILTER_Country:FILTER_Country, FILTER_SearchFor:FILTER_SearchFor, FILTER_Searchfield:FILTER_Searchfield, FILTER_Ordertype:FILTER_Ordertype, OrderBy:OrderBy, OrderDirection:OrderDirection, ResultPage:ResultPage,ResultRange:ResultRange, FILTER_DateSearchFor:FILTER_DateSearchFor, date_from:date_from, date_to:date_to},
 			function(data)
 			{
-				//show_status2(data);
+				//if ( user_id == 28625 ) show_status2(data);
 				//return;
 				//ResultPage=1;
 				wait_dialog_hide();
@@ -2919,10 +2927,14 @@ var preloadcount=0;
 						
 						OrderID=entry_pos[pos];
 						
-						if (FILTER_Ordertype == 4 || ( FILTER_Ordertype != 4 && orders[OrderID]["ordertype_id"]!=4) )
+						//if (FILTER_Ordertype == 4 || ( FILTER_Ordertype != 4 && orders[OrderID]["ordertype_id"]!=4) )
+						if ( orders[OrderID]["ordertype_id"]!=4 || ( orders[OrderID]["ordertype_id"] == 4 && orders[OrderID]["original_result"] == 1 ) )
 						{
 							rowcounter++;
 						}
+						
+						//rowcounter++;
+						
 						if (orders[OrderID]["ordertype_id"]==4)
 						{
 							if (rowcounter%2 == 0) var rowcolor="#ffd0d0"; else var rowcolor="#ffe9e9";
@@ -2943,10 +2955,14 @@ var preloadcount=0;
 						table+='</tr>';	
 						
 						$("#orderdata").append(table);
-						if (FILTER_Ordertype == 4 || ( FILTER_Ordertype != 4 && orders[OrderID]["ordertype_id"]!=4) )
+						
+						//if (FILTER_Ordertype == 4 || ( FILTER_Ordertype != 4 && orders[OrderID]["ordertype_id"]!=4) )
+						if ( orders[OrderID]["ordertype_id"]!=4 || ( orders[OrderID]["ordertype_id"] == 4 && orders[OrderID]["original_result"] == 1 ) )
 						{
 							show_combined_note(OrderID);
 						}
+						
+						//show_combined_note(OrderID);
 						
 						//INFOZEILE Warnhinweis Abweichung Versand <-> Zahlung bei Nachnahme
 						table='';
@@ -2959,18 +2975,24 @@ var preloadcount=0;
 						table+='</tr>';	
 						
 						$("#orderdata").append(table);
-						if (FILTER_Ordertype == 4 || ( FILTER_Ordertype != 4 && orders[OrderID]["ordertype_id"]!=4) )
+						
+						//if (FILTER_Ordertype == 4 || ( FILTER_Ordertype != 4 && orders[OrderID]["ordertype_id"]!=4) )
+						if ( orders[OrderID]["ordertype_id"]!=4 || ( orders[OrderID]["ordertype_id"] == 4 && orders[OrderID]["original_result"] == 1 ) )
 						{
 							show_COD_note(OrderID);
 						}
 						
-						
+						//show_COD_note(OrderID);
 						//ORDERDATA
 						table='';
-						if (FILTER_Ordertype == 4 || ( FILTER_Ordertype != 4 && orders[OrderID]["ordertype_id"]!=4) )
+						
+					//	if (FILTER_Ordertype == 4 || ( FILTER_Ordertype != 4 && orders[OrderID]["ordertype_id"]!=4) )
+						if ( orders[OrderID]["ordertype_id"]!=4 || ( orders[OrderID]["ordertype_id"] == 4 && orders[OrderID]["original_result"] == 1 ) )
+
 						{
 							table+='<tr id="orderdata'+OrderID+'" style="background-color:'+rowcolor+'">';
 						}
+					
 						else
 						{
 							table+='<tr id="orderdata'+OrderID+'" style="background-color:'+rowcolor+'; display:none;">';
@@ -3059,12 +3081,14 @@ var preloadcount=0;
 						table+='</tr>';	
 
 						$("#orderdata").append(table);
-						if (FILTER_Ordertype == 4 || ( FILTER_Ordertype != 4 && orders[OrderID]["ordertype_id"]!=4) )
+						
+						//if (FILTER_Ordertype == 4 || ( FILTER_Ordertype != 4 && orders[OrderID]["ordertype_id"]!=4) )
+						if ( orders[OrderID]["ordertype_id"]!=4 || ( orders[OrderID]["ordertype_id"] == 4 && orders[OrderID]["original_result"] == 1 ) )
 						{
 							show_PayPal_note(OrderID);
 						}
-
 						
+						//show_PayPal_note(OrderID);
 
 						//ORDER NOTES
 						table='';							
@@ -3078,12 +3102,14 @@ var preloadcount=0;
 						table+='</tr>';	
 
 						$("#orderdata").append(table);
-						if (FILTER_Ordertype == 4 || ( FILTER_Ordertype != 4 && orders[OrderID]["ordertype_id"]!=4) )
+						
+						//if (FILTER_Ordertype == 4 || ( FILTER_Ordertype != 4 && orders[OrderID]["ordertype_id"]!=4) )
+						if ( orders[OrderID]["ordertype_id"]!=4 || ( orders[OrderID]["ordertype_id"] == 4 && orders[OrderID]["original_result"] == 1 ) )
 						{
 							show_order_note(OrderID);
 						}
 						
-						
+						//show_order_note(OrderID);
 					}
 					draw_navigation();
 					
@@ -3720,7 +3746,7 @@ var preloadcount=0;
 		$html += '				<option value="0">Alle</option>';
 		for (var $ordertype_id in OrderTypes)
 		{
-			if ( $ordertype_id != 6 && $ordertype_id != 5)
+			if ( $ordertype_id != 6)
 			{
 				$html += '			<option value='+$ordertype_id+'>'+OrderTypes[$ordertype_id]["title"]+'</option>';
 			}

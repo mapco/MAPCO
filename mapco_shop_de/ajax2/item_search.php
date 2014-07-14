@@ -7,10 +7,10 @@
 	include("../functions/cms_url_encode.php");
 	
 	if ($_GET["wert"]=="") exit;
-	$results=q("SELECT * FROM shop_items_".$_GET["lang"]." WHERE title LIKE '%".mysql_real_escape_string($_GET["wert"], $dbshop)."%' LIMIT 20;", $dbshop, __FILE__, __LINE__);
+	$results=q("SELECT * FROM shop_items_".$_GET["lang"]." WHERE title LIKE '%".mysqli_real_escape_string($dbshop, $_GET["wert"])."%' LIMIT 20;", $dbshop, __FILE__, __LINE__);
 	echo '<table class="hover" style="margin:0;">';
 	echo '<tr><th colspan="4">';
-//	echo mysql_num_rows($results).' '.t("Suchergebnisse gefunden").'.';
+//	echo mysqli_num_rows($results).' '.t("Suchergebnisse gefunden").'.';
 	echo '	<img src="'.PATH.'images/icons/16x16/remove.png" style="cursor:pointer; float:right;" onclick="suche3();" alt="Schließen" title="Schließen" />';
 	echo '</th></tr>';
 	
@@ -23,23 +23,23 @@
 	echo '</tr>';
 
 	$i=0;
-	while($row=mysql_fetch_array($results))
+	while($row=mysqli_fetch_array($results))
 	{
 		$results3=q("SELECT * FROM shop_items WHERE id_item='".$row["id_item"]."' AND active=1 LIMIT 1;", $dbshop, __FILE__, __LINE__);
-		if (mysql_num_rows($results3)>0)
+		if (mysqli_num_rows($results3)>0)
 		{
 			echo '<tr>';
 			echo '	<td style="width:100px;"><a href="'.PATHLANG.'online-shop/autoteile/'.$row["id_item"].'/'.url_encode($row["title"]).'">'.$row["title"].'</a></td>';
 			if($_SESSION["rcid"]!=9999 and $_SESSION["rcid"]>0)
 			{
 				$results2=q("SELECT * FROM lagerrc AS a, shop_items AS b WHERE b.id_item='".$row["id_item"]."' AND b.MPN=a.ARTNR AND a.RCNR='".$_SESSION["rcid"]."' LIMIT 1;", $dbshop, __FILE__, __LINE__);
-				$row2=mysql_fetch_array($results2);
+				$row2=mysqli_fetch_array($results2);
 				echo '<td>';
 				if ($row2["ISTBESTAND"]>0) echo '<a href="'.PATHLANG.'online-shop/status/'.$row["id_item"].'/'.url_encode($row["title"]).'" style="color:#008000;">'.t("in").' '.$_SESSION["rcbez"].' '.t("vorrätig").'</a>';
 				else 
 				{
 					$results2=q("SELECT * FROM lager AS a, shop_items AS b WHERE b.id_item='".$row["id_item"]."' AND b.MPN=a.ArtNr LIMIT 1;", $dbshop, __FILE__, __LINE__);
-					$row2=mysql_fetch_array($results2);
+					$row2=mysqli_fetch_array($results2);
 					if ($row2["ISTBESTAND"]>0) echo '<a href="'.PATHLANG.'online-shop/status/'.$row["id_item"].'/'.url_encode($row["title"]).'" style="color:#DE9800;">'.t("in der Zentrale vorrätig").'</a>';
 					else echo '<a style="color:#800000;" href="'.PATHLANG.'online-shop/status/'.$row["id_item"].'/'.url_encode($row["title"]).'" >'.t("z.Z nicht lieferbar").'</a>';
 				}
@@ -47,7 +47,7 @@
 			else
 			{
 				$results2=q("SELECT * FROM lager AS a, shop_items AS b WHERE b.id_item='".$row["id_item"]."' AND b.MPN=a.ArtNr LIMIT 1;", $dbshop, __FILE__, __LINE__);
-				$row2=mysql_fetch_array($results2);
+				$row2=mysqli_fetch_array($results2);
 				echo '<td>';
 				if ($row2["ISTBESTAND"]>10) echo '<a href="'.PATHLANG.'online-shop/status/'.$row["id_item"].'/'.url_encode($row["title"]).'" style="color:#008000;">'.t("sofort lieferbar").'</a>';
 				elseif ($row2["ISTBESTAND"]>0) echo '<a style="color:#000080;" href="'.PATHLANG.'online-shop/status/'.$row["id_item"].'/'.url_encode($row["title"]).'" >'.t("Nur noch wenige lieferbar").'</a>';

@@ -101,7 +101,7 @@ hs.lang = {
 			
 			$results2=q("SELECT * FROM cms_articles_images WHERE article_id=".$id_article." ORDER BY ordering", $dbweb, __FILE__, __LINE__);
 			$max=mysqli_num_rows($results2);
-			$results3=q("SELECT * FROm cms_articles_labels WHERE article_id=".$id_article." AND label_id=12;", $dbweb, __FILE__, __LINE__);
+			$results3=q("SELECT * FROM cms_articles_labels WHERE article_id=".$id_article." AND label_id=12;", $dbweb, __FILE__, __LINE__);
 			if( mysqli_num_rows($results3)>0 ) $max=0;
 			if ($max>0)
 			{
@@ -158,11 +158,13 @@ hs.lang = {
 			else
 			{
 				//original language
-				$row=mysqli_fetch_array($results);
-				if ($row["code"]!=$_GET["lang"])
+				$id_article_original = $id_article; // not translated article (needed for getting pictures from the original article)
+				
+				$original=mysqli_fetch_array($results);
+				if ($original["code"]!=$_SESSION["lang"])
 				{
 					//translation available?
-					$results2=q("SELECT * FROM cms_articles WHERE article_id=".$id_article." AND language_id=".$language_id[$_GET["lang"]].";", $dbweb, __FILE__, __LINE__);
+					$results2=q("SELECT * FROM cms_articles WHERE article_id=".$id_article." AND language_id=".$_SESSION["id_language"].";", $dbweb, __FILE__, __LINE__);
 					if (mysqli_num_rows($results2)>0)
 					{
 						$row2=mysqli_fetch_array($results2);
@@ -170,7 +172,7 @@ hs.lang = {
 					}
 					else
 					{
-						$results2=q("SELECT * FROM cms_articles WHERE article_id=".$id_article." AND language_id=".$fallback_id[$_GET["lang"]].";", $dbweb, __FILE__, __LINE__);
+						$results2=q("SELECT * FROM cms_articles WHERE article_id=".$id_article." AND language_id=".$fallback_id[$_SESSION["lang"]].";", $dbweb, __FILE__, __LINE__);
 						if (mysqli_num_rows($results2)>0)
 						{
 							$row2=mysqli_fetch_array($results2);
@@ -223,7 +225,7 @@ hs.lang = {
 				//get article
 				$results2=q("SELECT * FROM cms_articles WHERE id_article=".$id_article.";", $dbweb, __FILE__, __LINE__);
 				$row2=mysqli_fetch_array($results2);
-				if ($row2["format"]==0)
+				if ($original["format"]==0)
 				{
 					$row2["introduction"]=nl2br($row2["introduction"]).'<br /><br />';
 					$row2["article"]=nl2br($row2["article"]);
@@ -233,17 +235,21 @@ hs.lang = {
 				
 				//show title
 				echo '<h1>'.$row2["title"].'</h1>';
-				
+	
+//				echo $id_article;			
 				//show gallery
 				if ($max>0)
 				{
-					$results3=q("SELECT * FROM cms_articles_labels WHERE article_id=".$id_article." AND label_id=12 LIMIT 1;", $dbweb, __FILE__, __LINE__);
+//					$results3=q("SELECT * FROM cms_articles_labels WHERE article_id=".$id_article." AND label_id=12 LIMIT 1;", $dbweb, __FILE__, __LINE__);
+					$results3=q("SELECT * FROM cms_articles_labels WHERE article_id=".$id_article_original." AND label_id=12 LIMIT 1;", $dbweb, __FILE__, __LINE__);
 					if (!mysqli_num_rows($results3)>0)
 					{
 						$i=0;
 						echo '<div class="highslide-gallery" style="margin:0; border:0; padding:0;">';
-						$results3=q("SELECT * FROM cms_articles_images WHERE article_id=".$id_article." ORDER BY ordering;", $dbweb, __FILE__, __LINE__);
-						$results=q("SELECT * FROM cms_articles_images WHERE article_id=".$id_article." ORDER BY ordering;", $dbweb, __FILE__, __LINE__);
+//						$results3=q("SELECT * FROM cms_articles_images WHERE article_id=".$id_article." ORDER BY ordering;", $dbweb, __FILE__, __LINE__);
+						$results3=q("SELECT * FROM cms_articles_images WHERE article_id=".$id_article_original." ORDER BY ordering;", $dbweb, __FILE__, __LINE__);
+//						$results=q("SELECT * FROM cms_articles_images WHERE article_id=".$id_article." ORDER BY ordering;", $dbweb, __FILE__, __LINE__);
+						$results=q("SELECT * FROM cms_articles_images WHERE article_id=".$id_article_original." ORDER BY ordering;", $dbweb, __FILE__, __LINE__);
 						while($row=mysqli_fetch_array($results))
 						{
 							$i++;
@@ -270,7 +276,7 @@ hs.lang = {
 				$row2["article"]=str_replace('src="'.PATH.'http', 'src="http', $row2["article"]);
 				echo '<span style="font-weight:bold;">';
 				echo $row2["introduction"];
-				echo '</span>';
+				echo '</span><br /><br />';
 				echo $row2["article"];
 				
 				//show attachments

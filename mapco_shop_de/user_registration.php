@@ -1,6 +1,16 @@
 <?php
 	include("config.php");
+	include("functions/cms_tl.php");
 	$title='Registrierung';
+	if ( $_SESSION["id_site"] == 17 )
+	{
+		if (isset($_SESSION["get_url"])) unset($_SESSION["get_url"]);
+		header( "Location: http://www.mapco.de/" . tl( 662, "alias" ) );
+		//header( "Location: http://www.mapco.de" );
+		exit;
+	}
+	
+	
 	include("templates/".TEMPLATE."/header.php");
 	
 	include("functions/cms_t.php");
@@ -8,11 +18,13 @@
 	
 	//prüfen, ob eine Gewerbeanmeldung möglich sein soll
 	$b2b_reg=0;
+	$news_reg=0;
 	$results=q("SELECT * FROM shop_shops WHERE site_id=".$_SESSION["id_site"].";", $dbshop, __FILE__, __LINE__);
 	if(mysqli_num_rows($results)>0)
 	{
 		$row=mysqli_fetch_array($results);
 		$b2b_reg=$row["b2b"];
+		$news_reg=$row["newsletter"];
 	}
 	
 	//cart merge?
@@ -170,12 +182,15 @@
 				td = $('<td style="text-align: left"><input type="text" id="usermail" style="width: 150px"><span style="color: #FF0000">*</span></td>');
 				tr.append(td);
 			table.append(tr);
-			tr = $('<tr></tr>');
-				var td = $('<td style="font-weight: bold; text-align: right"><?php echo t("Newsletter");?>:</td>');
-				tr.append(td);
-				td = $('<td style="text-align: left"><input type="checkbox" id="newsletter" value="1"><span style="font-size: 12px"><?php echo t("Ja ich möchte den MAPCO-Newsletter abonnieren");?>! <br /> &nbsp &nbsp (<?php echo t("Abmeldung jederzeit möglich");?>)</span></td>');
-				tr.append(td);
-			table.append(tr);
+			if(<?php echo $news_reg;?>==1)
+			{
+				tr = $('<tr></tr>');
+					var td = $('<td style="font-weight: bold; text-align: right"><?php echo t("Newsletter");?>:</td>');
+					tr.append(td);
+					td = $('<td style="text-align: left"><input type="checkbox" id="newsletter" value="1"><span style="font-size: 12px"><?php echo t("Ja ich möchte den MAPCO-Newsletter abonnieren");?>! <br /> &nbsp &nbsp (<?php echo t("Abmeldung jederzeit möglich");?>)</span></td>');
+					tr.append(td);
+				table.append(tr);
+			}
 			tr = $('<tr></tr>');
 				var td = $('<td style="font-weight: bold; text-align: right"></td>');
 				tr.append(td);

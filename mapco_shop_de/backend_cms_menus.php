@@ -2,10 +2,77 @@
 	if(isset($_GET["getvars1"])) $_GET["id_menu"]=$_GET["getvars1"];
 
 	include("config.php");
+	include("functions/cms_t2.php");
 	include("templates/".TEMPLATE_BACKEND."/header.php");
 	
 ?>
+<style>
+ul.ui-autocomplete {
+    z-index: 1100;
+}
+</style>
 <script type="text/javascript">
+	var	$data=new Array();
+<?php
+	//array of local files for autocomplete
+	echo '	var $global_files=new Array();'."\n";
+	$dir = ".";
+	$i=0;
+	if (is_dir($dir))
+	{
+		if ($dh = opendir($dir))
+		{
+			while ( ($file = readdir($dh)) !== false )
+			{
+				if( !is_dir($file) and strpos($file, ".LCK") === false )
+				{
+					echo "	$"."global_files[".$i."]='".$file."';\n";
+					$i++;
+				}
+			}
+			closedir($dh);
+		}
+	}
+	//array of local files for autocomplete
+	echo '	var $local_files=new Array();'."\n";
+	$dir = "templates/".TEMPLATE;
+	$i=0;
+	if (is_dir($dir))
+	{
+		if ($dh = opendir($dir))
+		{
+			while ( ($file = readdir($dh)) !== false )
+			{
+				if( !is_dir($file) and strpos($file, ".LCK") === false )
+				{
+					echo "	$"."local_files[".$i."]='".$file."';\n";
+					$i++;
+				}
+			}
+			closedir($dh);
+		}
+	}
+	//array of image files
+	echo '	var $icon_files=new Array();'."\n";
+	$dir = "images/icons/64x64/";
+	$i=0;
+	if (is_dir($dir))
+	{
+		if ($dh = opendir($dir))
+		{
+			while ( ($file = readdir($dh)) !== false )
+			{
+				if( !is_dir($file) and strpos($file, ".LCK") === false )
+				{
+					echo "	$"."icon_files[".$i."]='".$dir.$file."';\n";
+					$i++;
+				}
+			}
+			closedir($dh);
+		}
+	}
+	echo "\n";
+?>
 	function menu_add()
 	{
 		wait_dialog_show("Zeichne Menü-Editor", 100);
@@ -170,6 +237,34 @@
 		delete $cms_menus;
 		view();
 	}
+	
+	function alias_preview($input, $output)
+	{
+		$("#"+$output).html("<?php echo PATH; ?>"+$("#"+$input).val());
+	}
+	
+	
+	function menuitem_add_local_change()
+	{
+		if($("#menuitem_add_local").val()==0)
+		{
+			$( "#menuitem_add_link" ).autocomplete('option', 'source', $global_files)
+		}
+		else
+		{
+			$( "#menuitem_add_link" ).autocomplete('option', 'source', $local_files)
+		}
+	}
+	
+	
+	function menuitem_add_image_change()
+	{
+		var $src=$("#menuitem_add_icon").val();
+		if( $src.indexOf(".") >-1 )
+		{
+			$("#menuitem_add_image").html('<img src="<?php echo PATH; ?>'+$src+'" style="float:right;" />');
+		}
+	}
 
 
 	function menuitem_add()
@@ -180,47 +275,25 @@
 		var $html = '';
 		$html += '<div id="menuitem_add_tabs">';
 		$html += '<ul>';
+		$html += '	<li><a href="#menuitem_add_tab">Allgemein</a></li>';
 		for($i=0; $i<$cms_languages.length; $i++)
 		{
 			$html += '	<li><a href="#menuitem_add_tab'+$i+'">'+$cms_languages[$i]["language"]+'</a></li>';
 		}
 		$html += '</ul>';
-		for($i=0; $i<$cms_languages.length; $i++)
-		{
-			$html += '<div id="menuitem_add_tab'+$i+'">';
-			$html += '<table>';
-			$html += '	<tr>';
-			$html += '		<td>';
-			$html += '			<label>Titel</label><br />';
-			$html += '			<input id="menuitem_add_title'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="" />';
-			$html += '			<span id="menuitem_add_title'+$cms_languages[$i]["id_language"]+'_length"></span>';
-			$html += '		</td>';
-			$html += '		<td>';
-			$html += '			<label>Meta-Titel</label><br />';
-			$html += '			<input id="menuitem_add_meta_title'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="" onkeyup="textlength(\'menuitem_add_meta_title'+$cms_languages[$i]["id_language"]+'\', \'menuitem_add_meta_title'+$cms_languages[$i]["id_language"]+'_length\', 80);" />';
-			$html += '			<span id="menuitem_add_meta_title'+$cms_languages[$i]["id_language"]+'_length"></span>';
-			$html += '		</td>';
-			$html += '	</tr>';
-			$html += '	<tr>';
-			$html += '		<td>Beschreibung</td>';
-			$html += '		<td><textarea id="menuitem_add_description'+$cms_languages[$i]["id_language"]+'" style="width:300px; height:100px;"></textarea></td>';
-			$html += '		<td>Meta-Description</td>';
-			$html += '		<td><textarea id="menuitem_add_meta_description'+$cms_languages[$i]["id_language"]+'" style="width:300px; height:100px;"></textarea></td>';
-			$html += '	</tr>';
-			$html += '	<tr>';
-			$help='Der Alias wird als SEO-Link verwendet. Beispiel: Alias=test/ => Link=http://www.domain.de/test/';
-			$html += '		<td>Alias <img alt="Hilfe" onclick="alert($help);" src="<?php echo PATH; ?>images/icons/16x16/help.png" style="cursor:pointer; float:right;" title="Hilfe" /></td>';
-			$html += '		<td><input id="menuitem_add_alias'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text"  value=""/></td>';
-			$html += '		<td>Meta-Keywords</td>';
-			$html += '		<td><input id="menuitem_add_meta_keywords'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="" /></td>';
-			$html += '	</tr>';
-			$html += '</table>';
-			$html += '</div>';
-		}
-		$html += '</div>';
-		$html += '<table class="hover" style="float:left;">';
+		$html += '<div id="menuitem_add_tab">';
+		$html += '<table class="hover">';
 		$html += '	<tr>';
-		$html += '		<td>Lokal?</td>';
+		$html += '		<td>Dynamischer Link</td>';
+		$html += '		<td>';
+		$html += '			<select id="menuitem_add_dynamic">';
+		$html += '				<option value="0">Nein</option>';
+		$html += '				<option value="1">Ja</option>';
+		$html += '			</select>';
+		$html += '		</td>';
+		$html += '	</tr>';
+		$html += '	<tr>';
+		$html += '		<td>Lokal</td>';
 		$html += '		<td>';
 		$html += '			<select id="menuitem_add_local">';
 		$html += '				<option value="0">Nein</option>';
@@ -234,12 +307,67 @@
 		$html += '	</tr>';
 		$html += '	<tr>';
 		$html += '		<td>Icon</td>';
-		$html += '		<td><input id="menuitem_add_icon" style="width:300px;" type="text" value="" /></td>';
+		$html += '		<td>';
+		$html += '			<input id="menuitem_add_icon" style="width:200px;" type="text" value="" />';
+		$html += '			<span id="menuitem_add_image"></span>';
+		$html += '		</td>';
 		$html += '	</tr>';
 		$html += '</table>';
-		$html += '<input id="menuitem_add_id_menu" type="hidden" value="'+$cms_menus[$i]["id_menu"]+'" />';
+		$html += '</div>';
+		for($i=0; $i<$cms_languages.length; $i++)
+		{
+			$html += '<div id="menuitem_add_tab'+$i+'">';
+			$html += '<table>';
+			$html += '	<tr>';
+			$html += '		<td style="vertical-align:top;">';
+			$html += '			<label>Titel</label><br />';
+			$html += '			<input id="menuitem_add_title'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="" />';
+			$html += '		</td>';
+			$html += '		<td style="vertical-align:top;">';
+			$html += '			<label>Meta-Titel</label><br />';
+			$html += '			<input id="menuitem_add_meta_title'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="" onkeyup="textwidth(\'menuitem_add_meta_title'+$cms_languages[$i]["id_language"]+'\', \'menuitem_add_meta_title'+$cms_languages[$i]["id_language"]+'_length\', 512, 18);" />';
+			$html += '			<br /><span id="menuitem_add_meta_title'+$cms_languages[$i]["id_language"]+'_length"></span>';
+			$html += '		</td>';
+			$html += '	</tr>';
+			$html += '	<tr>';
+			$html += '		<td style="vertical-align:top;">';
+			$html += '			<label>Beschreibung</label><br />';
+			$html += '			<textarea id="menuitem_add_description'+$cms_languages[$i]["id_language"]+'" style="width:300px; height:100px;"></textarea>';
+			$html += '		</td>';
+			$html += '		<td style="vertical-align:top;">';
+			$html += '			<label>Meta-Description</label><br />';
+			$html += '			<textarea id="menuitem_add_meta_description'+$cms_languages[$i]["id_language"]+'" style="width:300px; height:100px;" onkeyup="textwidth(\'menuitem_add_meta_description'+$cms_languages[$i]["id_language"]+'\', \'menuitem_add_meta_description'+$cms_languages[$i]["id_language"]+'_length\', 923, 13);"></textarea>';
+			$html += '			<br /><span id="menuitem_add_meta_description'+$cms_languages[$i]["id_language"]+'_length"></span>';
+			$html += '		</td>';
+			$html += '	</tr>';
+			$html += '	<tr>';
+			$html += '		<td style="vertical-align:top;">';
+			$html += '			<label>Alias</label><br />';
+			$html += '			<input id="menuitem_add_alias'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="" onkeyup="alias_preview(\'menuitem_add_alias'+$cms_languages[$i]["id_language"]+'\', \'menuitem_add_alias'+$cms_languages[$i]["id_language"]+'_preview\');" />';
+			$html += '			<br /><span id="menuitem_add_alias'+$cms_languages[$i]["id_language"]+'_preview"></span>';
+			$html += '		</td>';
+			$html += '		<td style="vertical-align:top;">';
+			$html += '			<label>Meta-Keywords</label><br />';
+			$html += '			<input id="menuitem_add_meta_keywords'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="" onkeyup="textlength(\'menuitem_add_meta_keywords'+$cms_languages[$i]["id_language"]+'\', \'menuitem_add_meta_keywords'+$cms_languages[$i]["id_language"]+'_length\', 300);" />';
+			$html += '			<br /><span id="menuitem_add_meta_keywords'+$cms_languages[$i]["id_language"]+'_length"></span>';
+			$html += '		</td>';
+			$html += '	</tr>';
+			$html += '</table>';
+			$html += '</div>';
+		}
+		$html += '</div>';
+		$html += '<input id="menuitem_add_menu_id" type="hidden" value="'+$("#menu_id_menu").val()+'" />';
+		$html += '<input id="menuitem_add_menuitem_id" type="hidden" value="'+$("#view_menuitems_id_menuitem").val()+'" />';
 		if( $("#menuitem_add_dialog").length == 0 ) $("body").append('<div id="menuitem_add_dialog" style="display:none;"></div>');
 		$("#menuitem_add_dialog").html($html);
+		$("#menuitem_add_local").bind("change", function() { menuitem_add_local_change(); } );
+		$("#menuitem_add_icon").bind("change", function() { menuitem_add_image_change(); } );
+		$(function() { $("#menuitem_add_link").autocomplete({ source: $global_files }) });
+		$(function() { $("#menuitem_add_icon").autocomplete({ source: $icon_files }) });
+		$('.ui-autocomplete').on('click', '.ui-menu-item', function()
+		{
+		    $('.college').trigger('click');
+		});
 		
 		$(function() { $("#menuitem_add_tabs").tabs(); });
 		$("#menuitem_add_dialog").dialog
@@ -252,33 +380,19 @@
 			modal:true,
 			resizable:false,
 			title:"Menüpunkt hinzufügen",
-			width:800
+			width:850
 		});
 		wait_dialog_hide();	
 	}
-
 
 	function menuitem_add_save($xml)
 	{
 		if( typeof $xml === "undefined" )
 		{
-			wait_dialog_show("Lese Sprachen aus", 0);
-			if(table_data_select("cms_languages", "*", "ORDER BY ordering;", "dbweb", "$cms_languages", "menuitem_add_save")) return;
-			wait_dialog_show("Lese Menüpunktfelder aus", 20);
 			var $postdata=new Object();
+			$postdata=get_values("input, textarea, select", "menuitem_add_");
 			$postdata["API"]="cms";
 			$postdata["APIRequest"]="MenuitemAdd";
-			$postdata["id_menu"]=$("#menuitem_add_id_menu").val();
-			$postdata["id_menuitem"]=$("#menuitem_add_id_menuitem").val();
-			for($i=0; $i<$cms_languages.length; $i++)
-			{
-				$postdata["title"+$cms_languages[$i]["id_language"]]=$("#menuitem_add_title"+$cms_languages[$i]["id_language"]).val();
-				$postdata["description"+$cms_languages[$i]["id_language"]]=$("#menuitem_add_description"+$cms_languages[$i]["id_language"]).val();
-				$postdata["alias"+$cms_languages[$i]["id_language"]]=$("#menuitem_add_alias"+$cms_languages[$i]["id_language"]).val();
-			}
-			$postdata["local"]=$("#menuitem_add_local").val();
-			$postdata["link"]=$("#menuitem_add_link").val();
-			$postdata["icon"]=$("#menuitem_add_icon").val();
 			wait_dialog_show("Speichere Menüpunkt", 100);
 			soa2($postdata, "menuitem_add_save");
 			return;
@@ -288,6 +402,7 @@
 		show_status("Menüpunkt erfolgreich hinzugefügt.");
 		wait_dialog_hide();
 		delete $cms_menuitems;
+		delete $cms_menuitems_languages;
 		view_menuitems();
 	}
 
@@ -306,61 +421,59 @@
 		var $html = '';
 		$html += '<div id="menuitem_edit_tabs">';
 		$html += '<ul>';
+		$html += '	<li><a href="#menuitem_edit_tab">Allgemein</a></li>';
 		for($i=0; $i<$cms_languages.length; $i++)
 		{
 			$html += '	<li><a href="#menuitem_edit_tab'+$i+'">'+$cms_languages[$i]["language"]+'</a></li>';
 		}
 		$html += '</ul>';
-		for($i=0; $i<$cms_languages.length; $i++)
+		$html += '<div id="menuitem_edit_tab">';
+		$html += '<table>';
+		$html += '	<tr>';
+		$html += '		<td>Oberkategorie</td>';
+		$html += '		<td>';
+		$html += '			<select id="menuitem_edit_menuitem_id">';
+		$html += '				<option value="0">kein Unterpunkt</option>';
+		for($i=0; $i<$cms_menuitems.length; $i++)
 		{
-			var $title='';
-			var $description='';
-			var $alias='';
+			var $title="";
 			for($j=0; $j<$cms_menuitems_languages.length; $j++)
 			{
-				if( $cms_menuitems_languages[$j]["menuitem_id"]==$id_menuitem )
+				if( $cms_menuitems_languages[$j]["language_id"]==<?php echo $_SESSION["id_language"]; ?> && $cms_menuitems_languages[$j]["menuitem_id"]==$cms_menuitems[$i]["id_menuitem"] )
 				{
-					if( $cms_menuitems_languages[$j]["language_id"]==$cms_languages[$i]["id_language"] )
-					{
-						$title=$cms_menuitems_languages[$j]["title"];
-						$description=$cms_menuitems_languages[$j]["description"];
-						$alias=$cms_menuitems_languages[$j]["alias"];
-					}
+					$title=$cms_menuitems_languages[$j]["title"];
 				}
+				if( $title=="" && $cms_menuitems_languages[$j]["menuitem_id"]==$cms_menuitems[$i]["id_menuitem"] )
+				{
+					$title=$cms_menuitems_languages[$j]["title"];
+				}
+				if( $title!="" ) break;
 			}
-			$html += '<div id="menuitem_edit_tab'+$i+'">';
-			$html += '<table>';
-			$html += '	<tr>';
-			$html += '		<td>Titel</td>';
-			$html += '		<td><input id="menuitem_edit_title'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="'+$title+'" /></td>';
-			$html += '	</tr>';
-			$html += '	<tr>';
-			$html += '		<td>Beschreibung</td>';
-			$html += '		<td><textarea id="menuitem_edit_description'+$cms_languages[$i]["id_language"]+'" style="width:300px; height:100px;">'+$description+'</textarea></td>';
-			$html += '	</tr>';
-			$html += '	<tr>';
-			$help='Der Alias wird als SEO-Link verwendet. Beispiel: Alias=test/ => Link=http://www.domain.de/test/';
-			$html += '		<td>Alias <img alt="Hilfe" onclick="alert($help);" src="<?php echo PATH; ?>images/icons/16x16/help.png" style="cursor:pointer; float:right;" title="Hilfe" /></td>';
-			$html += '		<td><input id="menuitem_edit_alias'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="'+$alias+'"/></td>';
-			$html += '	</tr>';
-			$html += '</table>';
-			$html += '</div>';
+			$html += '				<option value="'+$cms_menuitems[$i]["id_menuitem"]+'">'+$title+'</option>';
 		}
-		var $link='';
-		var $icon='';
-		for($j=0; $j<$cms_menuitems.length; $j++)
-		{
-			if( $cms_menuitems[$j]["id_menuitem"]==$id_menuitem )
-			{
-				$local=$cms_menuitems[$j]["local"];
-				$link=$cms_menuitems[$j]["link"];
-				$icon=$cms_menuitems[$j]["icon"];
-			}
-		}
-		$html += '</div>';
-		$html += '<table class="hover" style="float:left;">';
+		$html += '			</select>';
+		$html += '		</td>';
+		$html += '	</tr>';
 		$html += '	<tr>';
-		$html += '		<td>Lokal?</td>';
+		$html += '		<td>Startseite</td>';
+		$html += '		<td>';
+		$html += '			<select id="menuitem_edit_home">';
+		$html += '				<option value="0">Nein</option>';
+		$html += '				<option value="1">Ja</option>';
+		$html += '			</select>';
+		$html += '		</td>';
+		$html += '	</tr>';
+		$html += '	<tr>';
+		$html += '		<td>Dynamischer Link</td>';
+		$html += '		<td>';
+		$html += '			<select id="menuitem_edit_dynamic">';
+		$html += '				<option value="0">Nein</option>';
+		$html += '				<option value="1">Ja</option>';
+		$html += '			</select>';
+		$html += '		</td>';
+		$html += '	</tr>';
+		$html += '	<tr>';
+		$html += '		<td>Lokal</td>';
 		$html += '		<td>';
 		$html += '			<select id="menuitem_edit_local">';
 		$html += '				<option value="0">Nein</option>';
@@ -370,19 +483,104 @@
 		$html += '	</tr>';
 		$html += '	<tr>';
 		$html += '		<td>Link</td>';
-		$html += '		<td><input id="menuitem_edit_link" style="width:300px;" type="text" value="'+$link+'" /></td>';
+		$html += '		<td><input id="menuitem_edit_link" style="width:300px;" type="text" value="" /></td>';
 		$html += '	</tr>';
 		$html += '	<tr>';
 		$html += '		<td>Icon</td>';
-		$html += '		<td><input id="menuitem_edit_icon" style="width:300px;" type="text" value="'+$icon+'" /></td>';
 		$html += '		<td>';
-		if( $icon!="" ) $html += '<img src="<?php echo PATH; ?>'+$icon+'" />';
+		$html += '			<input id="menuitem_edit_icon" style="width:250px;" type="text" value="" />';
+		$html += '			<span id="menuitem_add_image"></span>';
 		$html += '		</td>';
 		$html += '	</tr>';
 		$html += '</table>';
+		$html += '</div>';
+		for($i=0; $i<$cms_languages.length; $i++)
+		{
+			$html += '<div id="menuitem_edit_tab'+$i+'">';
+			$html += '<table>';
+			$html += '	<tr>';
+			$html += '		<td style="vertical-align:top;">';
+			$html += '			<label>Titel</label><br />';
+			$html += '			<input id="menuitem_edit_title'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="" />';
+			$html += '		</td>';
+			$html += '		<td style="vertical-align:top;">';
+			$html += '			<label>Meta-Titel</label><br />';
+			$html += '			<input id="menuitem_edit_meta_title'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="" onkeyup="textwidth(\'menuitem_edit_meta_title'+$cms_languages[$i]["id_language"]+'\', \'menuitem_edit_meta_title'+$cms_languages[$i]["id_language"]+'_length\', 512, 18);" />';
+			$html += '			<br /><span id="menuitem_edit_meta_title'+$cms_languages[$i]["id_language"]+'_length"></span>';
+			$html += '		</td>';
+			$html += '	</tr>';
+			$html += '	<tr>';
+			$html += '		<td style="vertical-align:top;">';
+			$html += '			<label>Beschreibung</label><br />';
+			$html += '			<textarea id="menuitem_edit_description'+$cms_languages[$i]["id_language"]+'" style="width:300px; height:100px;"></textarea>';
+			$html += '		</td>';
+			$html += '		<td style="vertical-align:top;">';
+			$html += '			<label>Meta-Description</label><br />';
+			$html += '			<textarea id="menuitem_edit_meta_description'+$cms_languages[$i]["id_language"]+'" style="width:300px; height:100px;" onkeyup="textwidth(\'menuitem_edit_meta_description'+$cms_languages[$i]["id_language"]+'\', \'menuitem_edit_meta_description'+$cms_languages[$i]["id_language"]+'_length\', 923, 13);"></textarea>';
+			$html += '			<br /><span id="menuitem_edit_meta_description'+$cms_languages[$i]["id_language"]+'_length"></span>';
+			$html += '		</td>';
+			$html += '	</tr>';
+			$html += '	<tr>';
+			$html += '		<td style="vertical-align:top;">';
+			$html += '			<label>Alias</label><br />';
+			$html += '			<input id="menuitem_edit_alias'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="" onkeyup="alias_preview(\'menuitem_edit_alias'+$cms_languages[$i]["id_language"]+'\', \'menuitem_edit_alias'+$cms_languages[$i]["id_language"]+'_preview\');" />';
+			$html += '			<br /><span id="menuitem_edit_alias'+$cms_languages[$i]["id_language"]+'_preview"></span>';
+			$html += '		</td>';
+			$html += '		<td style="vertical-align:top;">';
+			$html += '			<label>Meta-Keywords</label><br />';
+			$html += '			<input id="menuitem_edit_meta_keywords'+$cms_languages[$i]["id_language"]+'" style="width:300px;" type="text" value="" onkeyup="textlength(\'menuitem_edit_meta_keywords'+$cms_languages[$i]["id_language"]+'\', \'menuitem_edit_meta_keywords'+$cms_languages[$i]["id_language"]+'_length\', 300);" />';
+			$html += '			<br /><span id="menuitem_edit_meta_keywords'+$cms_languages[$i]["id_language"]+'_length"></span>';
+			$html += '		</td>';
+			$html += '	</tr>';
+			$html += '</table>';
+			$html += '</div>';
+		}
+		$html += '</div>';
+//		$html += '<input id="menuitem_edit_menu_id" type="hidden" value="'+$("#menu_id_menu").val()+'" />';
+		$html += '<input id="menuitem_edit_menuitem_id" type="hidden" value="'+$("#view_menuitems_id_menuitem").val()+'" />';
 		if( $("#menuitem_edit_dialog").length == 0 ) $("body").append('<div id="menuitem_edit_dialog" style="display:none;"></div>');
 		$("#menuitem_edit_dialog").html($html);
-		$("#menuitem_edit_local").val($local);
+
+		//update general field values
+		for($j=0; $j<$cms_menuitems.length; $j++)
+		{
+			if( $cms_menuitems[$j]["id_menuitem"]==$id_menuitem ) break;
+		}
+		$("#menuitem_edit_menuitem_id").val($cms_menuitems[$j]["menuitem_id"]);
+		$("#menuitem_edit_home").val($cms_menuitems[$j]["home"]);
+		$("#menuitem_edit_dynamic").val($cms_menuitems[$j]["dynamic"]);
+		$("#menuitem_edit_local").val($cms_menuitems[$j]["local"]);
+		$("#menuitem_edit_link").val($cms_menuitems[$j]["link"]);
+		$("#menuitem_edit_icon").val($cms_menuitems[$j]["icon"]);
+		
+		//update language field values
+		for($i=0; $i<$cms_languages.length; $i++)
+		{
+			for($j=0; $j<$cms_menuitems_languages.length; $j++)
+			{
+				if( $cms_menuitems_languages[$j]["menuitem_id"]==$id_menuitem )
+				{
+					if( $cms_menuitems_languages[$j]["language_id"]==$cms_languages[$i]["id_language"] )
+					{
+						$("#menuitem_edit_title"+$cms_languages[$i]["id_language"]).val($cms_menuitems_languages[$j]["title"]);
+						$("#menuitem_edit_description"+$cms_languages[$i]["id_language"]).val($cms_menuitems_languages[$j]["description"]);
+						$("#menuitem_edit_alias"+$cms_languages[$i]["id_language"]).val($cms_menuitems_languages[$j]["alias"]);
+						$("#menuitem_edit_meta_title"+$cms_languages[$i]["id_language"]).val($cms_menuitems_languages[$j]["meta_title"]);
+						$("#menuitem_edit_meta_description"+$cms_languages[$i]["id_language"]).val($cms_menuitems_languages[$j]["meta_description"]);
+						$("#menuitem_edit_meta_keywords"+$cms_languages[$i]["id_language"]).val($cms_menuitems_languages[$j]["meta_keywords"]);
+					}
+				}
+			}
+		}
+
+		//add events handlers
+		$("#menuitem_edit_local").bind("change", function() { menuitem_edit_local_change(); } );
+		$("#menuitem_edit_icon").bind("change", function() { menuitem_edit_image_change(); } );
+		$(function() { $("#menuitem_edit_link").autocomplete({ source: $global_files }) });
+		$(function() { $("#menuitem_edit_icon").autocomplete({ source: $icon_files }) });
+		menuitem_edit_local_change();
+		
+		//show dialog
 		$(function() { $("#menuitem_edit_tabs").tabs(); });
 		$("#menuitem_edit_dialog").dialog
 		({	buttons:
@@ -394,21 +592,39 @@
 			modal:true,
 			resizable:false,
 			title:"Menüpunkt bearbeiten",
-			width:800
+			width:850
 		});
 		wait_dialog_hide();	
 	}
 
 
+	function menuitem_edit_local_change()
+	{
+		if($("#menuitem_edit_local").val()==0)
+		{
+			$( "#menuitem_edit_link" ).autocomplete('option', 'source', $global_files)
+		}
+		else
+		{
+			$( "#menuitem_edit_link" ).autocomplete('option', 'source', $local_files)
+		}
+	}
+	
+	
+	function menuitem_edit_image_change()
+	{
+		var $src=$("#menuitem_edit_icon").val();
+		if( $src.indexOf(".") >-1 )
+		{
+			$("#menuitem_edit_image").html('<img src="<?php echo PATH; ?>'+$src+'" style="float:right;" />');
+		}
+	}
+
+
 	function menuitem_edit_save()
 	{
-		var $input=$('#menuitem_edit_dialog').find("input[id^='menuitem_edit_']");
-		$input.each(function()
-		{
-			alert($(this).id);
-		})
-		return;
-		$postdata=new Object();
+		var $postdata=new Object();
+		$postdata=get_values("input, textarea, select", "menuitem_edit_");
 		$postdata["API"]="cms";
 		$postdata["APIRequest"]="MenuitemEdit";
 		soa2($postdata, "menuitem_edit_save2");
@@ -417,7 +633,10 @@
 
 	function menuitem_edit_save2($xml)
 	{
-		alert($xml);
+		delete $cms_menuitems;
+		delete $cms_menuitems_languages;
+		$("#menuitem_edit_dialog").dialog("close");
+		view_menuitems();
 	}
 
 
@@ -482,6 +701,12 @@
 		
 		//view menus
 		var $html = '';
+		$html += '<div id="view_tabs">';
+		$html += '	<ul>';
+		$html += '		<li><a href="#view_menus_tab">Menüs</a></li>';
+		$html += '		<li><a id="view_optimization_tab_link" href="#view_optimization_tab">SEO-Optimierung</a></li>';
+		$html += '	</ul>';
+		$html += '	<div id="view_menus_tab">';
 		$html += '<table class="hover" style="float:left;">';
 		$html += '	<tr>';
 		$html += '		<th>Nr.</th>';
@@ -512,12 +737,72 @@
 			$html += '		</td>';
 			$html += '	</tr>';
 		}
-		$html += '</table>';
-		$html += '<input id="menu_id_menu" type="hidden" value="'+$id_menu+'">';
-		$html += '<div id="view_menuitem" style="float:left;"></div>';
+		$html += '		</table>';
+		$html += '		<input id="menu_id_menu" type="hidden" value="'+$id_menu+'">';
+		$html += '		<input id="menuitem_edit_id_menuitem" type="hidden" value="">';
+		$html += '		<div id="view_menuitem" style="float:left;"></div>';
+		$html += '	</div>';
+		$html += '	<div id="view_optimization_tab"></div>';
+		$html += '</div>';
 		$("#view").html($html);
+		$("#view_tabs").tabs();
+		$("#view_optimization_tab_link").bind("click", function(event, ui) { view_optimization_tab(); } );
 		wait_dialog_hide();
 		view_menuitems();
+	}
+	
+	
+	function view_optimization_tab($xml)
+	{
+		if( typeof $xml === "undefined" )
+		{
+			$postdata=new Object();
+			$postdata["API"]="cms";
+			$postdata["APIRequest"]="MenuitemOptimization";
+			$postdata["id_language"]=<?php echo $_SESSION["id_language"]; ?>;
+			soa2($postdata, "view_optimization_tab");
+			return;
+		}
+		
+		var $html = '';
+		//progress bar
+		var $total=$xml.find("ItemsTotal").text();
+		var $optimized=$xml.find("ItemsOptimized").text();
+		var $progress=Math.round($optimized/$total*10000)/100;
+		$html += '<div id="optimization_progress_wrapper" style="position:relative;">';
+		$html += '	<div id="optimization_progress" style="width:100%;"></div>';
+		$html += '	<div id="optimization_progress_status" style="width:100%; position:absolute; left:0; top:5px; text-align:center;">'+$optimized+' / '+$total+'</div>';
+		$html += '</div>';
+		
+		//table
+		$html += '<table>';
+		$html += '	<tr>';
+		$html += '		<th>Nr.</th>';
+		$html += '		<th>Titel</th>';
+		$html += '		<th>Grund</th>';
+		$html += '		<th>Optionen</th>';
+		$html += '	</tr>';
+		$i=0;
+		$xml.find("Menuitem").each(function()
+		{
+			$i++;
+			if($i>=21) return;
+			$html += '	<tr>';
+			$html += '		<td>'+$i+'</td>';
+			$html += '		<td>'+$(this).find("Title").text()+'</td>';
+			$html += '		<td>'+$(this).find("Reason").text()+'</td>';
+			$html += '		<td>';
+			$html += '			<img alt="Menüpunkt bearbeiten" onclick="menuitem_edit('+$(this).find("menuitem_id").text()+');" src="<?php echo PATH; ?>images/icons/24x24/edit.png" style="cursor:pointer;" title="Menüpunkt bearbeiten" />';
+			$html += '		</td>';
+			$html += '	</tr>';
+		});
+		$html += '</table>';
+		$("#view_optimization_tab").html($html);
+		$(function() {
+			$("#optimization_progress").progressbar({
+				value: $progress
+			});
+		});
 	}
 	
 	
@@ -538,12 +823,21 @@
 		wait_dialog_show("Lese Menüpunkte aus", 20);
 		if(table_data_select("cms_menuitems", "*", "WHERE menu_id="+$id_menu+" ORDER BY menuitem_id, ordering;", "dbweb", "$cms_menuitems", "view_menuitems")) return;
 		wait_dialog_show("Lese Menüpunkttitel aus", 50);
-		if(table_data_select("cms_menuitems_languages", "*", "", "dbweb", "$cms_menuitems_languages", "view_menuitems")) return;
+		var $in="";
+		for($i=0; $i<$cms_menuitems.length; $i++)
+		{
+			if( $in != "" ) $in+=', ';
+			$in += $cms_menuitems[$i]["id_menuitem"];
+		}
+		if ( $in != "" )
+		{
+			if(table_data_select("cms_menuitems_languages", "*", "WHERE menuitem_id IN("+$in+");", "dbweb", "$cms_menuitems_languages", "view_menuitems")) return;
+		}
 		wait_dialog_show("Zeichne Menüpunkte", 100);
 		var $html = '';
 		$html += '<div style="margin:5px; float:left;">'+view_menuitem_path($id_menuitem, "")+'</div>';
 		$html += '<br style="clear:both;" />';
-		$html += '<table class="hover" id="menuitem_edit" style="float:left;">';
+		$html += '<table class="hover" id="menuitem_edit" style="margin:5px; float:left;">';
 		$html += '	<tr class="unsortable">';
 		$html += '		<th>Nr.</th>';
 		$html += '		<th>Icon</th>';
@@ -615,7 +909,6 @@
 		}
 		$html += '</table>';
 		$html += '<input id="view_menuitems_id_menuitem" type="hidden" value="'+$id_menuitem+'">';
-		$html += '<input id="menuitem_edit_id_menuitem" type="hidden" value="">';
 		$("#view_menuitem").html($html);
 		$(function() {
 			$("#menuitem_edit").sortable( { items:"tr:not(.unsortable)" } );
@@ -641,7 +934,7 @@
 		{
 			for($i=0; $i<$cms_menus.length; $i++)
 			{
-				if( $cms_menus[$i]["id_menu"]==$cms_menuitems[0]["menu_id"] )
+				if( $cms_menus[$i]["id_menu"]==$('#menu_id_menu').val() )
 				{
 					var $id_menu=$cms_menus[$i]["id_menu"];
 					var $title=$cms_menus[$i]["title"];
@@ -655,7 +948,20 @@
 			//find current element
 			if( $cms_menuitems[$i]["id_menuitem"]==$id_menuitem )
 			{
-				$path=' &gt; <a href="javascript:view_menuitems('+$cms_menuitems[$i]["menu_id"]+', '+$id_menuitem+');">'+$cms_menuitems[$i]["title"]+'</a>'+$path;
+				var $title="";
+				for($j=0; $j<$cms_menuitems_languages.length; $j++)
+				{
+					if( $cms_menuitems_languages[$j]["language_id"]==<?php echo $_SESSION["id_language"]; ?> && $cms_menuitems_languages[$j]["menuitem_id"]==$cms_menuitems[$i]["id_menuitem"] )
+					{
+						$title=$cms_menuitems_languages[$j]["title"];
+					}
+					if( $title=="" && $cms_menuitems_languages[$j]["menuitem_id"]==$cms_menuitems[$i]["id_menuitem"] )
+					{
+						$title=$cms_menuitems_languages[$j]["title"];
+					}
+					if( $title!="" ) break;
+				}
+				$path=' &gt; <a href="javascript:view_menuitems('+$cms_menuitems[$i]["menu_id"]+', '+$id_menuitem+');">'+$title+'</a>'+$path;
 				$path=view_menuitem_path($cms_menuitems[$i]["menuitem_id"], $path);
 				break;
 			}
@@ -782,8 +1088,8 @@
 		}
 	}
 
-	//copy links to cms_menuitems_languages
 /*
+	//copy links to cms_menuitems_languages
 	$results=q("SELECT * FROM cms_menuitems;", $dbweb, __FILE__, __LINE__);
 	while( $row=mysqli_fetch_assoc($results) )
 	{
@@ -793,6 +1099,7 @@
 			$data=$row;
 			unset($data["id_menuitem"]);
 			unset($data["link"]);
+			unset($data["dynamic"]);
 			unset($data["local"]);
 			unset($data["ordering"]);
 			unset($data["icon"]);
@@ -804,6 +1111,42 @@
 		}
 	}
 */
+
+
+	//copy translated links to cms_menuitems_languages
+/*
+	$results=q("SELECT * FROM cms_menuitems;", $dbweb, __FILE__, __LINE__);
+	while( $row=mysqli_fetch_assoc($results) )
+	{
+		$results3=q("SELECT * FROM cms_languages;", $dbweb, __FILE__, __LINE__);
+		while( $cms_languages=mysqli_fetch_array($results3) )
+		{
+			$results2=q("SELECT * FROM cms_menuitems_languages WHERE language_id=".$cms_languages["id_language"]." AND menuitem_id=".$row["id_menuitem"].";", $dbweb, __FILE__, __LINE__);
+			if( mysqli_num_rows($results2)==0 )
+			{
+				$data=$row;
+				unset($data["id_menuitem"]);
+				unset($data["link"]);
+				unset($data["dynamic"]);
+				unset($data["local"]);
+				unset($data["ordering"]);
+				unset($data["icon"]);
+				unset($data["menu_id"]);
+				unset($data["hide"]);
+				$data["language_id"]=$cms_languages["id_language"];
+				$data["menuitem_id"]=$row["id_menuitem"];
+//				print_r($data);
+//				echo '<br><br>';
+				$data["title"]=t($data["title"], __FILE__, __LINE__, $cms_languages["code"]);
+				$data["description"]=t($data["description"], __FILE__, __LINE__, $cms_languages["code"]);
+//				print_r($data);
+				q_insert("cms_menuitems_languages", $data, $dbweb, _FILE__, __LINE__);
+//				exit;
+			}
+		}
+	}
+*/
+
 
 	include("templates/".TEMPLATE_BACKEND."/footer.php");
 ?>

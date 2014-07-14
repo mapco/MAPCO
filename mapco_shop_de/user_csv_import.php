@@ -42,8 +42,8 @@ function isInteger (id) {
 	
 	//PATH
 	echo '<p>';
-	echo '<a href="'.PATHLANG.'online-shop/mein-konto/">Mein Konto</a>';
-	echo ' > '.t("Auftragsimport");
+	echo '<a href="'.PATHLANG.tl(301, "alias").'" title="'.tl(301, "description").'">'.tl(301, "title").'</a>';
+	echo ' > '.tl(303, "title");
 	echo '</p>';
 
 	echo '<h1>'.t("Auftragsimport").'</h1>';

@@ -5,7 +5,7 @@
 
 	//cache files
 	$files=array();
-	$results=q("SELECT * FROm cms_files WHERE original_id>0;", $dbweb, __FILE__, __LINE__);
+	$results=q("SELECT * FROM cms_files WHERE original_id>0;", $dbweb, __FILE__, __LINE__);
 	while( $row=mysqli_fetch_assoc($results) )
 	{
 		$files[$row["original_id"]][$row["imageformat_id"]]=$row["id_file"];
@@ -15,7 +15,7 @@
 	$imageformat=array();
 	$results=q("SELECT * FROM cms_articles WHERE id_article=".$_POST["id_article"].";", $dbweb, __FILE__, __LINE__);
 	$row=mysqli_fetch_assoc($results);
-	$results=q("SELECT * FROM cms_imageformats WHERe imageprofile_id=".$row["imageprofile_id"].";", $dbweb, __FILE__, __LINE__);
+	$results=q("SELECT * FROM cms_imageformats WHERE imageprofile_id=".$row["imageprofile_id"].";", $dbweb, __FILE__, __LINE__);
 	while( $row=mysqli_fetch_assoc($results) )
 	{
 		$imageformat[]=$row["id_imageformat"];

@@ -8,7 +8,7 @@
 
 	$insert = false;
 	
-	$res_users = q("SELECT id_user, usermail, phone, mobile, fax FROM cms_users LIMIT 500;", $dbweb, __FILE__, __LINE__);
+	$res_users = q("SELECT id_user, usermail FROM cms_users LIMIT 500;", $dbweb, __FILE__, __LINE__);
 	while ($row_users = mysqli_fetch_assoc($res_users))
 	{
 		$res_customer = q( $select_crm_customer."SELECT id_crm_customer, user_id FROM crm_customers WHERE user_id=".$row_users[ 'user_id' ]." OR mail='".$row_users['usermail']."' LIMIT 1;", $dbweb, __FILE__, __LINE__ );

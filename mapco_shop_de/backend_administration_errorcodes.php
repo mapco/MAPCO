@@ -17,6 +17,8 @@
 			$shortMsg=substr($line[2], 12, $split-12);
 			$longMsg=substr($line[2], $split+12, strlen($line[2]));
 			$vehicles[]="(".$_POST["id_errortype"].", ".$line[0].", '".mysqli_real_escape_string($dbweb, $line[1])."', '".mysqli_real_escape_string($dbweb, $shortMsg)."', '".mysqli_real_escape_string($dbweb, $longMsg)."')";
+			//FOR IMPORT PAYPALERRORs
+		//	$vehicles[]="(".$_POST["id_errortype"].", ".$line[0].", 'Error', '".mysqli_real_escape_string($dbweb, $line[1])."',  '".mysqli_real_escape_string($dbweb, $line[2])."')";
 		}
 		fclose($handle);
 		

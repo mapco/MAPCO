@@ -7,8 +7,12 @@
 	echo '<META HTTP-EQUIV="content-type" CONTENT="text/html; charset=utf-8">';
 	echo '	<script src="'.PATH.'modules/jQuery/jquery-1.10.0.min.js" type="text/javascript"></script>'."\n";
 	//echo print_r($_SESSION);
-	$in_path=$_SESSION["in_path"];
-	if(isset($_SESSION["in_path"])) unset($_SESSION["in_path"]);
+	$in_path = 'http://www.mapco.de';
+	if ( isset( $_SESSION["in_path"] ) )
+	{
+		$in_path=$_SESSION["in_path"];
+		unset($_SESSION["in_path"]);
+	}
 	
 ?>
 
@@ -17,10 +21,10 @@
 	function article_read(article_id)
 	{
 		//alert(article_id);
-		var post_data = new Object();
-		post_data['API'] = 'cms';
-		post_data['APIRequest'] = 'ArticleReadSet';
-		post_data['article_id'] = article_id;
+		var post_data = 			new Object();
+		post_data['API'] = 			'cms';
+		post_data['APIRequest'] = 	'ArticleReadSet';
+		post_data['article_id'] = 	article_id;
 		
 		$.post('<?php echo PATH;?>soa2/', post_data, function($data){
 			try{$xml = $($.parseXML($data));} catch($err){show_status2($err.message); return;}

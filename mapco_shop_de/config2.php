@@ -36,7 +36,7 @@ exit;
 				$header .= "From: MAPCO-Server <server@mapco.de> \r\n";
 //				$header .= 'Reply-To: '.$_POST["firstname"].' '.$_POST["lastname"].' <'.$_POST["email"]."> \r\n";
 				mail("habermann.jens@gmail.com", "Fehler in ".$file.", Zeile ".$line, $report, $header);
-				mail("developer@mapco.de", "Fehler in ".$file.", Zeile ".$line, $report, $header);
+//				mail("developer@mapco.de", "Fehler in ".$file.", Zeile ".$line, $report, $header);
 				die("An error occured. The administrators have been informed.");
 			}
 		}

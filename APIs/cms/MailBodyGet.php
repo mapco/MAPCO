@@ -25,15 +25,16 @@
 	check_man_params(array(
 						"msg_num"	=> "numeric",
 						"account"	=> "numericNN",
+						"folder"	=> "numericNN",
 						"mode"		=> "numericNN"
 						)
 					);
 
 	//$mbox = mail_connect($_POST['account']);
-	$mbox = mail_connect($_POST['account']);
+	$mbox = mail_connect($_POST['account'], $_POST['folder']);
 	
 	if ( $_POST['mode'] == 2 && $_POST['msg_num'] == 0 )
-	{
+	{		
 		$xml = '';
 		$tmp_mails = array();
 		//get sender mails
@@ -60,73 +61,117 @@
 	}
 	else
 	{
-		$result_lock=q("SELECT locked, locked_by FROM cms_mail_history WHERE account_id=".$_POST['account']." AND msg_uid=".$_POST['msg_num']." LIMIT 1;", $dbweb, __FILE__, __LINE__);
-		$row_lock=mysqli_fetch_array($result_lock);
-
+		$result_lock=q("SELECT conversation_id, locked, locked_by FROM cms_mail_history WHERE account_id=".$_POST['account']." AND folder_id=".$_POST['folder']." AND msg_uid=".$_POST['msg_num']." LIMIT 1;", $dbweb, __FILE__, __LINE__);
+		$row_lock=mysqli_fetch_assoc($result_lock);
+		
 		$lock_time = time()-900;
 		if ( ($row_lock['locked'] == 0 and $row_lock['locked_by'] == 0) or ($row_lock['locked']<$lock_time and $row_lock['locked_by'] > 0) or $row_lock['locked_by'] == $_SESSION['id_user'] )
 		{
 			$xml = '';
 			$msg = array();
 			
-			getmsg($mbox,$_POST['msg_num']);
+			$result_order=q("SELECT order_id, user_id FROM crm_conversations WHERE id=".$row_lock['conversation_id']." LIMIT 1;", $dbweb, __FILE__, __LINE__);
+			$row_order=mysqli_fetch_assoc($result_order);
+			
+			$msg['order_id'] = $row_order['order_id'];
+			$msg['user_id'] = $row_order['user_id'];
+
+			getmsg($mbox,$_POST['msg_num'],$mode,1);
 
 			imap_close($mbox);
-			
-			$i = 0;
-			foreach ( $attachments as $filename => $filedata )
-			{	
-				$fname = explode(".",$filename);
-				$filename = createPassword(20).'.'.$fname[1];
-				
-				//get filename
-				do
+
+			if ( sizeof($attachments) > 0 )
+			{
+				$res_his = q('SELECT id_mail_history FROM cms_mail_history WHERE `msg_uid`= '.$_POST["msg_num"].' AND `account_id`='.$_POST["account"].' AND folder_id='.$_POST['folder'].";", $dbweb, __FILE__, __LINE__);
+				$row_his = mysqli_fetch_assoc($res_his);
+				$id_mail_history = $row_his['id_mail_history'];
+
+				$res_att = q('SELECT att_name, att_path FROM cms_mail_history_files WHERE `msg_id`='.$id_mail_history.';', $dbweb, __FILE__, __LINE__);
+				while ( $row_att = mysqli_fetch_assoc($res_att) )
 				{
-					$filename2="../temp/".$filename;
-					$filename=substr($filename2,3);
+					$registered_attachments[$row_att['att_name']] = $row_att['att_path'];
 				}
-				while( file_exists($filename2) );
 				
-				//create file
-				$handle=fopen($filename2, "w");
-				fwrite($handle,$filedata);
-				
-			//	$path = PATH.$filename;
-			//	$path = str_replace("temp/","",$path, 1);
-				
-				$msg['attachments'][$i]['File'] = str_replace("../", "", $filename2);
-				$msg['attachments'][$i]['Filename'] = $fname[0].'.'.$fname[1];
-				$msg['attachments'][$i]['Path'] = PATH.$filename2;
-				$i++;
+				$i = 0;
+				$update_history = false;
+				foreach ( $attachments as $filename => $filedata )
+				{	
+					$fname = explode(".",$filename);
+					$filename = createPassword(20).'.'.$fname[1];
+						
+					//get filename
+					do
+					{
+						$filename2="../temp/".$filename;
+						$filename=substr($filename2,3);
+					}
+					while( file_exists($filename2) );
+					
+					if ( sizeof($registered_attachments) > 0 )
+					{
+						foreach ( $registered_attachments as $att_name => $att_path )
+						{
+							if ( $att_name == $fname[0].".".$fname[1] && file_exists($att_path) === true )
+							{
+								$filename2 = $att_path;
+								$msg['attachments'][$i]['writed'] = "0";	
+							}
+							else
+							{
+								//create file
+								$handle=fopen($filename2, "w");
+								fwrite($handle,$filedata['data']);
+								
+								$msg['attachments'][$i]['writed'] = "1";	
+							
+								$res_his_files = q("SELECT id FROM cms_mail_history_files WHERE att_name='".$att_name."' AND msg_id=".$id_mail_history.";", $dbweb, __FILE__, __LINE__);
+								$row_his_files = mysqli_fetch_assoc($res_his_files);
+								$where = 'WHERE `id`= '.$row_his_files['id'];
+								$update_data = array();	
+								$update_data['att_path'] = $filename2;
+								q_update('cms_mail_history_files', $update_data, $where, $dbweb, __FILE__, __LINE__);	
+							}
+						}
+					}
+					else
+					{
+						$update_data = array();
+						$update_data['msg_id'] = $id_mail_history;
+						$update_data['att_name'] = $fname[0].".".$fname[1];
+						$update_data['att_path'] = $filename2;
+						q_insert('cms_mail_history_files', $update_data, $dbweb, __FILE__, __LINE__);	
+					}
+					//	$path = PATH.$filename;
+					//	$path = str_replace("temp/","",$path, 1);
+					
+					$msg['attachments'][$i]['File'] = str_replace("../", "", $filename2);
+					$msg['attachments'][$i]['Filename'] = $fname[0].'.'.$fname[1];
+					$msg['attachments'][$i]['Path'] = PATH.$filename2;
+					
+					$i++;
+				}
 			}
 			
-		//	$attachments = array_keys($attachments);			
-		//$msg['attachments'] = implode(',',$attachments);
-	
-	/*		//CID image names will be dynamic so i must use REGEX
-        $fileto = "/src="cid:(.*).png@(.*)/"";
-        #$fileto = "/src="cid:(.*).bmp(.*)/"";
-        #$fileto = "/src="cid:(.*).png(.*)/"";
-        #$fileto = "/src="cid:(.*).gif(.*)/"";
-
-        $remote_f = 'data:image/gif;base64,DATEN';
-		
-        $new_img = str_replace($fileto, $remote_f, $body);*/
-
-			if ( $_POST['mode'] == 2)
+			if ( $_POST['mode'] == 2 or $_POST['mode'] == 4 )
 			{
-				if ( $plainmsg != '' )
-				{
-					$body = nl2br($plainmsg);
+				if ( $_POST['msg_num'] > 0 )
+				{					
+					if ( $plainmsg != '' )
+					{
+						$body = $plainmsg;
+					}
+					else
+					{
+						$body = $htmlmsg;
+					}
+					$msg['text'] = nl2br($body);
 				}
 				else
 				{
-					$body = $htmlmsg;
+					$msg['text'] = '';
 				}
-				$msg['text'] = $body;
 				
 				//get sender mails
-				
 				$result_mails=q("SELECT DISTINCT user, id_account FROM cms_mail_accounts, cms_mail_accounts_users WHERE user_id=".$_SESSION['id_user']." AND id_account=account_id;", $dbweb, __FILE__, __LINE__);
 				while ($row_mails=mysqli_fetch_array($result_mails) )
 				{
@@ -138,12 +183,55 @@
 					}
 					$xml .= '>'.$row_mails['user'].'</option>]]></sendermail>'."\n";
 				}
-				$head = imap_rfc822_parse_headers($header);
-				$msg['From'] = $head->from[0]->mailbox.'@'.$head->from[0]->host;
-				$msg['Subject'] = iconv_mime_decode($head->subject, 0, "utf-8");
+
+				if ( $_POST['submode'] == 1 )
+				{
+					$msg['From'] = $header->from[0]->mailbox.'@'.$header->from[0]->host;
+				}
+				$msg['Subject'] = iconv_mime_decode($header->subject, 0, "utf-8");
+
+				$result_mails=q("SELECT DISTINCT user, id_account FROM cms_mail_accounts, cms_mail_accounts_users WHERE user_id!=".$_SESSION['id_user']." AND id_account=account_id;", $dbweb, __FILE__, __LINE__);
+				while ($row_mails=mysqli_fetch_array($result_mails) )
+				{				
+					if ( !in_array($row_mails['user'], $tmp_mails) )
+					{
+						$tmp_mails[] = $row_mails['user'];
+						$xml .= '<ToAddress><![CDATA['.$row_mails['user'].']]></ToAddress>'."\n";
+					}
+				}
+				print $xml;
+
+				switch($_SESSION['lang'])
+				{
+					case 'de': setlocale(LC_TIME,"de_DE");
+								break;
+					case 'fr': setlocale (LC_TIME,"fr_FR");
+								break;			
+					case 'es': setlocale (LC_TIME,"es_ES");
+								break;
+					case 'it': setlocale (LC_TIME,"it_IT");
+								break;
+					case 'pl': setlocale (LC_TIME,"pl_PL");
+								break;			
+					default: setlocale(LC_TIME,"en_GB");
+							break;
+				}
+
+				$msg['text'] = '
+==========boundary=old_message==========
+____________________________________________
+Gesendet: '.strftime("%A, %d. %B %G, %R",strtotime($header->date)).'
+Von: '.$header->fromaddress.'
+An: '.$header->toaddress.'
+Betreff: '.$msg['Subject'].' 
+
+'.$msg['text'];					
+
+				//archiviere originalmail
+				//$mail_moved = move_mail_to_archiv($mbox, $_POST['msg_num'], $_POST['account'], $_POST['folder']);		
 			}
 			elseif ( $_POST['mode'] == 1 )
-			{ 
+			{  
 				lock_mail ( $_POST['msg_num'], $_POST['account'] );
 	
 				if ( $htmlmsg != '' )
@@ -152,45 +240,16 @@
 				}
 				else
 				{
-					$body = nl2br($plainmsg);
+					$body = $plainmsg;
 				}
-				$msg['text'] = $body;
+				$msg['text'] = nl2br($body);
 			}
-
-	/*		preg_match_all('/src="cid:(.*)"/Uims', $msg['text'], $out, PREG_SET_ORDER);
-var_dump($inline_pics['<image001.png@01CF8A10.649C04D0">']); die();
-			if ( sizeof($out) > 0 )
-			{ 
 			
-				foreach ( $out as $inline_element )
-				{
-					$imageid = "<". $inline_element[0] .">";
-					$imageid = str_ireplace('src="cid:','',$imageid);
-					var_dump($imageid);
-								var_dump($inline_pics[$imageid]);
-					
-					$msg['text'] = str_ireplace($inline_element[0],$replace_data,$msg['text']);
-					
-				}
-			} 
-			
-			var_dump($inline_pics);die();
-			*/
 			if ( sizeof($inline_pics) > 0 )
 			{
-				foreach ( $inline_pics as $img_id => $img_data )
-				{ 
-					$img_id = substr($img_id, 1, strlen($img_id)-2);
-					$search_string = 'cid:'.$img_id;
-					$img_id = "<".$img_id.">";
-					$replace_data = 'data:image/gif;base64,'.base64_encode($inline_pics[$img_id]['content']);
-					$msg['text'] = str_ireplace($search_string, $replace_data, $msg['text']);
-				}
+				$msg['text'] = replace_inline_images($msg['text']);
 			}
 
-
-		//	$msg['text'] = $mbox->get_msg($_POST['msg_num'], $_POST['mode']);
-			//var_dump($msg); die();
 			$xml .= '<msg>'."\n";
 			foreach ( $msg as $key => $value )
 			{
@@ -199,6 +258,7 @@ var_dump($inline_pics['<image001.png@01CF8A10.649C04D0">']); die();
 					foreach ( $value as $attachment )
 					{
 						$xml .= '<attachment>'."\n";
+						$xml .= '	<writed><![CDATA['.$attachment['writed'].']]></writed>'."\n";
 						$xml .= '	<File><![CDATA['.$attachment['File'].']]></File>'."\n";
 						$xml .= '	<Filename><![CDATA['.$attachment['Filename'].']]></Filename>'."\n";
 						$xml .= '	<Path><![CDATA['.$attachment['Path'].']]></Path>'."\n";

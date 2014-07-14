@@ -693,7 +693,7 @@ include("functions/shop_mail_order2.php");
 	if (isset($_POST["form_button"])) unset($_SESSION["PayPalCheckout"]);
 
 	//PAYPAL ABBRUCH DURCH KUNDEN
-	if (isset($_GET["PayPalAction"]) && $_GET["PayPalAction"]=="abort") {
+	if (isset($_GET["getvars1"]) && $_GET["getvars1"]=="abort") {
 		echo '<div class="warning">'.t("Die Zahlung der Bestellung per PayPal wurde abgebrochen. Bitte wählen Sie eine andere Zahlungsart.").'</div>';
 		echo '<script type="text/javascript">payment_select();</script>';
 	}
@@ -712,9 +712,9 @@ include("functions/shop_mail_order2.php");
 	//CHECK, OB PAYPAL-ZAHLUNG DURCHGEFÜHRT WURDE -> Redirect von PayPal
 	$onlinePaymentTyp="";
 	$onlinepaymentOK=false;
-	if (isset($_GET["PayPalAction"]) && $_GET["PayPalAction"]=="payment") {
+	if (isset($_GET["getvars1"]) && $_GET["getvars1"]=="payment") {
 		//TOKEN VERHGLEICHEN
-		if ($_SESSION["paypaltoken"]==$_GET["token"]) {
+		//if ($_SESSION["paypaltoken"]==$_GET["token"]) {
 			$onlinepaymentOK=true;
 			$onlinePaymentTyp="PayPal";
 			/*
@@ -723,7 +723,7 @@ include("functions/shop_mail_order2.php");
 				echo "TOKEN".$_GET["token"];
 			}
 			*/
-		}
+	//	}
 	}
 	
 	
@@ -816,7 +816,7 @@ include("functions/shop_mail_order2.php");
 	//Bestellung abschicken
 	if ((isset($_POST["form_button"]) || $onlinepaymentcheckout) and !isset($_POST["cartupdate"]) and !isset($_POST["cartclear"]))
 	{
-		$results=q("SELECT * FROM shop_carts WHERE shop_id=".$_SESSION["id_shop"]." AND user_id='".$_SESSION["id_user"]."';", $dbshop, __FILE__, __LINE__);
+		$results=q("SELECT * FROM shop_carts WHERE shop_id=".$_SESSION["id_shop"]." AND user_id='".$_SESSION["id_user"]."' AND order_id=0;", $dbshop, __FILE__, __LINE__);
 		if (mysqli_num_rows($results)==0) echo '<div class="failure">'.t("Der Warenkorb darf nicht leer sein").'!</div>';
 		elseif ($_SESSION["usermail"]=="") echo '<div class="failure">'.t("Sie müssen eine E-Mail-Adresse angeben").'!</div>';
 		elseif ($_SESSION["bill_firstname"]=="") echo '<div class="failure">'.t("Sie müssen eine Rechnungsanschrift angeben").'!</div>';
@@ -838,7 +838,7 @@ include("functions/shop_mail_order2.php");
 				{
 					if ($_SESSION["id_shop"] == 22)
 					{
-						mail("nputzing@mapco.de", "PAYPAL MAPCO ES", print_r($_SESSION)."<br>".print_r($onlinePayment));	
+						//mail("nputzing@mapco.de", "PAYPAL MAPCO ES", print_r($_SESSION, true)."<br>".print_r($onlinePayment, true));	
 					}
 					if (isset($_SESSION["bill_firstname"])) $firstname=$_SESSION["bill_firstname"];
 					if (isset($_SESSION["bill_lastname"])) $lastname=$_SESSION["bill_lastname"];
@@ -1084,7 +1084,15 @@ include("functions/shop_mail_order2.php");
 				}
 				
 				//autopartner und franchise Korrektur
-				if( $_SESSION['id_shop'] == 2 or $_SESSION['id_shop'] == 4 or $_SESSION['id_shop'] == 6 or $_SESSION['id_shop'] == 21 ) {
+				if( $_SESSION['id_shop'] == 2 or $_SESSION['id_shop'] == 4 or $_SESSION['id_shop'] == 6 )  {
+					$vat_temp = 19;
+					if ( $country_id == 3) // ÖSTERREICH
+					{
+						$vat_temp = 20;
+					}
+				}
+				if ( $_SESSION['id_shop'] == 21 )
+				{
 					$vat_temp = 19;
 				}
 				if ( $_SESSION[ 'id_shop' ] == 19 ) {
@@ -1200,7 +1208,7 @@ include("functions/shop_mail_order2.php");
 				//Bestellte Artikel und Preise abspeichern
 				$gross_total=0;
 				$net_total=0;
-				$results=q("SELECT * FROM shop_carts WHERE shop_id=".$_SESSION["id_shop"]." AND user_id='".$_SESSION["id_user"]."';", $dbshop, __FILE__, __LINE__);
+				$results=q("SELECT * FROM shop_carts WHERE shop_id=".$_SESSION["id_shop"]." AND user_id='".$_SESSION["id_user"]."' AND order_id=0;", $dbshop, __FILE__, __LINE__);
 				while($row=mysqli_fetch_array($results))
 				{
 					$price = get_prices($row["item_id"], $row["amount"]);
@@ -1268,7 +1276,7 @@ include("functions/shop_mail_order2.php");
 				}
 				
 				// Warenkorb leeren
-				$res = q( "DELETE FROM shop_carts WHERE shop_id=".$_SESSION["id_shop"]." AND user_id='".$_SESSION["id_user"]."'", $dbshop, __FILE__, __LINE__ );
+				$res = q( "DELETE FROM shop_carts WHERE shop_id=".$_SESSION["id_shop"]." AND user_id='".$_SESSION["id_user"]."' AND order_id=0", $dbshop, __FILE__, __LINE__ );
 		
 				if ( $_SESSION["id_user"] != 49352 )
 				{
@@ -1520,11 +1528,11 @@ include("functions/shop_mail_order2.php");
 				{
 					if ($_POST["amount"][$i]>0)
 					{
-						q("UPDATE shop_carts SET amount=".$_POST["amount"][$i].", lastmod=".time()." WHERE shop_id=".$_SESSION["id_shop"]." AND item_id=".$_POST["item_id"][$i]." AND user_id='".$_SESSION["id_user"]."';", $dbshop, __FILE__, __LINE__);
+						q("UPDATE shop_carts SET amount=".$_POST["amount"][$i].", lastmod=".time()." WHERE shop_id=".$_SESSION["id_shop"]." AND item_id=".$_POST["item_id"][$i]." AND user_id='".$_SESSION["id_user"]."' AND order_id=0;", $dbshop, __FILE__, __LINE__);
 					}
 					else
 					{
-						q("DELETE FROM shop_carts WHERE shop_id=".$_SESSION["id_shop"]." AND item_id=".$_POST["item_id"][$i]." AND user_id='".$_SESSION["id_user"]."';", $dbshop, __FILE__, __LINE__);
+						q("DELETE FROM shop_carts WHERE shop_id=".$_SESSION["id_shop"]." AND item_id=".$_POST["item_id"][$i]." AND user_id='".$_SESSION["id_user"]."' AND order_id=0;", $dbshop, __FILE__, __LINE__);
 					}
 				}
 			}
@@ -1539,7 +1547,7 @@ include("functions/shop_mail_order2.php");
 	$total=0;
 	if ( isset($_POST["coupon_code"]) and $_POST["coupon_code"]=="12345" )
 	{
-		$results=q("SELECT * FROM shop_carts AS a, shop_items AS b, shop_items_".$_GET["lang"]." AS c WHERE a.shop_id=".$_SESSION["id_shop"]." AND a.user_id='".$_SESSION["id_user"]."' AND item_id=b.id_item AND b.id_item=c.id_item;", $dbshop, __FILE__, __LINE__);
+		$results=q("SELECT * FROM shop_carts AS a, shop_items AS b, shop_items_".$_GET["lang"]." AS c WHERE a.shop_id=".$_SESSION["id_shop"]." AND a.user_id='".$_SESSION["id_user"]."' AND item_id=b.id_item AND b.id_item=c.id_item AND a.order_id=0;", $dbshop, __FILE__, __LINE__);
 		while($row=mysqli_fetch_array($results))
 		{
 			$total+=$row["amount"]*get_net_price($row["id_item"]);
@@ -1569,7 +1577,7 @@ include("functions/shop_mail_order2.php");
 		{
 			if (isset($_POST["removeitem".$_POST["item_id"][$i]."_x"]))
 			{
-				q("DELETE FROM shop_carts WHERE shop_id=".$_SESSION["id_shop"]." AND item_id=".$_POST["item_id"][$i]." AND user_id='".$_SESSION["id_user"]."';", $dbshop, __FILE__, __LINE__);
+				q("DELETE FROM shop_carts WHERE shop_id=".$_SESSION["id_shop"]." AND item_id=".$_POST["item_id"][$i]." AND user_id='".$_SESSION["id_user"]."' AND order_id=0;", $dbshop, __FILE__, __LINE__);
 				echo '<script type="text/javascript"> cart_update(); </script>';
 				echo '<div class="success">'.t("Artikel erfolgreich aus dem Warenkorb entfernt").'!</div>';
 			}
@@ -1580,7 +1588,7 @@ include("functions/shop_mail_order2.php");
 	//Warenkorb leeren
 	if (isset($_POST["cartclear"]))
 	{
-		q("DELETE FROM shop_carts WHERE user_id='".$_SESSION["id_user"]."';", $dbshop, __FILE__, __LINE__);
+		q("DELETE FROM shop_carts WHERE user_id='".$_SESSION["id_user"]."' AND order_id=0;", $dbshop, __FILE__, __LINE__);
 		echo '<script type="text/javascript">cart_update(); </script>';
 		echo '<div class="success">'.t("Warenkorb erfolgreich geleert").'</div>';
 	}
@@ -1684,7 +1692,7 @@ include("functions/shop_mail_order2.php");
 					$_SESSION["bill_zip"]="";
 					$_SESSION["bill_city"]="";
 					$_SESSION["bill_country"]="";
-					$_SESSION["bill_country_id"]="";
+					$_SESSION["bill_country_id"]=0;
 				}
 
 				$_SESSION["ship_company"]="";
@@ -1698,7 +1706,7 @@ include("functions/shop_mail_order2.php");
 				$_SESSION["ship_zip"]="";
 				$_SESSION["ship_city"]="";
 				$_SESSION["ship_country"]="";
-				$_SESSION["ship_country_id"]="";
+				$_SESSION["ship_country_id"]=0;
 			}
 		}
 	}

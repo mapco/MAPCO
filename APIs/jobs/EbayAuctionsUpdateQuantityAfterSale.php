@@ -30,7 +30,7 @@
 
 	//GET SOLD EBAYITEMS from last 24h
 	$sold_items=array();
-	$res_sold_ebayitems = q("SELECT * FROM ebay_orders_items WHERE CreatedDateTimestamp > ".(time()-12*3600), $dbshop, __FILE__, LINE__);
+	$res_sold_ebayitems = q("SELECT * FROM ebay_orders_items WHERE CreatedDateTimestamp > ".(time()-9*3600), $dbshop, __FILE__, LINE__);
 	while ($row_sold_ebayitems = mysqli_fetch_assoc($res_sold_ebayitems))
 	{
 		$sold_items[]=$row_sold_ebayitems["ItemItemID"];
@@ -39,7 +39,7 @@
 	//GET MPN FROM ItemIDs
 	$update_items=array();
 	$SKU = array();
-	$res_auctions = q("SELECT id_auction, SKU, account_id FROM ebay_auctions WHERE NOT upload = 1 AND ItemID IN (".implode(", ", $sold_items).");", $dbshop, __FILE__, __LINE__);
+	$res_auctions = q("SELECT id_auction, SKU, account_id FROM ebay_auctions WHERE NOT upload = 1 AND NOT premium = 1 AND ItemID IN (".implode(", ", $sold_items).");", $dbshop, __FILE__, __LINE__);
 	while ($row_auctions = mysqli_fetch_assoc($res_auctions))
 	{
 		$update_items[$row_auctions["id_auction"]]["SKU"]=$row_auctions["SKU"];

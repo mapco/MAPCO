@@ -4,7 +4,13 @@
 	include("functions/cms_tl.php");
 	
 	$_GET['id_order'] = 0;
-	
+/*	
+	if ( $_SESSION['id_shop']  == 18 )
+	{
+		echo '***' . $_GET['getvars1'] . '***' . $_SESSION['id_user'] . '+++';
+		exit;
+	}
+*/	
 	if( isset( $_GET["getvars1"] ) )
 	{
 		$_GET["id_order"] = $_GET["getvars1"];
@@ -73,13 +79,13 @@
 		$postdata['APIRequest'] = 	'CheckoutOrderSet';
 		$postdata['get_id_order'] = <?php echo $_GET['id_order'];?>;
 
-		soa2( $postdata, 'order_set_callback', 'xml' );
+		soa2( $postdata, 'order_set_callback');
 
 	}
 	
 	function order_set_callback( $xml )
 	{
-		//show_status2( $xml + '<?php echo str_replace( "\n", "", print_r( $_SESSION, true )); ?>' );
+//		show_status2( $xml + '<?php echo str_replace( "\n", "", print_r( $_SESSION, true )); ?>' );
 		location.href = '<?php echo PATHLANG . tl(667, "alias");?>';
 	}
 	
@@ -91,6 +97,7 @@
 */
 	function shop_checkout_order_main()
 	{	
+//		return;
 //		alert( 'test');
 //		show_status2( '<?php echo str_replace( "\n", "", print_r( $_SESSION, true )); ?>' );
 /*		

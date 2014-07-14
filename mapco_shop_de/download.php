@@ -73,6 +73,36 @@ if ($_GET["id_file"]>0)
 			header("Content-Disposition: attachment; filename=\"".$download_name."\";" ); 
 			readfile($file);
 		}
+		
+		// interne news download
+		$article_ids = array();
+		//$article_ids_2 = 	array();
+		$res = q( "SELECT * FROM cms_articles_files WHERE file_id=" . $_GET[ 'id_file' ], $dbweb, __FILE__, __LINE__ );
+		if ( mysqli_num_rows( $res ) > 0 ) {
+			while ( $cms_articles_files = mysqli_fetch_assoc( $res ) ) {
+				$article_ids[] = $cms_articles_files[ 'article_id' ];
+			}
+			$res2 = q( "SELECT * FROM cms_articles_labels WHERE article_id IN (" . implode( ',', $article_ids ) . ") AND label_id=39", $dbweb, __FILE__, __LINE__ );
+			if( mysqli_num_rows( $res2 ) > 0 ) {
+				while ( $cms_articles_labels = mysqli_fetch_assoc( $res2 ) ) {
+					//$article_ids_2[] = $cms_articles_labels[ 'article_id' ];
+					$res4 = q( "SELECT * FROM cms_contacts WHERE idCmsUser=" . $_SESSION[ 'id_user' ], $dbweb, __FILE__, __LINE__ );
+					if ( mysqli_num_rows( $res4 ) > 0 ) {					
+						$res3 = q( "SELECT * FROM cms_articles_files_downloads WHERE article_id=" . $cms_articles_labels[ 'article_id' ] . " AND file_id=" . $_GET[ 'id_file' ] . " AND user_id=" . $_SESSION[ 'id_user' ], $dbweb, _FILE__, __LINE__ );
+						if ( mysqli_num_rows( $res3 ) == 0 ) {
+							$insertdata = 					array();
+							$insertdata[ 'article_id' ] = 	$cms_articles_labels[ 'article_id' ];
+							$insertdata[ 'file_id' ] = 		$_GET[ 'id_file' ];
+							$insertdata[ 'user_id' ] = 		$_SESSION[ 'id_user' ];
+							$insertdata[ 'firstmod' ] = 	time();
+							
+							q_insert( 'cms_articles_files_downloads', $insertdata, $dbweb, __FILE__, __LINE__);
+						}
+					}
+				}
+			}
+		}
+		
 	}
 
 ?>

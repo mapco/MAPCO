@@ -16,10 +16,6 @@
 	include("functions/cms_tl.php");
 
 
-
-	$_SESSION["checkout_order_id"] = 1851448;
-	
-	
 	//GET PAYMENT_TYPE_ID
 	$res = q("SELECT * FROM shop_orders WHERE id_order = ".$_SESSION["checkout_order_id"], $dbshop, __FILE__, __LINE__);
 	if ( mysqli_num_rows( $res ) == 0 )
@@ -104,15 +100,37 @@
 	{
 		if ( $payment_type_id == 4) // PAYPAL
 		{
+
 			//CHECK von woher der Aufruf der Seite kam
 				// shop_checkout ($paymenttype == "") -> PayPalExpressCheckoutSet
 				// PayPal ($paymenttype == "paypal") -> PayPalExpressCheckoutGet -> PayPalExpressCheckoutDo
 				
+
+			if ( $( '#assist_div' ).length == 0 )
+			{
+				$( '#main_div' ).append( $( '<div id="assist_div"></div>' ) );
+			}
+			else
+			{
+				$( '#assist_div' ).html( '' );
+			}
+		
+			$( '#assist_div' ).css("position","relative");
+			$( '#assist_div' ).css("top", Math.max(0, (($( '#main_div' ).height() - $( '#assist_div' ).outerHeight()) / 2) + $( '#main_div' ).scrollTop()) + "px");
+
+
+
+
 			if ( $paymenttype == "" )
 			{
-				alert("Die Zahlungsdaten werden an PayPal gesendet...");
+			
 			// SET EXPRESSCHECKOUT	
-				wait_dialog_show("Die Zahlungsdaten werden zu PayPal gesendet...");
+				//wait_dialog_show("Die Zahlungsdaten werden zu PayPal gesendet...");
+			
+				$( '#assist_div' ).append( '<strong><?php echo t("Die Zahlungsdaten werden zu PayPal gesendet..." ); ?></strong>' );
+				//$( '#assist_div' ).append( '<strong>Die Zahlungsdaten werden zu PayPal gesendet...</strong> LINK:'+$paypal_url );
+				$( '#assist_div' ).fadeIn(500);
+
 				
 			}
 			if ( $paymenttype == "paypal" )
@@ -120,21 +138,31 @@
 				if ( $getvars2 == "cancel")
 				{
 					//RÜCKLEITUNG AUF CHECKOUT
-					wait_dialog_show("Sie werden auf die Bestellübersicht zurückgeleitet.");	
+					//wait_dialog_show("Sie werden auf die Bestellübersicht zurückgeleitet.");	
+					$( '#assist_div' ).append( '<strong><?php echo t("Sie werden auf die Bestellübersicht zurückgeleitet." ); ?></strong>' );
+					//$( '#assist_div' ).append( '<strong>Sie werden auf die Bestellübersicht zurückgeleitet.</strong> LINK:'+$paypal_url );
+					$( '#assist_div' ).fadeIn(500);
+
 				}
 				
 				if ( $getvars2 == "success")
 				{
 					//GET EXPRESSCHECKOUT + DO EXPRESSCHECKOUT
 					//SHOW MESSAGE TO USER
-					
-					wait_dialog_show("Ihre Zahlung wird verbucht und die Bestellung verarbeitet.");
+					//wait_dialog_show("Ihre Zahlung wird verbucht und die Bestellung verarbeitet.");
+					$( '#assist_div' ).append( '<strong><?php echo t("Ihre Zahlung wird verbucht und die Bestellung verarbeitet." ); ?></strong>' );
+					//$( '#assist_div' ).append( '<strong>Ihre Zahlung wird verbucht und die Bestellung verarbeitet.</strong> LINK:'+$paypal_url );
+					$( '#assist_div' ).fadeIn(500);
+
 				}
 			}
 		}
 		else
 		{
-			wait_dialog_show("Ihre Bestellung wird verarbeitet.");
+			//wait_dialog_show("Ihre Bestellung wird verarbeitet.");
+			$( '#assist_div' ).append( '<strong><?php echo t("Ihre Bestellung wird verarbeitet." ); ?></strong>' );
+			//$( '#assist_div' ).append( '<strong>Ihre Bestellung wird verarbeitet.</strong>);
+			$( '#assist_div' ).fadeIn(500);
 			
 		}
 
@@ -144,10 +172,12 @@
 		$postfield['APIRequest'] 			= 'ShopCheckoutPaymentsProcess';
 		$postfield['ValidateResponse']		= true;
 
-		$.post('<?php echo PATH;?>soa2/', $postfield, function($data)
+		$.post('<?php echo PATH;?>soa3/', $postfield, function($data)
 		{
-			wait_dialog_hide();
-			try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); wait_dialog_hide(); return; }
+			//wait_dialog_hide();
+			//show_status2($data);
+			//return;
+			try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
 			paymentaction_evaluate ( $xml );
 		});
 
@@ -198,28 +228,38 @@
 		{
 			$( '#main_div' ).append( $( '<div id="assist_div"></div>' ) );
 		}
+		else
+		{
+			$( '#assist_div' ).html( '' );
+		}
 	
 		$( '#assist_div' ).css("position","relative");
 		$( '#assist_div' ).css("top", Math.max(0, (($( '#main_div' ).height() - $( '#assist_div' ).outerHeight()) / 2) + $( '#main_div' ).scrollTop()) + "px");
 	
-		//$( '#assist_div' ).append( '<?php echo t("Sie werden zu PayPal weitergeleitet..." ); ?>' );
-		$( '#assist_div' ).append( '<strong>Sie werden zu PayPal weitergeleitet...</strong> LINK:'+$paypal_url );
+		$( '#assist_div' ).append( '<strong><?php echo t("Sie werden zu PayPal weitergeleitet..." ); ?></strong>' );
+		//$( '#assist_div' ).append( '<strong>Sie werden zu PayPal weitergeleitet...</strong> LINK:'+$paypal_url );
 		$( '#assist_div' ).fadeIn(500);
 
-		location.href = $paypal_url;
+		window.location.href = $paypal_url;
 		
+		
+		// SHOW USERMESSAGE
 		setTimeout( function ()
 		{
 			$( '#assist_div' ).fadeOut(300);
 			setTimeout( function ()
 			{
 				$( '#assist_div' ).html( '' );
-				//$( '#assist_div' ).append( '<?php echo t("Sollten Sie nicht innerhalb weiniger Sekunden zu PayPal weitergeleitet worden sein, nutzen Sie bitte folgenden Link: " ); ?>' );
-				$( '#assist_div' ).append( '<strong>Sollten Sie nicht innerhalb weiniger Sekunden zu PayPal weitergeleitet worden sein, nutzen Sie bitte folgenden Link: </strong><a href='+$paypal_url+'> Weiter zu PayPal </a>' );
+				$( '#assist_div' ).append( '<strong><?php echo t("Sollten Sie nicht innerhalb weiniger Sekunden zu PayPal weitergeleitet worden sein, nutzen Sie bitte folgenden Link: " ); ?></strong><a href='+$paypal_url+'> <?php echo t('Weiter zu PayPal'); ?> </a>' );
+				//$( '#assist_div' ).append( '<strong>Sollten Sie nicht innerhalb weiniger Sekunden zu PayPal weitergeleitet worden sein, nutzen Sie bitte folgenden Link: </strong><a href='+$paypal_url+'> Weiter zu PayPal </a>' );
 				$( '#assist_div' ).fadeIn(300);
 			}, 300 );
 		}, 7000 );
 		
+		//WEITERLEITUNGreplace
+	//	location.href.replace = $paypal_url;
+
+
 	}
 	
 	function paymentsSuccess( )

@@ -29,19 +29,37 @@
 	function user_edit($id_user)
 	{
 		wait_dialog_show();
-		$.post("<?php echo PATH; ?>soa/", { API:"cms", Action:"UserGet", id_user:$id_user }, function($data)
+		$.post("<?php echo PATH; ?>soa2/", { API:"cms", APIRequest:"UserGet_neu", id_user:$id_user }, function($data)
 		{
-			wait_dialog_hide();
+			//show_status2($data); return;
 			try { $xml = $($.parseXML($data)); } catch ($err) { show_status($err.message); return; }
 			$ack = $xml.find("Ack");
 			if ( $ack.text()!="Success" ) { show_status2($data); return; }
 
-			$html  = '';
+			$html  = '<div id="user_edit_error" style="color:red;"></div>';
 			$html += '	<table>';
 			var $username=$xml.find("username").text();
 			$html += '		<tr>';
 			$html += '			<td>Benutzername</td>';
 			$html += '			<td><input id="user_edit_username" type="text" value="'+$username+'" /></td>';
+			$html += '		</tr>';
+		//	$html += '		<tr>';
+			//$html += '			<td>IDIMS Benutzer ID</td>';
+			//$html += '			<td><input id="user_edit_idims_user_id" type="text" value="'+$(this).find("idims_user_id").text()+'" /></td>';
+		//	$html += '		</tr>';
+			$html += '		<tr>';
+
+			var $userrole = $xml.find('userrole_id').text();
+			var $userrole_id = 0;
+			$html += '			<td>Benutzerrolle</td>';
+			$html += '			<td><select id="user_edit_userrole">';
+			$xml.find("userrole").each(function(){
+				$userrole_id =$(this).find("user_role_id").text();
+				$html +=			'<option value="'+$(this).find("user_role_id").text()+'"';
+				if( $userrole == $userrole_id ){ $html += ' selected="selected"'; }
+				$html += '>'+$(this).find("user_role_title").text()+'</option>';	
+			});			
+			$html += '			</select></td>';
 			$html += '		</tr>';
 			var $usermail=$xml.find("usermail").text();
 			$html += '		<tr>';
@@ -53,15 +71,31 @@
 			$html += '			<td>Name</td>';
 			$html += '			<td><input id="user_edit_name" type="text" value="'+$name+'" /></td>';
 			$html += '		</tr>';
-			var $language_id=$xml.find("language_id").text();
 			$html += '		<tr>';
 			$html += '			<td>Sprache</td>';
-			$html += '			<td><input id="user_edit_language_id" type="text" value="'+$language_id+'" /></td>';
+			$html += '			<td><select id="user_edit_language">';
+			
+			var $language = $xml.find('user_language').text();
+			var $language_id = 0;
+			$xml.find('language').each(function(){
+				$language_id = $(this).find("language_id").text();
+				$html +=			'<option value="'+$language_id+'"';
+				if( $language == $language_id ){ $html += ' selected="selected"'; }
+				$html += '>'+$(this).find("language_title").text()+'</option>';	
+			});
+			$html += '			</select></td>';
 			$html += '		</tr>';
-			var $origin=$xml.find("origin").text();
 			$html += '		<tr>';
-			$html += '			<td>Herkunft</td>';
-			$html += '			<td><input id="user_edit_origin" type="text" value="'+$origin+'" /></td>';
+			$html += '			<td>Land</td>';
+			$html += '			<td><select id="user_edit_country">';
+			var $origin = $xml.find('origin').text();
+			var $country = 0;
+			$xml.find("country").each(function(){
+				$html +=			'<option value="'+$(this).find("country_code").text()+'"';
+				if( $(this).find("country_code").text() == $origin ){ $html += ' selected="selected"'; }
+				$html += '>'+$(this).find("country_title").text()+'</option>';	
+			});			
+			$html += '			</select></td>';
 			$html += '		</tr>';
 			$html += '	</table>';
 			if( $("#user_edit_dialog").length==0 ) $("body").append('<div id="user_edit_dialog"></div>');
@@ -70,8 +104,8 @@
 			$("#user_edit_dialog").dialog
 			({	buttons:
 				[
-					{ text: "Speichern", click: function() { user_edit_save(); } },
-					{ text: "Abbrechen", click: function() { $(this).dialog("close"); } }
+					{ text: "Speichern", click: function() { user_edit_save($id_user); } },
+					{ text: "Schließen", click: function() { $(this).dialog("close"); } }
 				],
 				closeText:"Fenster schließen",
 				modal:true,
@@ -79,13 +113,50 @@
 				title:"Benutzerdetails bearbeiten",
 				width:400
 			});
+			wait_dialog_hide();
 		});
 	}
 
 
-	function user_edit_save()
+	function user_edit_save($id_user)
 	{
-		alert("Nocht nicht verfügbar!");
+		var $postdata = new Object();
+		$postdata['API'] = 'cms';
+		$postdata['APIRequest'] = 'UserEdit';
+		$postdata['id_user'] = $id_user;
+		$postdata['username'] = $("#user_edit_username").val();
+		$postdata['usermail'] = $("#user_edit_usermail").val();
+		$postdata['name'] = $("#user_edit_name").val();
+		$postdata['userrole'] = $("#user_edit_userrole").val();
+		$postdata['language'] = $("#user_edit_language").val();
+		$postdata['country'] = $("#user_edit_country").val();
+		//show_status2(print_r($postdata)); return;
+		wait_dialog_show();
+		$.post("<?php echo PATH; ?>soa2/",$postdata, function($data){
+			//show_status2($data); return;
+			try { $xml = $($.parseXML($data)); } catch ($err) { show_status($err.message); return; }
+			$ack = $xml.find("Ack");
+			if ( $ack.text()!="Success" ) { show_status2($data); return; }
+			
+			var status_name = $xml.find('status_name').text();
+			var status_mail = $xml.find('status_mail').text();
+					
+			var error = '';
+			if ( status_name == 2 )
+			{
+				error = '<div>Dieser Name ist bereits vergeben!</div>';
+			}
+			
+			if ( status_mail == 2 )
+			{
+				error = '<div>Diese Mail ist bereits vergeben!</div>';
+			}
+			
+			$("#user_edit_error").append(error);
+			
+			$("#user_edit_dialog").dialog("close");
+			view();
+		})
 	}
 
 
@@ -191,13 +262,19 @@
 		var $search=$("#view_search").val();
 		if( typeof $search == "undefined" ) $search='';
 		wait_dialog_show();
-		$.post("<?php echo PATH; ?>soa/", { API:"cms", Action:"UsersGet", search:$search }, function($data)
+		$postdata=new Object();
+		$postdata["API"]="cms";
+		$postdata["APIRequest"]="UsersGet_neu";
+		$postdata["search"]=$search;
+		$postdata["limit"]=100;
+		$.post("<?php echo PATH; ?>soa2/", $postdata, function($data)
 		{
 			wait_dialog_hide();
+			//show_status2($data); return;
 			try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
 			$ack = $xml.find("Ack");
 			if ( $ack.text()!="Success" ) { show_status2($data); return; }
-
+			
 			$html  = '';
 			$html += '<input id="view_search" onkeyup="view_on_enter();" type="text" value="'+$search+'" />';
 			$html += '<input type="button" onclick="view();" value="Suchen" />';
@@ -205,29 +282,63 @@
 			$html += '	<tr>';
 			$html += '		<th>Nr.</th>';
 			$html += '		<th>ID</th>';
+			$html += '		<th>Sperrung</th>';
+			$html += '		<th>Benutzerrolle</th>';
 			$html += '		<th>Benutzername</th>';
 			$html += '		<th>E-Mail</th>';
 			$html += '		<th>Name</th>';
+			$html += '		<th>Sprache</th>';
+			$html += '		<th>Land</th>';
+			$html += '		<th>Usertoken</th>';
 			$html += '		<th>Letzter Login</th>';
 			$html += '		<th>Optionen</th>';
 			$html += '	</tr>';
 			$nr=0;
 			$xml.find("User").each(function()
 			{
+				$is_active = $(this).find("active").text();
+				if ( $is_active == 1 )
+				{
+					$active_image = 'lock_off.png';
+				}
+				else
+				{
+					$active_image = 'lock_disabled.png';
+				}
+				
 				$nr++;
 				$html += '	<tr>';
 				$html += '		<td>'+$nr+'</td>';
 				var $id_user=$(this).find("id_user").text();
 				$html += '		<td>'+$id_user+'</td>';
+				$html += '		<td><img src="<?php echo PATH; ?>images/icons/24x24/'+$active_image+'" onclick="Javascript:user_set_active('+$id_user+','+$is_active+')" style="cursor:pointer;"></td>';
+				$html += '		<td>'+$(this).find("userrole").text()+'</td>';
 				$html += '		<td>'+$(this).find("username").text()+'</td>';
 				$html += '		<td>'+$(this).find("usermail").text()+'</td>';
 				$html += '		<td>'+$(this).find("name").text()+'</td>';
-				var $timestamp=Number($(this).find("lastlogin").text())*1000;
-				var $lastlogin=new Date($timestamp);
+				$html += '		<td>'+$(this).find("language").text()+'</td>';
+				$html += '		<td>'+$(this).find("country").text()+'</td>';
+				$html += '		<td>'+$(this).find("user_token").text()+'</td>';
+				
+				$lastlogin = $(this).find("lastlogin").text();
+				if ( $lastlogin == 0 )
+				{
+					$lastlogin = 'noch nie';	
+				}
+				else
+				{
+					var $timestamp=Number($lastlogin)*1000;
+					$lastlogin=new Date($timestamp);
+				}
+				
 				$html += '		<td>'+$lastlogin.toLocaleString()+'</td>';
 				$html += '		<td>';
 				$html += '			<img alt="Als Benutzer einloggen" src="<?php echo PATH; ?>images/icons/24x24/user_accept.png" style="cursor:pointer;" title="Als Benutzer einloggen" onclick="user_switch('+$id_user+');" />';
 				$html += '			<img alt="Benutzerdetails bearbeiten" src="<?php echo PATH; ?>images/icons/24x24/user.png" style="cursor:pointer;" title="Benutzerdetails bearbeiten" onclick="user_edit('+$id_user+');" />';
+				if ( $(this).find("is_gewerbe").text() == 0 )
+				{
+					$html += '			<img alt="Benutzerpasswort ändern" src="<?php echo PATH; ?>images/icons/24x24/process.png" style="cursor:pointer;" title="Passwort ändern" onclick="dialog_user_password_edit('+$id_user+');" />';
+				}
 				$html += '			<img alt="Benutzerseiten bearbeiten" src="<?php echo PATH; ?>images/icons/24x24/users.png" style="cursor:pointer;" title="Benutzerseiten bearbeiten" onclick="user_sites_edit('+$id_user+');" />';
 				$html += '		</td>';
 				$html += '	</tr>';
@@ -236,6 +347,87 @@
 			$("#view").html($html);
 		});
 	}
+	
+	function user_set_active(id_user, is_active)
+	{
+		wait_dialog_show();
+		$.post("<?php echo PATH; ?>soa2/", { API:'cms', APIRequest:'UserActiveSet', id_user:id_user, is_active:is_active }, function($data)
+		{
+			//show_status2($data); return;
+			try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
+			$ack = $xml.find("Ack");
+			if ( $ack.text()!="Success" ) { show_status2($data); return; }
+			
+			wait_dialog_hide();
+			view();
+		});
+	}
+	
+	function dialog_user_password_edit(id_user)
+	{
+		if ($("#dialog_user_password_edit").length == 0)
+		{
+			var dialog_div = $('<div id="dialog_user_password_edit"></div>');
+			$("#content").append(dialog_div);
+		}
+		$("#dialog_user_password_edit").empty();
+		
+		var dialog_content = '<input type="password" id="input_user_password_edit" />';
+		
+		$("#dialog_user_password_edit").append(dialog_content);
+		
+		$("#dialog_user_password_edit").dialog({	
+			buttons:
+			[
+				{ text: "<?php echo t("OK"); ?>", click: function() { user_password_edit(id_user); } },
+				{ text: "<?php echo t("Abbrechen"); ?>", click: function() {$(this).dialog("close");} }
+			],
+			closeText:"<?php echo t("Fenster schließen"); ?>",
+			hide: { effect: 'drop', direction: "up" },
+			modal:true,
+			resizable:false,
+			show: { effect: 'drop', direction: "up" },
+			title:"<?php echo t("Neues Passwort festlegen"); ?>",
+			width:300
+		});	
+	}
+	
+	function user_password_edit(id_user)
+	{
+		$new_password = $("#input_user_password_edit").val(); //prompt("Neues Passwort festlegen", "");
+
+		if ( $new_password !== null )
+		{
+			$where = 'WHERE id_user='+id_user;
+			wait_dialog_show();
+			$.post("<?php echo PATH; ?>soa2/", { API:'cms', APIRequest:'TableDataSelect', table:'cms_users', db:'dbweb', select:'user_salt, password', where:$where }, function($data)
+			{
+				//show_status2($data); return;
+				try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
+				$ack = $xml.find("Ack");
+				if ( $ack.text()!="Success" ) { show_status2($data); return; }
+				
+				$new_password = md5($new_password);
+				$new_password += $xml.find('user_salt').text();
+				$new_password = md5($new_password);
+				$new_password += "<?php print PEPPER; ?>";
+				$new_password = md5($new_password);
+				
+				
+				$.post("<?php echo PATH; ?>soa2/", { API:'cms', APIRequest:'UserChangePassword', id_user:id_user, password:$new_password }, function($data)
+				{
+					//show_status2($data); return;
+					try { $xml = $($.parseXML($data)); } catch ($err) { show_status2($err.message); return; }
+					$ack = $xml.find("Ack");
+					if ( $ack.text()!="Success" ) { show_status2($data); return; }
+					alert($xml.find('message').text());
+				});
+				
+				wait_dialog_hide();
+			});
+		}
+	}
+	
 	$( document ).ready(function() { view(); });
 </script>
 
