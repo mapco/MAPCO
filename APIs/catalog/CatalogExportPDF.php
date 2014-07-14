@@ -8,10 +8,14 @@
  *******************************************************************************/
 
 DEFINE('TCPDF_VERSION', 		'tcpdf_6_0_088');
+DEFINE('TEMPLATE_PATH', 		'templates/');
+DEFINE('TEMPLATE_SET', 		'001_car');
+
+$logoPath = 'mapco_logo_small.png';
 
 // Include the main TCPDF library (search for installation path).
-$realPath = realpath('../vendor/'. TCPDF_VERSION . '/tcpdf.php');
-require_once($realPath);
+require_once('../vendor/' . TCPDF_VERSION . '/tcpdf.php');
+//require_once(TEMPLATE_PATH . TEMPLATE_SET . '/' . TEMPLATE_SET . '_config.php');
 
 // create new PDF document
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -24,7 +28,7 @@ $pdf->SetSubject('Vehicles Data for a special category');
 $pdf->SetKeywords('Category ec');
 
 // set default header data
-$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 061', PDF_HEADER_STRING);
+$pdf->SetHeaderData($logoPath, 15, 'Mapco Katalog für Motorlager', "by Mapco - www.mapco.de");
 
 // set header and footer fonts
 $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));

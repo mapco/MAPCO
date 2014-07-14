@@ -104,9 +104,9 @@ foreach($shopItems as $shopItem)
 	$templateRow = '
 	<tr class="content-list">
 		<td class="description">
-			<span class="keywords-list">' . $keywords . '</span>
-			<span class="vehicles-list">' . $showVehicles . '</span>
-			<span class="criteria-list"><i class="fa fa-info-circle"></i>' . $criteriasList . '</span>
+			<strong>' . $keywords . '</strong><br /><br />
+			' . $showVehicles . '<br /><br />
+			<i class="fa fa-info-circle"></i>Hinweis: ' . $criteriasList . '
 		</td>
 		<td class="center numbers">
 			<span class="mpn"><strong>' . $shopItem['MPN'] . '</strong></span><br /><br />' . $oeNumbers . '

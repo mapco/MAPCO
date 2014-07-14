@@ -1,0 +1,5 @@
+AuthType Basic
+AuthName "Mapco Systems"
+AuthUserFile /var/www/vhosts/mapco.systems/httpdocs/.htpasswd
+Require valid-user
+php_flag display_errors true
