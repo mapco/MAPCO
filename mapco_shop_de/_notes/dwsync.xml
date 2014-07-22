@@ -306,7 +306,7 @@
 <file name="sitemap_oenr_250t.php" server="www.mapco.de/public_html/" local="130344312180000000" remote="130344312180000000" Dst="1" />
 <file name="sitemap_oenr_50t.php" server="www.mapco.de/public_html/" local="130344312280000000" remote="130344312280000000" Dst="1" />
 <file name="test96.php" server="www.mapco.de/public_html/" local="130344463600000000" remote="130344463600000000" Dst="1" />
-<file name="config.php" server="www.mapco.de/public_html/" local="130493717783251817" remote="130493717400000000" Dst="2" />
+<file name="config.php" server="www.mapco.de/public_html/" local="130498017000000000" remote="130498017000000000" Dst="2" />
 <file name="index.php" server="www.mapco.de/public_html/" local="130439386200000000" remote="130439386200000000" Dst="2" />
 <file name="shop_category.php" server="www.mapco.de/public_html/" local="130344300590000000" remote="130344300590000000" Dst="1" />
 <file name="shop_item.php" server="www.mapco.de/public_html/" local="130476552000000000" remote="130476552000000000" Dst="2" />
@@ -389,10 +389,6 @@
 <file name="backend_cms_article_editor_alt.php" server="www.mapco.de/public_html/" local="130344144600000000" remote="130344144600000000" Dst="2" />
 <file name="backend_cms_site_editor.php" server="www.mapco.de/public_html/" local="130480918800000000" remote="130480918800000000" Dst="2" />
 <file name="backend_amazon_feed_submission.php" server="www.mapco.de/public_html/" local="130487614184604107" remote="130488602400000000" Dst="2" />
-<<<<<<< HEAD
-<file name="backend_interna_catalog.php" server="www.mapco.de/public_html/" local="130495507842743252" remote="130495507800000000" Dst="2" />
-<file name="backend_interna_catalog_export.php" server="www.mapco.de/public_html/" local="130495536924606639" remote="130495536600000000" Dst="2" />
-=======
-<file name="backend_interna_catalog.php" server="www.mapco.de/public_html/" local="130488670377765783" remote="130488670200000000" Dst="2" />
->>>>>>> 9bee1381fb04c89b0c2821d7a819ff7e9b33434b
+<file name="backend_interna_catalog.php" server="www.mapco.de/public_html/" local="130499900364394653" remote="130499900400000000" Dst="2" />
+<file name="backend_interna_catalog_export.php" server="www.mapco.de/public_html/" local="130499016066620706" remote="130499016000000000" Dst="2" />
 </dwsync>

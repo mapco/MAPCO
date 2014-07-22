@@ -1,20 +1,22 @@
 <?php
 
-
-						
 //	include("Wartung.php");
 //	exit;
 	include("config.php");
 
-
 	if (!function_exists("startsWith"))
 	{
+		/**
+		 * @param $check
+		 *
+		 * @param $startStr
+		 * @return bool
+		 */
 		function startsWith($check, $startStr)
 		{
 			if (!is_string($check) || !is_string($startStr) || strlen($check)<strlen($startStr)) {
 				return false;
 			}
-	
 			return (substr($check, 0, strlen($startStr)) === $startStr);
 		}
 	}
@@ -199,4 +201,3 @@
 			exit;
 		}
 	}
-?>

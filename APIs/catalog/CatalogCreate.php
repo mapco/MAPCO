@@ -13,18 +13,21 @@
 include("../functions/cms_core.php");
 $templateLoad = 'templates/';
 $templateSet = '001_car';
-$GART = '00247';
 
 // keep post submit
 $post = $_POST;
 
 if (isset($post['action']) && $post['action'] == 'showCatalog')
 {
-	if (isset($post['KHerNr']) && $post['KHerNr'] != null)
+	if (isset($post['KHerNr']) && $post['KHerNr'] != null && isset($post['gart']) && !empty($post['gart']))
 	{
 		$KHerNr = $post['KHerNr'];
+		$GART = $post['gart'];
 	} else {
-		$KHerNr = '00093';
+		//$KHerNr = '00093';
+		//$GART = '00247';
+		echo 'Hurra Hurra so nicht...';
+		exit;
 	}
 
 	//	get shop items by GART (category)
@@ -109,9 +112,11 @@ if (isset($post['action']) && $post['action'] == 'showCatalog')
 		$addWhere = "
 			id_catalog = " . $cmsCatalog['id_catalog'];
 		SQLUpdate('cms_catalog', $data, $addWhere, 'web', __FILE__, __LINE__);
+		$exportLink = '<div><a target="_blank" href="/backend_interna_catalog_export.php?catalogNumber=' . $cmsCatalog['id_catalog'] . '">PDF Export von: ' . $cmsCatalog['filename'] . '</a></div>';
 	} else {
 		$field = array(
-			'table' => 'cms_catalog'
+			'table' => 'cms_catalog',
+			$field['lastInsertId'] = true
 		);
 		$data = array();
 		//	content data
@@ -125,9 +130,11 @@ if (isset($post['action']) && $post['action'] == 'showCatalog')
 		$data['firstmod_user'] = $_SESSION["id_user"];
 		$data['lastmod'] = time();
 		$data['lastmod_user'] = $_SESSION["id_user"];
-		SQLInsert($field, $data, 'web', __FILE__, __LINE__);
+		$lastInsertId = SQLInsert($field, $data, 'web', __FILE__, __LINE__);
+		$exportLink = '<div><a target="_blank" href="/backend_interna_catalog_export.php?catalogNumber=' . $lastInsertId . '">PDF Export von: ' . $data['filename'] . '</a></div>';
 	}
-    echo '<showCatalog><![CDATA[' . $showTemplate . ']]></showCatalog>';
+	$xml = '<showCatalog><![CDATA[' . $exportLink . $showTemplate . ']]></showCatalog>';
+	echo $xml;
 }
 
 function getCssForTable()

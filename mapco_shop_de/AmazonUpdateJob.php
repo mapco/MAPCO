@@ -6,7 +6,7 @@
 	{
 		$method = "POST";
 		$uri = "/";
-		
+
 		//account
 		global $AWSAccessKeyId;
 		global $Marketplace;
@@ -18,7 +18,7 @@
 
 		// Clean up and sort
 		$url = explode('&',$url);
-		
+
 		foreach ($url as $key => $value)
 		{
 			$t = explode("=",$value);
@@ -39,16 +39,16 @@
 
 		// create the string to sign
 		$string_to_sign = $method."\n".$host."\n".$uri."\n".$canonicalized_query;
-		
+
 		// calculate HMAC with SHA256 and base64-encoding
 		$signature = base64_encode(hash_hmac("sha256", $string_to_sign, $SecretKey, true));
-		
+
 		// encode the signature for the request
 		$signature = str_replace("%7E", "~", rawurlencode($signature));
-		
+
 		// create request
 		$url = "https://".$host.$uri."?".$canonicalized_query."&Signature=".$signature;
-		
+
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_USERAGENT, "AmazonQuery/1.0 (Language=Amazon)");
 
@@ -78,7 +78,6 @@
 	}
 
 
-	
 	//get account
 	$results=q("SELECT * FROM amazon_accounts WHERE id_account=1;", $dbshop, __FILE__, __LINE__);
 	if ( mysql_num_rows($results)>0 )
@@ -109,11 +108,11 @@
 		q("UPDATE amazon_products SET lastupdate=".time()." WHERE id_product=".$row["id_product"].";", $dbshop, __FILE__, __LINE__);
 		$results2=q("SELECT * FROM shop_items WHERE id_item=".$row["item_id"].";", $dbshop, __FILE__, __LINE__);
 		$shop_items=mysql_fetch_array($results2);
-		
+
 		$results6=q("SELECT * FROM prpos WHERE ARTNR='".$shop_items["MPN"]."' AND LST_NR=5;", $dbshop, __FILE__, __LINE__);
 		$row6=mysql_fetch_array($results6);
 		$StandardPrice=number_format($row6["POS_0_WERT"]*((100+UST)/100), 2); //mandatory
-		
+
 		$datapost["FeedContent"] .= '
 			<Message>
 				<MessageID>'.($i+1).'</MessageID>
@@ -165,6 +164,6 @@
 		echo 'ERROR:';
 		print_r($array);
 	}
-	
+
 
 ?>

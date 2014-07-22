@@ -69,9 +69,9 @@ foreach($shopItems as $shopItem)
 					} else {
 						if (empty($stringTemp)) 
 						{
-							$showVehicles.= $stringOne . ' ' . $vehicle["BEZ3"] . ', ';
+							$showVehicles.= '<br />' . $stringOne . ' ' . $vehicle["BEZ3"] . ', ';
 						} else {
-							$showVehicles.= '<br />' . $stringOne . ' ' . $vehicle["BEZ3"];
+							$showVehicles.=  '<br />' . $stringOne . ' ' . $vehicle["BEZ3"];
 						}
 					}
 					$stringTemp = $stringOne;
@@ -104,9 +104,9 @@ foreach($shopItems as $shopItem)
 	$templateRow = '
 	<tr class="content-list">
 		<td class="description">
-			<strong>' . $keywords . '</strong><br /><br />
-			' . $showVehicles . '<br /><br />
-			<i class="fa fa-info-circle"></i>Hinweis: ' . $criteriasList . '
+			<strong>' . $keywords . '</strong><br />
+			<i>' . $criteriasList . '</i><br />
+			' . $showVehicles . '
 		</td>
 		<td class="center numbers">
 			<span class="mpn"><strong>' . $shopItem['MPN'] . '</strong></span><br /><br />' . $oeNumbers . '
